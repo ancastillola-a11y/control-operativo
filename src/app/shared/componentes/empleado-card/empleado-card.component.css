@@ -1,0 +1,185 @@
+/* src/app/shared/componentes/empleado-card/empleado-card.component.css */
+
+:host {
+  display: block;
+}
+
+.empleado-card {
+  background: #ffffff;
+  border: 1px solid #edf0f5;
+  border-radius: 18px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px;
+  align-items: center;
+  gap: 9px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+}
+
+.empleado-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.empleado-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 17px;
+  background: #eef4ff;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  color: #1759e8;
+  font-size: 13px;
+  font-weight: 900;
+  flex-shrink: 0;
+  border: 1px solid #dbe8ff;
+}
+
+.empleado-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.empleado-info {
+  min-width: 0;
+}
+
+.codigo-row {
+  margin-bottom: 4px;
+}
+
+.codigo-chip {
+  height: 21px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #1759e8;
+  font-size: 10px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.codigo-chip ion-icon {
+  font-size: 12px;
+  color: #1759e8;
+}
+
+.empleado-info h3 {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empleado-cargo {
+  margin: 3px 0 6px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empleado-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.empleado-meta span {
+  max-width: 150px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.empleado-meta ion-icon {
+  font-size: 12px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.empleado-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.estado-badge {
+  min-width: 64px;
+  height: 25px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.estado-badge.activo {
+  background: #daf5e4;
+  color: #1f9d57;
+}
+
+.estado-badge.inactivo {
+  background: #fde2e2;
+  color: #d63a3a;
+}
+
+.btn-more {
+  width: 36px;
+  height: 34px;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #062b6f;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.btn-more ion-icon {
+  font-size: 21px;
+  color: #062b6f;
+}
+
+.btn-more:active {
+  transform: scale(0.94);
+  background: #eef4ff;
+}
+
+@media (max-width: 360px) {
+  .empleado-card {
+    grid-template-columns: 1fr;
+  }
+
+  .empleado-side {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

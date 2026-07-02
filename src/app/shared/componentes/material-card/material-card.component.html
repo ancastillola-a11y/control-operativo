@@ -1,0 +1,65 @@
+<!-- src/app/shared/componentes/material-card/material-card.component.html -->
+
+<article class="material-card">
+
+  <div class="material-main">
+
+    <div class="material-image">
+      <img
+        *ngIf="material.imagenUrl; else imagenDefault"
+        [src]="material.imagenUrl"
+        alt="Imagen del material"
+      />
+
+      <ng-template #imagenDefault>
+        <span>{{ material.iniciales }}</span>
+      </ng-template>
+    </div>
+
+    <div class="material-info">
+
+      <h3>{{ material.nombre }}</h3>
+
+      <p class="material-categoria">
+        {{ material.categoria }}
+      </p>
+
+      <div class="material-meta">
+
+        <span>
+          <ion-icon name="cube-outline"></ion-icon>
+          {{ material.stockTexto }}
+        </span>
+
+        <span>
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          Mín. {{ material.stockMinimoTexto }}
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="material-side">
+
+    <span
+      class="estado-badge"
+      [ngClass]="material.estadoStock === 'bajo' ? 'bajo' : 'disponible'"
+    >
+      {{ material.estadoTexto }}
+    </span>
+
+    <button
+      type="button"
+      class="btn-more"
+      aria-label="Acciones del material"
+      (click)="abrirAcciones()"
+    >
+      <span class="dots-text">⋮</span>
+    </button>
+
+  </div>
+
+</article>

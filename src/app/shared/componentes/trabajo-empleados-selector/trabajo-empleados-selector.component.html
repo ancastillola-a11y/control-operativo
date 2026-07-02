@@ -1,0 +1,51 @@
+<!-- src/app/shared/componentes/trabajo-empleados-selector/trabajo-empleados-selector.component.html -->
+
+<section class="selector-wrapper">
+
+  <div class="selector-header">
+    <div>
+      <h3>Empleados disponibles</h3>
+      <p>Seleccione uno o más empleados responsables.</p>
+    </div>
+
+    <span>{{ seleccionados.length }} seleccionado(s)</span>
+  </div>
+
+  <div class="selector-list" *ngIf="empleados.length > 0; else sinEmpleados">
+
+    <button
+      type="button"
+      class="empleado-option"
+      *ngFor="let empleado of empleados"
+      [class.selected]="estaSeleccionado(empleado.uid)"
+      (click)="alternarEmpleado(empleado)"
+    >
+
+      <div class="avatar">
+        <span>{{ empleado.iniciales }}</span>
+      </div>
+
+      <div class="info">
+        <h4>{{ empleado.nombreCompleto }}</h4>
+        <p>{{ empleado.cargo }}</p>
+        <small>{{ empleado.usuario }}</small>
+      </div>
+
+      <div class="check">
+        <ion-icon
+          [name]="estaSeleccionado(empleado.uid) ? 'checkmark-circle-outline' : 'ellipse-outline'"
+        ></ion-icon>
+      </div>
+
+    </button>
+
+  </div>
+
+  <ng-template #sinEmpleados>
+    <div class="empty-mini">
+      <ion-icon name="people-outline"></ion-icon>
+      <p>No hay empleados habilitados para asignar.</p>
+    </div>
+  </ng-template>
+
+</section>

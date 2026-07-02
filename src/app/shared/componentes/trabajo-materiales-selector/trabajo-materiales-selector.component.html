@@ -1,0 +1,81 @@
+<!-- src/app/shared/componentes/trabajo-materiales-selector/trabajo-materiales-selector.component.html -->
+
+<section class="selector-wrapper">
+
+  <div class="selector-header">
+    <div>
+      <h3>Materiales disponibles</h3>
+      <p>Seleccione materiales y cantidad a asignar.</p>
+    </div>
+
+    <span>{{ seleccionados.length }} seleccionado(s)</span>
+  </div>
+
+  <div class="selector-list" *ngIf="materiales.length > 0; else sinMateriales">
+
+    <article
+      class="material-option"
+      *ngFor="let material of materiales"
+      [class.selected]="estaSeleccionado(material.uid)"
+    >
+
+      <button
+        type="button"
+        class="material-main"
+        (click)="alternarMaterial(material)"
+      >
+
+        <div class="material-image">
+          <img
+            *ngIf="material.imagenUrl; else inicialesMaterial"
+            [src]="material.imagenUrl"
+            alt="Material"
+          />
+
+          <ng-template #inicialesMaterial>
+            <span>{{ material.iniciales }}</span>
+          </ng-template>
+        </div>
+
+        <div class="info">
+          <h4>{{ material.nombre }}</h4>
+          <p>{{ material.categoria }}</p>
+          <small>Stock: {{ material.stockActual }} {{ material.unidad }}</small>
+        </div>
+
+        <div class="check">
+          <ion-icon
+            [name]="estaSeleccionado(material.uid) ? 'checkmark-circle-outline' : 'ellipse-outline'"
+          ></ion-icon>
+        </div>
+
+      </button>
+
+      <div class="cantidad-box" *ngIf="estaSeleccionado(material.uid)">
+        <label>Cantidad</label>
+
+        <ion-input
+          type="number"
+          inputmode="decimal"
+          min="1"
+          [max]="material.stockActual"
+          [value]="obtenerCantidad(material.uid)"
+          [readonly]="readonly"
+          (ionInput)="cambiarCantidad(material, $event)"
+        ></ion-input>
+
+        <span>{{ material.unidad }}</span>
+      </div>
+
+    </article>
+
+  </div>
+
+  <ng-template #sinMateriales>
+    <div class="empty-mini">
+      <ion-icon name="cube-outline"></ion-icon>
+      <p>No hay materiales con stock disponible.</p>
+    </div>
+  </ng-template>
+
+</section>

@@ -1,0 +1,189 @@
+﻿<!-- src/app/paginas/administrador/gps-admin/gps-admin.page.html -->
+
+<ion-content [fullscreen]="true" class="gps-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas || 0"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <div class="gps-container">
+
+      <section class="gps-title-row">
+        <button
+          type="button"
+          class="btn-back"
+          (click)="volver()"
+        >
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+
+        <div>
+          <h2>Monitoreo GPS</h2>
+          <p>Seguimiento operativo del personal en campo.</p>
+        </div>
+      </section>
+
+      <section class="employee-select-card">
+        <ion-select
+          interface="popover"
+          [value]="vm.empleadoSeleccionadoUid"
+          (ionChange)="cambiarEmpleado($event.detail.value)"
+        >
+          <ion-select-option
+            *ngFor="let empleado of vm.empleadosFiltro"
+            [value]="empleado.uid"
+          >
+            {{ empleado.etiqueta }}
+          </ion-select-option>
+        </ion-select>
+      </section>
+
+      <section class="map-card">
+        <app-gps-live-map
+          [ubicaciones]="vm.ubicacionesFiltradas"
+        ></app-gps-live-map>
+      </section>
+
+      <section
+        class="route-card"
+        *ngIf="vm.empleadoPrincipal"
+      >
+        <div class="route-header">
+          <div>
+            <span>Ruta del empleado al trabajo</span>
+            <h3>
+              {{ vm.empleadoPrincipal.trabajoCodigo || 'Sin trabajo vinculado' }}
+            </h3>
+            <p>
+              {{ vm.empleadoPrincipal.trabajoTitulo || vm.empleadoPrincipal.direccionTexto || 'Destino no registrado' }}
+            </p>
+          </div>
+
+          <ion-icon name="map-outline"></ion-icon>
+        </div>
+
+        <div class="route-metrics">
+
+          <article>
+            <ion-icon name="navigate-outline"></ion-icon>
+            <span>Distancia</span>
+            <strong>{{ obtenerDistanciaTexto(vm.empleadoPrincipal) }}</strong>
+          </article>
+
+          <article>
+            <ion-icon name="time-outline"></ion-icon>
+            <span>Tiempo</span>
+            <strong>{{ obtenerTiempoTexto(vm.empleadoPrincipal) }}</strong>
+          </article>
+
+          <article>
+            <ion-icon name="navigate-outline"></ion-icon>
+            <span>Velocidad</span>
+            <strong>{{ obtenerVelocidadTexto(vm.empleadoPrincipal) }}</strong>
+          </article>
+
+        </div>
+
+        <button
+          type="button"
+          class="btn-route"
+          [disabled]="!tieneRuta(vm.empleadoPrincipal)"
+          (click)="abrirRutaGoogleMaps(vm.empleadoPrincipal)"
+        >
+          <ion-icon name="map-outline"></ion-icon>
+          <span>Abrir ruta en Google Maps</span>
+        </button>
+
+      </section>
+
+      <section
+        class="employee-card"
+        *ngIf="vm.empleadoPrincipal; else sinGps"
+      >
+        <div class="employee-avatar">
+          <img
+            *ngIf="vm.empleadoPrincipal.empleadoFotoUrl; else avatarDefault"
+            [src]="vm.empleadoPrincipal.empleadoFotoUrl"
+            alt="Empleado"
+          />
+
+          <ng-template #avatarDefault>
+            <span>E</span>
+          </ng-template>
+        </div>
+
+        <div class="employee-info">
+          <h3>{{ vm.empleadoPrincipal.empleadoNombre }}</h3>
+          <p>{{ vm.empleadoPrincipal.empleadoRol || 'Técnico operativo' }}</p>
+
+          <span
+            class="status-pill"
+            [class.warning]="vm.empleadoPrincipal.estado === 'sin_senal'"
+            [class.inactive]="vm.empleadoPrincipal.estado === 'inactivo'"
+          >
+            {{ obtenerEstadoTexto(vm.empleadoPrincipal) }}
+          </span>
+
+          <small>
+            Última actualización:
+            {{ obtenerHoraTexto(vm.empleadoPrincipal) }}
+          </small>
+        </div>
+      </section>
+
+      <ng-template #sinGps>
+        <section class="empty-gps-card">
+          <ion-icon name="location-outline"></ion-icon>
+
+          <h3>Sin ubicaciones GPS</h3>
+
+          <p *ngIf="vm.empleadoSeleccionado; else textoGeneral">
+            {{ vm.empleadoSeleccionado.nombreCompleto }} todaví­a no tiene ubicación GPS activa.
+          </p>
+
+          <ng-template #textoGeneral>
+            <p>
+              Los trabajadores aparecerán en el mapa cuando activen su ubicación desde el aplicativo.
+            </p>
+          </ng-template>
+        </section>
+      </ng-template>
+
+      <section class="gps-metrics">
+
+        <div class="metric-card">
+          <span>Trabajadores</span>
+          <strong>{{ vm.empleadosFiltro.length - 1 }}</strong>
+        </div>
+
+        <div class="metric-card">
+          <span>Con GPS activo</span>
+          <strong>{{ vm.totalActivos }}</strong>
+        </div>
+
+        <div class="metric-card">
+          <span>Sin señal</span>
+          <strong>{{ vm.totalSinSenal }}</strong>
+        </div>
+
+      </section>
+
+    </div>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="mas"></app-admin-bottom-nav>
+
+</ion-content>
+
+

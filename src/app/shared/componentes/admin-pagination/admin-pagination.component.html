@@ -1,0 +1,33 @@
+<!-- src/app/shared/componentes/admin-pagination/admin-pagination.component.html -->
+
+<section class="pagination-section">
+
+  <button
+    type="button"
+    class="page-btn"
+    (click)="emitirAnterior()"
+    [disabled]="paginaActual === 1"
+  >
+    <ion-icon name="chevron-back-outline"></ion-icon>
+  </button>
+
+  <button
+    type="button"
+    class="page-number"
+    *ngFor="let pagina of paginas"
+    [class.active]="pagina === paginaActual"
+    (click)="emitirPagina(pagina)"
+  >
+    {{ pagina }}
+  </button>
+
+  <button
+    type="button"
+    class="page-btn"
+    (click)="emitirSiguiente()"
+    [disabled]="paginaActual === totalPaginas"
+  >
+    <ion-icon name="chevron-forward-outline"></ion-icon>
+  </button>
+
+</section>

@@ -1,0 +1,322 @@
+/* src/app/paginas/auth/login-empleado/login-empleado.page.css */
+
+ion-content.login-root,
+ion-content.login-rol-root {
+  --background: #f5f7fa;
+}
+
+.login-wrapper {
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px 40px;
+  background: #f5f7fa;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.btn-volver {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #087b2d;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-volver ion-icon {
+  font-size: 20px;
+}
+
+.login-header {
+  width: 100%;
+  max-width: 380px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.header-logo-area,
+.login-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.header-texto,
+.login-header div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.empresa-nombre {
+  font-size: 16px;
+  font-weight: 700;
+  color: #101828;
+}
+
+.empresa-subtitulo {
+  font-size: 11px;
+  color: #667085;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px 24px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08), 0 4px 16px rgba(16, 24, 40, 0.06);
+  box-sizing: border-box;
+}
+
+.rol-icon {
+  display: none;
+}
+
+.card-titulo,
+.login-card h2 {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  color: #101828;
+  margin: 0;
+}
+
+.card-descripcion,
+.login-card p {
+  font-size: 13px;
+  color: #667085;
+  text-align: center;
+  margin: 8px 0 24px;
+  line-height: 1.45;
+}
+
+.campo-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.campo-etiqueta,
+.campo-bloque label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #101828;
+}
+
+.campo-caja {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  height: 44px;
+  padding: 0 12px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.campo-caja:focus-within {
+  border-color: #087b2d;
+  box-shadow: 0 0 0 3px rgba(8, 123, 45, 0.12);
+}
+
+.campo-caja.error {
+  border-color: #d92d20;
+}
+
+.campo-caja.error:focus-within {
+  box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.12);
+}
+
+.campo-icono-iz,
+.campo-caja ion-icon {
+  font-size: 18px;
+  color: #667085;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.campo-input,
+.campo-caja input {
+  flex: 1;
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #101828;
+  background: transparent;
+  height: 100%;
+}
+
+.btn-ojo {
+  background: none;
+  border: none;
+  padding-left: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.btn-ojo ion-icon {
+  font-size: 18px;
+  color: #667085;
+  margin: 0;
+}
+
+.login-opciones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.recordarme-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #101828;
+  cursor: pointer;
+}
+
+.recordarme-label ion-checkbox,
+.recordarme-label ion-checkbox.checkbox-custom {
+  --size: 16px;
+  --checkbox-background-checked: #087b2d;
+  --border-color: #d0d5dd;
+  --border-radius: 4px;
+}
+
+.btn-olvide,
+.btn-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  color: #087b2d;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-ingresar {
+  width: 100%;
+  height: 48px;
+  background: #087b2d;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-ingresar:hover:not(:disabled) {
+  background: #066a27;
+}
+
+.btn-ingresar:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-ingresar:disabled,
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.card-pie {
+  text-align: center;
+  font-size: 13px;
+  color: #667085;
+  margin-top: 18px;
+}
+
+.link-contacto {
+  color: #087b2d;
+  font-weight: 500;
+  cursor: pointer;
+}
+/* FIX APK RESPONSIVE SIN CAMBIAR DISEÑO */
+ion-content.login-rol-root {
+  --background: #f5f7fa;
+  --overflow: auto;
+}
+
+.login-wrapper {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  height: auto;
+  padding-top: calc(54px + env(safe-area-inset-top));
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+.btn-volver {
+  top: calc(16px + env(safe-area-inset-top));
+  z-index: 50;
+}
+
+.btn-volver ion-icon,
+.campo-caja ion-icon,
+.btn-ojo ion-icon {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.campo-caja input {
+  min-width: 0;
+}
+
+@media (max-height: 720px) {
+  .login-wrapper {
+    justify-content: flex-start;
+    padding-top: calc(58px + env(safe-area-inset-top));
+  }
+
+  .login-header {
+    margin-bottom: 14px;
+  }
+
+  .login-card {
+    padding-top: 22px;
+    padding-bottom: 22px;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-wrapper {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .login-opciones {
+    gap: 8px;
+  }
+
+  .btn-link,
+  .recordarme-label {
+    font-size: 12px;
+  }
+}

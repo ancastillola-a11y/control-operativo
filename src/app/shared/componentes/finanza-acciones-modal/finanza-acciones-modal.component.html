@@ -1,0 +1,114 @@
+<!-- src/app/shared/componentes/finanza-acciones-modal/finanza-acciones-modal.component.html -->
+
+<div class="acciones-panel">
+
+  <div class="modal-bar"></div>
+
+  <header class="acciones-header">
+
+    <div class="finanza-avatar">
+      <ion-icon [name]="icono"></ion-icon>
+    </div>
+
+    <div class="finanza-info">
+      <h2>{{ titulo }}</h2>
+      <p>{{ subtitulo }}</p>
+
+      <span [ngClass]="movimiento.estadoClase">
+        {{ movimiento.estadoTexto }}
+      </span>
+    </div>
+
+    <button
+      type="button"
+      class="btn-close"
+      (click)="cancelar()"
+    >
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+
+  </header>
+
+  <section class="resumen-box">
+
+    <article>
+      <span>Total</span>
+      <strong>{{ movimiento.montoTotalTexto }}</strong>
+    </article>
+
+    <article>
+      <span>Pagado</span>
+      <strong>{{ movimiento.montoPagadoTexto }}</strong>
+    </article>
+
+    <article>
+      <span>Pendiente</span>
+      <strong>{{ movimiento.saldoPendienteTexto }}</strong>
+    </article>
+
+    <article>
+      <span>Seguimiento</span>
+      <strong>{{ movimiento.codigoSeguimiento }}</strong>
+    </article>
+
+  </section>
+
+  <section class="acciones-lista">
+
+    <button
+      *ngIf="!estaCerrado"
+      type="button"
+      class="accion-item"
+      (click)="seleccionar('cerrar')"
+    >
+      <div class="accion-icon cerrar">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+      </div>
+
+      <div class="accion-text">
+        <h3>{{ cerrarTexto }}</h3>
+        <p>{{ cerrarDescripcion }}</p>
+      </div>
+
+      <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+    </button>
+<button
+  *ngIf="movimiento.tipo === 'cobro_cliente' && movimiento.estado !== 'anulado'"
+  type="button"
+  class="accion-item"
+  (click)="seleccionar('sincronizar_trabajo')"
+>
+  <div class="accion-icon cerrar">
+    <ion-icon name="cash-outline"></ion-icon>
+  </div>
+
+  <div class="accion-text">
+    <h3>Actualizar monto del trabajo</h3>
+    <p>
+      Cambia el monto del trabajo a {{ movimiento.montoTotalTexto }}.
+    </p>
+  </div>
+
+  <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+</button>
+    <button
+      *ngIf="movimiento.estado !== 'anulado'"
+      type="button"
+      class="accion-item danger"
+      (click)="seleccionar('anular')"
+    >
+      <div class="accion-icon anular">
+        <ion-icon name="ban-outline"></ion-icon>
+      </div>
+
+      <div class="accion-text">
+        <h3>Anular movimiento</h3>
+        <p>El movimiento no se contará como pendiente ni como cerrado.</p>
+      </div>
+
+      <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+    </button>
+
+  </section>
+
+</div>

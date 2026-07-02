@@ -1,0 +1,284 @@
+/* src/app/paginas/trabajos/codigos-seguridad/codigos-seguridad.page.css */
+
+:host {
+  display: block;
+}
+
+ion-content.codigos-root {
+  --background: var(--color-page-outside);
+}
+
+.codigos-container {
+  width: 100%;
+  max-width: var(--app-width);
+  min-height: calc(100vh - 76px);
+  margin: 0 auto;
+  padding: 12px 14px 94px;
+  background: var(--color-background);
+}
+
+.back-row {
+  border: none;
+  background: transparent;
+  padding: 2px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-primary);
+  font-family: var(--font-main);
+}
+
+.back-row ion-icon {
+  font-size: 20px;
+}
+
+.back-row span {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.module-title-card {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  border-radius: 18px;
+  padding: 15px;
+  color: #ffffff;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-button);
+}
+
+.module-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.16);
+  display: grid;
+  place-items: center;
+}
+
+.module-icon ion-icon {
+  font-size: 25px;
+}
+
+.module-title-card span {
+  font-size: 10px;
+  font-weight: 900;
+  color: #ffd166;
+}
+
+.module-title-card h2 {
+  margin: 2px 0 0;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.module-title-card p {
+  margin: 4px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.selector-card,
+.tabs-card,
+.info-card,
+.empty-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 12px;
+}
+
+.selector-card {
+  padding: 13px;
+}
+
+.selector-card label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.select-card {
+  --background: #ffffff;
+  --border-radius: 11px;
+  --min-height: 43px;
+  --padding-start: 12px;
+  --inner-padding-end: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+}
+
+.select-card ion-select {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.trabajo-resumen {
+  margin-top: 10px;
+  padding: 11px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.trabajo-resumen h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.trabajo-resumen p {
+  margin: 3px 0 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.trabajo-resumen span {
+  display: inline-flex;
+  margin-top: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.trabajo-resumen strong {
+  min-width: 76px;
+  height: 25px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trabajo-resumen strong.pendiente {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.trabajo-resumen strong.camino,
+.trabajo-resumen strong.proceso {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.trabajo-resumen strong.finalizado,
+.trabajo-resumen strong.devolucion {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.trabajo-resumen strong.cancelado {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+.tabs-card {
+  padding: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.tabs-card button {
+  height: 38px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-main);
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.tabs-card button.active {
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-button);
+}
+
+.codigo-section {
+  margin-bottom: 12px;
+}
+
+.info-card {
+  padding: 12px;
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  background: var(--color-primary-soft);
+  border-color: #dbe8ff;
+}
+
+.info-card ion-icon {
+  font-size: 19px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.info-card p {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.empty-card {
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.empty-card ion-icon {
+  font-size: 42px;
+  color: var(--color-primary);
+}
+
+.empty-card h3 {
+  margin: 10px 0 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--color-text);
+}
+
+.empty-card p {
+  margin: 6px 0 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.empty-card button {
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+@media (max-width: 360px) {
+  .trabajo-resumen {
+    grid-template-columns: 1fr;
+  }
+}

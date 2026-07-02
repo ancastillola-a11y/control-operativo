@@ -1,0 +1,242 @@
+/* src/app/shared/componentes/finanza-acciones-modal/finanza-acciones-modal.component.css */
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  font-family: var(--font-main);
+}
+
+.acciones-panel {
+  width: 100%;
+  min-height: 100%;
+  background: #f5f7fb;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 10px 14px 18px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.modal-bar {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: #cbd5e1;
+  margin: 0 auto 14px;
+}
+
+.acciones-header {
+  background: linear-gradient(135deg, #062b6f, #0b3d91);
+  border-radius: 18px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 36px;
+  gap: 12px;
+  align-items: center;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.finanza-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.16);
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+}
+
+.finanza-avatar ion-icon {
+  font-size: 25px;
+}
+
+.finanza-info {
+  min-width: 0;
+}
+
+.finanza-info h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.finanza-info p {
+  margin: 3px 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffd166;
+}
+
+.finanza-info span {
+  display: inline-flex;
+  height: 22px;
+  padding: 0 9px;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.finanza-info span.pendiente,
+.finanza-info span.parcial {
+  background: #fff4d6;
+  color: #b77900;
+}
+
+.finanza-info span.cobrado,
+.finanza-info span.pagado {
+  background: #daf5e4;
+  color: #1f9d57;
+}
+
+.finanza-info span.anulado {
+  background: #fde2e2;
+  color: #d63a3a;
+}
+
+.btn-close {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+}
+
+.btn-close ion-icon {
+  font-size: 22px;
+}
+
+.resumen-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-bottom: 12px;
+}
+
+.resumen-box article {
+  min-height: 58px;
+  background: #ffffff;
+  border: 1px solid #e6ebf3;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+  box-sizing: border-box;
+}
+
+.resumen-box span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.resumen-box strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 900;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.acciones-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.accion-item {
+  width: 100%;
+  border: 1px solid #e6ebf3;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 20px;
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+  font-family: var(--font-main);
+}
+
+.accion-item:active {
+  transform: scale(0.985);
+}
+
+.accion-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+}
+
+.accion-icon ion-icon {
+  font-size: 21px;
+}
+
+.accion-icon.cerrar {
+  background: #eafaf0;
+  color: #1f9d57;
+}
+
+.accion-icon.anular {
+  background: #ffecec;
+  color: #d63a3a;
+}
+
+.accion-text {
+  min-width: 0;
+}
+
+.accion-text h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.accion-text p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1.25;
+}
+
+.accion-item.danger .accion-text h3 {
+  color: #b42318;
+}
+
+.arrow {
+  color: #94a3b8;
+  font-size: 17px;
+}
+
+@media (max-width: 360px) {
+  .resumen-box {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones-header {
+    grid-template-columns: 44px minmax(0, 1fr) 34px;
+  }
+
+  .finanza-avatar {
+    width: 44px;
+    height: 44px;
+  }
+}

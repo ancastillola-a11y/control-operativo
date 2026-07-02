@@ -1,0 +1,165 @@
+/* src/app/shared/componentes/osm-map-picker/osm-map-picker.component.css */
+
+:host {
+  display: block;
+  font-family: var(--font-main);
+}
+
+.osm-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.osm-toolbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn-search-location,
+.btn-save-location {
+  height: 40px;
+  border: none;
+  border-radius: 12px;
+  font-family: var(--font-main);
+  font-size: 11.5px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-search-location {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.btn-save-location {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid #c7f0d5;
+}
+
+.btn-search-location:disabled {
+  opacity: 0.65;
+}
+
+.btn-search-location ion-icon,
+.btn-save-location ion-icon {
+  font-size: 17px;
+}
+
+.osm-map-box {
+  position: relative;
+  width: 100%;
+  height: 245px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: #e2e8f0;
+}
+
+.osm-map {
+  width: 100%;
+  height: 100%;
+}
+
+.btn-center-map {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  height: 34px;
+  padding: 0 13px;
+  border: none;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--color-primary);
+  font-family: var(--font-main);
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+  z-index: 500;
+}
+
+.osm-selected,
+.osm-message {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  border-radius: 13px;
+  padding: 10px;
+}
+
+.osm-selected {
+  background: var(--color-success-bg);
+  border: 1px solid #c7f0d5;
+}
+
+.osm-message {
+  background: var(--color-primary-soft);
+  border: 1px solid #dbe8ff;
+}
+
+.osm-selected ion-icon {
+  color: var(--color-success);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.osm-message ion-icon {
+  color: var(--color-primary);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.osm-selected strong {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.osm-selected span,
+.osm-message span {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+
+:host ::ng-deep .osm-custom-marker {
+  background: transparent;
+  border: none;
+}
+
+:host ::ng-deep .osm-pin {
+  width: 24px;
+  height: 24px;
+  background: var(--color-primary);
+  border: 3px solid #ffffff;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.35);
+}
+
+:host ::ng-deep .osm-pin::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+  border-radius: 50%;
+  top: 5px;
+  left: 5px;
+}
+
+@media (max-width: 360px) {
+  .osm-toolbar {
+    grid-template-columns: 1fr;
+  }
+}

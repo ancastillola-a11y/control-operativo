@@ -1,0 +1,83 @@
+<!-- src/app/paginas/auth/seleccion-usuario/seleccion-usuario.page.html -->
+
+<ion-content [fullscreen]="true" class="seleccion-root">
+
+  <main class="pantalla-login">
+
+    <!-- HERO SUPERIOR -->
+    <section class="hero">
+      <div class="hero-overlay"></div>
+
+      <img
+        src="assets/img/logo.png"
+        alt="Logo Comproy SAC"
+        class="logo"
+      />
+
+      <h1>COMPROY S.A.C.</h1>
+      <p>Consultoría Obras y Mantenimiento de Proyectos S.A.C.</p>
+    </section>
+
+    <!-- PANEL PRINCIPAL -->
+    <section class="panel">
+
+      <h2>Bienvenido</h2>
+
+      <p class="descripcion">
+        Seleccione el tipo de usuario con el que desea ingresar
+      </p>
+
+      <!-- OPCIÓN ADMINISTRADOR -->
+      <button
+        type="button"
+        class="opcion"
+        (click)="seleccionarRol('admin')"
+      >
+        <img
+          src="assets/img/admin.png"
+          alt="Administrador"
+          class="opcion-img"
+        />
+
+        <div class="texto">
+          <h3>Administrador</h3>
+          <p>Acceso completo al sistema para gestión y administración.</p>
+        </div>
+
+        <div class="flecha">›</div>
+      </button>
+
+      <!-- OPCIÓN EMPLEADO -->
+      <button
+        type="button"
+        class="opcion"
+        (click)="seleccionarRol('empleado')"
+      >
+        <img
+          src="assets/img/empleado.png"
+          alt="Empleado"
+          class="opcion-img"
+        />
+
+        <div class="texto">
+          <h3>Empleado</h3>
+          <p>Acceso a funciones operativas asignadas en campo.</p>
+        </div>
+
+        <div class="flecha">›</div>
+      </button>
+
+      <!-- NOTA INFERIOR -->
+      <div class="nota">
+        <div class="nota-icono">i</div>
+
+        <p>
+          Cada usuario tiene permisos y funciones según su rol dentro de la empresa.
+        </p>
+      </div>
+
+    </section>
+
+  </main>
+
+</ion-content>

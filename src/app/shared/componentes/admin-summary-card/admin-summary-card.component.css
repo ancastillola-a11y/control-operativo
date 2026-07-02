@@ -1,0 +1,66 @@
+/* src/app/shared/componentes/admin-summary-card/admin-summary-card.component.css */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.summary-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-height: 86px;
+  box-shadow: var(--shadow-card);
+}
+
+.summary-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+}
+
+.summary-icon ion-icon {
+  font-size: 18px;
+}
+
+.summary-info span {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.summary-info strong {
+  display: block;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.summary-card.total .summary-icon,
+.summary-card.primary .summary-icon {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.summary-card.success .summary-icon {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.summary-card.danger .summary-icon {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+.summary-card.warning .summary-icon {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}

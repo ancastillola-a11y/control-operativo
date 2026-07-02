@@ -1,0 +1,387 @@
+/* src/app/shared/componentes/empleado-form-modal/empleado-form-modal.component.css */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-background);
+  font-family: var(--font-main);
+}
+
+/* HEADER */
+
+.modal-header ion-toolbar {
+  --background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-hover)
+  );
+  --color: #ffffff;
+  --min-height: 86px;
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+.modal-toolbar-content {
+  min-height: 86px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modal-title-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.modal-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.modal-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-title-text {
+  min-width: 0;
+}
+
+.modal-title-text h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-title-text p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffd166;
+  line-height: 1.25;
+}
+
+.btn-close {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.13);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.btn-close ion-icon {
+  font-size: 22px;
+}
+
+/* CONTENT */
+
+.modal-content {
+  --background: var(--color-background);
+  flex: 1;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 14px 14px 18px;
+}
+
+.form-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.form-section-title ion-icon {
+  font-size: 17px;
+  color: var(--color-primary);
+}
+
+/* FOTO */
+
+.foto-card {
+  border-color: #d9e6ff;
+  background: #f8fbff;
+}
+
+.foto-box {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.foto-preview {
+  width: 78px;
+  height: 78px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #eef4ff;
+  border: 1px solid #dbe8ff;
+  display: grid;
+  place-items: center;
+}
+
+.foto-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.foto-empty {
+  display: grid;
+  place-items: center;
+  gap: 3px;
+  color: var(--color-primary);
+  font-weight: 900;
+}
+
+.foto-empty ion-icon {
+  font-size: 23px;
+}
+
+.foto-empty span {
+  font-size: 13px;
+}
+
+.foto-actions {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.foto-input {
+  display: none;
+}
+
+.btn-foto,
+.btn-quitar-foto {
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-main);
+}
+
+.btn-foto {
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-button);
+}
+
+.btn-quitar-foto {
+  background: #ffecec;
+  color: #d63a3a;
+}
+
+.btn-foto ion-icon,
+.btn-quitar-foto ion-icon {
+  font-size: 16px;
+}
+
+.foto-actions small {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  line-height: 1.25;
+}
+
+/* CAMPOS */
+
+.field-group {
+  margin-bottom: 12px;
+}
+
+.field-group:last-child {
+  margin-bottom: 0;
+}
+
+.field-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.field-group small {
+  display: block;
+  margin-top: 5px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.25;
+}
+
+ion-item.input-card {
+  --background: #ffffff;
+  --border-radius: 10px;
+  --min-height: 44px;
+  --padding-start: 12px;
+  --inner-padding-end: 10px;
+  --highlight-height: 0;
+
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+ion-item.input-card:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(26, 62, 140, 0.12);
+}
+
+ion-item.input-card ion-input {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.info-box {
+  background: var(--color-primary-soft);
+  border: 1px solid #d9e6ff;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.info-box ion-icon {
+  font-size: 18px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.info-box p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* BOTONES */
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 2px;
+  padding-bottom: 4px;
+}
+
+.btn-cancelar,
+.btn-guardar {
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-main);
+}
+
+.btn-cancelar {
+  background: #ffffff;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.btn-guardar {
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-button);
+}
+
+.btn-guardar ion-icon {
+  font-size: 17px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 380px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .foto-box {
+    grid-template-columns: 70px 1fr;
+    gap: 10px;
+  }
+
+  .foto-preview {
+    width: 70px;
+    height: 70px;
+    border-radius: 18px;
+  }
+
+  .modal-title-text h2 {
+    font-size: 16px;
+  }
+
+  .modal-title-text p {
+    font-size: 10.5px;
+  }
+}

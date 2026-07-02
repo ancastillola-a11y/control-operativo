@@ -1,0 +1,128 @@
+<!-- src/app/paginas/administrador/dashboard-admin/dashboard-admin.page.html -->
+<ion-content [fullscreen]="true" class="admin-root">
+
+  <ng-container *ngIf="vm$ | async as vm; else cargandoDashboard">
+
+    <div class="admin-container" @fadeIn>
+
+      <!-- HEADER REUTILIZABLE -->
+      <app-admin-header
+        [nombre]="
+          vm.administrador.nombres ||
+          vm.administrador.usuario ||
+          vm.administrador.correo ||
+          'Administrador'
+        "
+        [rol]="'Administrador'"
+        [fotoUrl]="vm.administrador.fotoUrl || ''"
+        [notificaciones]="vm.resumen.notificacionesNoLeidas"
+        (menuClick)="abrirMenu()"
+        (notificacionesClick)="abrirNotificaciones()"
+        (perfilClick)="abrirPerfil()"
+      ></app-admin-header>
+
+      <!-- TARJETA DE EMPRESA -->
+      <section class="company-card">
+
+        <div class="company-left">
+          <div class="company-logo">
+            <img
+              [src]="vm.empresa.logoUrl || 'assets/img/admin/logo-empresa.png'"
+              alt="Logo"
+            />
+          </div>
+
+          <div class="company-info">
+            <h2>{{ vm.empresa.nombre }}</h2>
+            <p>{{ vm.empresa.rubro }}</p>
+            <span>{{ vm.empresa.detalle }}</span>
+          </div>
+        </div>
+
+        <div class="company-date" *ngIf="reloj$ | async as reloj">
+          <div class="date-line">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>{{ reloj.fechaTexto }}</span>
+          </div>
+
+          <p>{{ reloj.horaTexto }}</p>
+        </div>
+
+      </section>
+
+      <!-- BANNER PRINCIPAL -->
+      <section class="monitor-card">
+
+        <div class="monitor-text">
+          <h2>Control y monitoreo en tiempo real</h2>
+          <p>Gestiona almacén, trabajos y personal en campo.</p>
+
+          <button type="button" class="btn-map" (click)="abrirMapa()">
+            Ver mapa
+          </button>
+        </div>
+
+        <div class="monitor-image">
+          <img
+            [src]="vm.empresa.bannerUrl || 'assets/img/admin/banner-obrero.png'"
+            alt="Monitoreo"
+          />
+        </div>
+
+      </section>
+
+      <!-- MÓDULOS PRINCIPALES -->
+      <section class="modules-section">
+
+        <h3>Módulos principales</h3>
+
+        <div class="modules-grid">
+
+          <button
+            type="button"
+            class="module-card"
+            *ngFor="let modulo of vm.modulos; trackBy: trackByModulo"
+            (click)="abrirModulo(modulo)"
+          >
+
+            <div class="module-icon">
+              <img
+                [src]="modulo.iconoUrl"
+                [alt]="modulo.titulo"
+              />
+
+              <span
+                class="module-badge"
+                *ngIf="modulo.badgeValor > 0"
+              >
+                {{ modulo.badgeValor }}
+              </span>
+            </div>
+
+            <p>{{ modulo.titulo }}</p>
+
+          </button>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </ng-container>
+
+  <!-- ESTADO DE CARGA -->
+  <ng-template #cargandoDashboard>
+    <div class="admin-container">
+      <div class="empty-state">
+        <ion-icon name="hourglass-outline"></ion-icon>
+        <h3>Cargando panel administrativo...</h3>
+        <p>Espere un momento.</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- FOOTER / BARRA INFERIOR REUTILIZABLE -->
+  <app-admin-bottom-nav activo="inicio"></app-admin-bottom-nav>
+
+</ion-content>

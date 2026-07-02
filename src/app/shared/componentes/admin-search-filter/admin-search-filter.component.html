@@ -1,0 +1,23 @@
+<!-- src/app/shared/componentes/admin-search-filter/admin-search-filter.component.html -->
+
+<section class="control-card">
+
+  <div class="search-box">
+    <ion-icon name="search-outline"></ion-icon>
+
+    <ion-input
+      [placeholder]="placeholder"
+      (ionInput)="emitirBusqueda($event)"
+    ></ion-input>
+  </div>
+
+  <button type="button" class="btn-filtro" (click)="abrirFiltro()">
+    <div>
+      <span>Filtro</span>
+      <strong>{{ textoFiltro }}</strong>
+    </div>
+
+    <ion-icon name="filter-outline"></ion-icon>
+  </button>
+
+</section>

@@ -1,0 +1,127 @@
+/* src/app/shared/componentes/admin-header/admin-header.component.css */
+
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: block;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  background: #f5f7fa;
+}
+
+.top-header {
+  width: 100%;
+  height: 76px;
+  background: linear-gradient(135deg, #062b6f, #0b3d91);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 14px 12px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.header-btn,
+.profile-btn {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: manipulation;
+  position: relative;
+}
+
+.header-btn {
+  width: 34px;
+  height: 34px;
+}
+
+.header-btn ion-icon {
+  display: block;
+  font-size: 28px;
+  color: currentColor;
+  pointer-events: none;
+}
+
+.welcome-box {
+  flex: 1;
+  min-width: 0;
+}
+
+.welcome-box h1 {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.welcome-box p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffd166;
+}
+
+.notification-btn {
+  z-index: 20;
+  overflow: visible;
+}
+
+.notification-btn ion-icon {
+  font-size: 23px;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: #f04438;
+  color: #ffffff;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  border: 2px solid #062b6f;
+  pointer-events: none !important;
+  user-select: none;
+  z-index: 1;
+}
+
+.profile-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-btn ion-icon {
+  display: block;
+  font-size: 31px;
+  color: currentColor;
+  pointer-events: none;
+}
+
+.profile-btn img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}

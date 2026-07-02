@@ -1,0 +1,168 @@
+/* src/app/shared/componentes/material-card/material-card.component.css */
+
+:host {
+  display: block;
+  font-family: var(--font-main);
+}
+
+.material-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 11px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 78px;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-card);
+}
+
+.material-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.material-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  background: var(--color-primary-soft);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 1px solid #dbe8ff;
+}
+
+.material-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.material-info {
+  min-width: 0;
+}
+
+.material-info h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.material-categoria {
+  margin: 3px 0 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.material-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.material-meta span {
+  max-width: 145px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 9.8px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.material-meta ion-icon {
+  font-size: 12px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.material-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.estado-badge {
+  min-width: 74px;
+  height: 25px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 9.8px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.estado-badge.disponible {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.estado-badge.bajo {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+.btn-more {
+  width: 36px;
+  height: 34px;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.dots-text {
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.btn-more:active {
+  transform: scale(0.94);
+  background: var(--color-primary-soft);
+}
+
+@media (max-width: 360px) {
+  .material-card {
+    grid-template-columns: 1fr;
+  }
+
+  .material-side {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

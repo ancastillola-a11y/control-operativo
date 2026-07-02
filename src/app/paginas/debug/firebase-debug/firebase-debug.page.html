@@ -1,0 +1,74 @@
+<!-- src/app/paginas/debug/firebase-debug/firebase-debug.page.html -->
+
+<ion-content [fullscreen]="true" class="debug-root">
+
+  <div class="debug-container">
+
+    <section class="debug-header">
+      <div>
+        <h1>Diagnóstico Firebase</h1>
+        <p>Materiales, stock bajo, notificaciones, movimientos e historial.</p>
+      </div>
+
+      <button
+        type="button"
+        class="btn-back"
+        (click)="volverDashboard()"
+      >
+        Volver
+      </button>
+    </section>
+
+    <section class="actions-row">
+<button
+  type="button"
+  class="btn-warning"
+  (click)="sincronizarAlertasStockBajo()"
+  [disabled]="cargando"
+>
+  Sincronizar alertas stock bajo
+</button>
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="generarDiagnostico()"
+        [disabled]="cargando"
+      >
+        {{ cargando ? 'Revisando...' : 'Actualizar diagnóstico' }}
+      </button>
+
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="copiarResultado()"
+        [disabled]="!resultadoTexto"
+      >
+        Copiar resultado
+      </button>
+
+    </section>
+
+    <section class="summary-card" *ngIf="resumenTexto">
+      <h2>Resumen rápido</h2>
+      <pre>{{ resumenTexto }}</pre>
+    </section>
+
+    <section class="result-card">
+      <h2>Resultado completo</h2>
+
+      <p class="hint">
+        Copia este resultado completo y pégalo en el chat.
+      </p>
+
+      <pre *ngIf="resultadoTexto; else sinResultado">{{ resultadoTexto }}</pre>
+
+      <ng-template #sinResultado>
+        <div class="empty">
+          No hay diagnóstico generado.
+        </div>
+      </ng-template>
+    </section>
+
+  </div>
+
+</ion-content>

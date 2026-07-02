@@ -1,0 +1,39 @@
+/* src/app/shared/componentes/admin-pagination/admin-pagination.component.css */
+
+:host {
+  display: block;
+}
+
+.pagination-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.page-btn,
+.page-number {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #dfe5ef;
+  background: #ffffff;
+  border-radius: 10px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-btn:disabled {
+  opacity: 0.45;
+}
+
+.page-number.active {
+  background: #1759e8;
+  border-color: #1759e8;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(23, 89, 232, 0.22);
+}

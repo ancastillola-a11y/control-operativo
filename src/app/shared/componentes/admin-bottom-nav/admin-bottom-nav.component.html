@@ -1,0 +1,53 @@
+<nav class="bottom-nav">
+
+  <button
+    type="button"
+    class="nav-item"
+    [class.active]="activo === 'inicio'"
+    (click)="irInicio()"
+  >
+    <ion-icon name="home"></ion-icon>
+    <span>Inicio</span>
+  </button>
+
+  <button
+    type="button"
+    class="nav-item"
+    [class.active]="activo === 'almacen'"
+    (click)="irAlmacen()"
+  >
+    <ion-icon name="cube-outline"></ion-icon>
+    <span>Almacén</span>
+  </button>
+
+  <button
+    type="button"
+    class="nav-item"
+    [class.active]="activo === 'trabajos'"
+    (click)="irTrabajos()"
+  >
+    <ion-icon name="clipboard-outline"></ion-icon>
+    <span>Trabajos</span>
+  </button>
+
+  <button
+    type="button"
+    class="nav-item"
+    [class.active]="activo === 'reportes'"
+    (click)="irReportes()"
+  >
+    <ion-icon name="bar-chart-outline"></ion-icon>
+    <span>Reportes</span>
+  </button>
+
+  <button
+    type="button"
+    class="nav-item"
+    [class.active]="activo === 'mas'"
+    (click)="irMas()"
+  >
+    <ion-icon name="ellipsis-horizontal"></ion-icon>
+    <span>Más</span>
+  </button>
+
+</nav>

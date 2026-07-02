@@ -1,0 +1,112 @@
+<!-- src/app/paginas/administrador/empleados/empleados.page.html -->
+<ion-content [fullscreen]="true" class="empleados-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <div class="empleados-container">
+
+      <app-admin-module-hero
+        titulo="Registro de empleados"
+        descripcion="Gestiona accesos, estados y datos del personal operativo."
+        icono="people-outline"
+        botonTexto="Nuevo"
+        botonIcono="add-outline"
+        (botonClick)="nuevoUsuario()"
+      ></app-admin-module-hero>
+
+      <section class="summary-grid">
+        <app-admin-summary-card
+          titulo="Total"
+          [valor]="vm.totalEmpleados"
+          icono="people-outline"
+          tipo="total"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="Activos"
+          [valor]="vm.totalHabilitados"
+          icono="checkmark-circle-outline"
+          tipo="success"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="Inactivos"
+          [valor]="vm.totalDeshabilitados"
+          icono="close-circle-outline"
+          tipo="danger"
+        ></app-admin-summary-card>
+      </section>
+
+      <app-admin-search-filter
+        placeholder="Buscar empleados..."
+        [filtroActual]="vm.filtro"
+        (buscar)="buscarEmpleado($event)"
+        (filtrar)="abrirFiltro()"
+      ></app-admin-search-filter>
+
+      <section class="list-title-row">
+        <div>
+          <h3>Lista de empleados</h3>
+          <p>{{ vm.empleadosFiltrados.length }} registro(s) encontrado(s)</p>
+        </div>
+
+        <span class="page-indicator">
+          Pág. {{ vm.paginaActual }} / {{ vm.totalPaginas }}
+        </span>
+      </section>
+
+      <section class="list-section">
+
+        <div
+          class="empleados-list"
+          *ngIf="vm.empleadosPagina.length > 0; else sinResultados"
+        >
+          <app-empleado-card
+            *ngFor="let empleado of vm.empleadosPagina; trackBy: trackByEmpleado"
+            [empleado]="empleado"
+            (acciones)="abrirAcciones($event)"
+          ></app-empleado-card>
+        </div>
+
+        <ng-template #sinResultados>
+          <app-admin-empty-state
+            icono="people-outline"
+            titulo="No hay empleados para mostrar"
+            descripcion="No se encontraron registros con el criterio actual."
+            botonTexto="Registrar empleado"
+            botonIcono="add-outline"
+            (botonClick)="nuevoUsuario()"
+          ></app-admin-empty-state>
+        </ng-template>
+
+      </section>
+
+      <app-admin-pagination
+        *ngIf="vm.totalPaginas > 1"
+        [paginaActual]="vm.paginaActual"
+        [totalPaginas]="vm.totalPaginas"
+        [paginas]="vm.paginas"
+        (anterior)="paginaAnterior()"
+        (siguiente)="paginaSiguiente(vm.totalPaginas)"
+        (irPagina)="irPagina($event)"
+      ></app-admin-pagination>
+
+    </div>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="mas"></app-admin-bottom-nav>
+
+</ion-content>

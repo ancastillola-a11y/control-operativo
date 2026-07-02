@@ -1,0 +1,95 @@
+/* src/app/shared/componentes/gps-live-map/gps-live-map.component.css */
+
+:host {
+  display: block;
+}
+
+.gps-map-shell {
+  position: relative;
+  width: 100%;
+  height: clamp(280px, 44dvh, 390px);
+  min-height: 280px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #e5e7eb;
+}
+
+.gps-map {
+  width: 100%;
+  height: 100%;
+}
+
+.btn-center-map {
+  position: absolute;
+  right: 12px;
+  bottom: 14px;
+  z-index: 500;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #087b2d;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2);
+}
+
+.btn-center-map ion-icon {
+  font-size: 20px;
+}
+
+:host ::ng-deep .gps-marker {
+  background: transparent;
+  border: none;
+}
+
+:host ::ng-deep .gps-marker-pin {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 4px solid #087b2d;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.25);
+}
+
+:host ::ng-deep .gps-marker-pin span {
+  font-size: 14px;
+  font-weight: 1000;
+  color: #087b2d;
+}
+
+:host ::ng-deep .gps-marker-en_camino .gps-marker-worker {
+  border-color: #0b3d91;
+}
+
+:host ::ng-deep .gps-marker-en_camino .gps-marker-worker span {
+  color: #0b3d91;
+}
+
+:host ::ng-deep .gps-marker-sin_senal .gps-marker-worker {
+  border-color: #f59e0b;
+}
+
+:host ::ng-deep .gps-marker-sin_senal .gps-marker-worker span {
+  color: #f59e0b;
+}
+
+:host ::ng-deep .gps-marker-inactivo .gps-marker-worker {
+  border-color: #94a3b8;
+}
+
+:host ::ng-deep .gps-marker-inactivo .gps-marker-worker span {
+  color: #64748b;
+}
+
+:host ::ng-deep .gps-marker-destination {
+  background: #087b2d;
+  border-color: #ffffff;
+}
+
+:host ::ng-deep .gps-marker-destination span {
+  color: #ffffff;
+}

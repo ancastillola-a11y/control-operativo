@@ -1,0 +1,115 @@
+<!-- control-operativo\src\app\vista\auth\nueva-contrasena.page\nueva-contrasena.page.html -->
+<ion-content [fullscreen]="true" class="reset-root">
+  <div class="reset-wrapper" @fadeIn>
+
+    <div class="header-back">
+      <button class="btn-back" type="button" (click)="volverLogin()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div class="imagen-reset">
+      <img src="assets/img/recuperar.png" alt="Nueva contraseña">
+    </div>
+
+    <h2 class="card-titulo">Crear nueva contraseña</h2>
+
+    <p class="card-descripcion" *ngIf="!cargando && codigoValido">
+      Ingresa una nueva contraseña para la cuenta:
+      <strong>{{ correoVerificado }}</strong>
+    </p>
+
+    <p class="card-descripcion" *ngIf="cargando">
+      Verificando enlace de recuperación...
+    </p>
+
+    <div class="error-box" *ngIf="!cargando && !codigoValido">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>El enlace de recuperación expiró o no es válido. Solicita uno nuevo desde el inicio de sesión.</p>
+    </div>
+
+    <form
+      *ngIf="!cargando && codigoValido"
+      [formGroup]="formulario"
+      (ngSubmit)="guardarNuevaContrasena()"
+    >
+
+      <div class="campo-bloque">
+        <label class="campo-etiqueta">Nueva contraseña</label>
+
+        <div
+          class="campo-caja"
+          [class.error]="formulario.get('password')?.invalid && formulario.get('password')?.touched"
+        >
+          <ion-icon name="lock-closed-outline" class="campo-icono-iz"></ion-icon>
+
+          <input
+            [type]="mostrarPassword ? 'text' : 'password'"
+            class="campo-input"
+            placeholder="Ingrese su nueva contraseña"
+            formControlName="password"
+            autocomplete="new-password"
+          />
+
+          <button type="button" class="btn-ojo" (click)="togglePassword()">
+            <ion-icon [name]="mostrarPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="campo-bloque">
+        <label class="campo-etiqueta">Confirmar contraseña</label>
+
+        <div
+          class="campo-caja"
+          [class.error]="
+            (formulario.get('confirmarPassword')?.invalid && formulario.get('confirmarPassword')?.touched)
+            || (formulario.errors?.['passwordsNoCoinciden'] && formulario.get('confirmarPassword')?.touched)
+          "
+        >
+          <ion-icon name="shield-checkmark-outline" class="campo-icono-iz"></ion-icon>
+
+          <input
+            [type]="mostrarConfirmar ? 'text' : 'password'"
+            class="campo-input"
+            placeholder="Repita su nueva contraseña"
+            formControlName="confirmarPassword"
+            autocomplete="new-password"
+          />
+
+          <button type="button" class="btn-ojo" (click)="toggleConfirmar()">
+            <ion-icon [name]="mostrarConfirmar ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </button>
+        </div>
+
+        <p
+          class="mensaje-error"
+          *ngIf="formulario.errors?.['passwordsNoCoinciden'] && formulario.get('confirmarPassword')?.touched"
+        >
+          Las contraseñas no coinciden.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <ion-icon name="information-circle-outline" class="info-icono"></ion-icon>
+        <p class="info-texto">
+          La contraseña debe tener como mínimo 6 caracteres.
+        </p>
+      </div>
+
+      <button
+        type="submit"
+        class="btn-ingresar"
+        [disabled]="formulario.invalid || procesando"
+      >
+        {{ procesando ? 'Guardando...' : 'Guardar nueva contraseña' }}
+      </button>
+
+    </form>
+
+    <button type="button" class="btn-volver" (click)="volverLogin()">
+      Volver al inicio de sesión
+    </button>
+
+  </div>
+</ion-content>

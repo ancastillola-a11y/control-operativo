@@ -1,0 +1,178 @@
+<!-- src/app/paginas/administrador/finanzas/finanzas.page.html -->
+
+<ion-content [fullscreen]="true" class="finanzas-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <div class="finanzas-container">
+
+      <app-admin-module-hero
+        titulo="Gestión financiera"
+        descripcion="Controla cobros a clientes y pagos a empleados por trabajos realizados."
+        icono="wallet-outline"
+        botonTexto="Nuevo"
+        botonIcono="add-outline"
+        (botonClick)="nuevoMovimiento()"
+      ></app-admin-module-hero>
+
+      <section class="summary-grid">
+
+        <app-admin-summary-card
+          titulo="Por cobrar"
+          [valor]="vm.totalPorCobrarTexto"
+          icono="receipt-outline"
+          tipo="total"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="Cobrado"
+          [valor]="vm.totalCobradoTexto"
+          icono="checkmark-circle-outline"
+          tipo="success"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="Por pagar"
+          [valor]="vm.totalPorPagarTexto"
+          icono="alert-circle-outline"
+          tipo="danger"
+        ></app-admin-summary-card>
+
+      </section>
+
+      <app-admin-search-filter
+        placeholder="Buscar cobro, pago, cliente..."
+        [filtroActual]="vm.filtro"
+        (buscar)="buscarFinanza($event)"
+        (filtrar)="abrirFiltro()"
+      ></app-admin-search-filter>
+
+      <section class="list-title-row">
+        <div>
+          <h3>Movimientos financieros</h3>
+          <p>{{ vm.movimientosFiltrados.length }} registro(s) encontrado(s)</p>
+        </div>
+
+        <span class="page-indicator">
+          Pág. {{ vm.paginaActual }} / {{ vm.totalPaginas }}
+        </span>
+      </section>
+
+      <section class="list-section">
+
+        <div
+          class="finanzas-list"
+          *ngIf="vm.movimientosPagina.length > 0; else sinResultados"
+        >
+
+          <button
+            type="button"
+            class="finanza-card"
+            *ngFor="let movimiento of vm.movimientosPagina; trackBy: trackByMovimiento"
+            [class.cobro]="movimiento.clase === 'cobro'"
+            [class.pago]="movimiento.clase === 'pago'"
+            (click)="abrirAcciones(movimiento)"
+          >
+
+            <div class="finanza-main">
+
+              <div class="finanza-icon">
+                <ion-icon [name]="movimiento.icono"></ion-icon>
+              </div>
+
+              <div class="finanza-info">
+
+                <div class="codigo-row">
+                  <span class="codigo-chip">
+                    {{ movimiento.codigo }}
+                  </span>
+
+                  <span
+                    class="estado-badge"
+                    [ngClass]="movimiento.estadoClase"
+                  >
+                    {{ movimiento.estadoTexto }}
+                  </span>
+                </div>
+
+                <h3>{{ movimiento.concepto }}</h3>
+
+                <p class="finanza-persona">
+                  {{ movimiento.personaEtiqueta }}: {{ movimiento.personaNombre }}
+                </p>
+
+                <div class="finanza-meta">
+
+                  <span>
+                    <ion-icon name="cash-outline"></ion-icon>
+                    Total: {{ movimiento.montoTotalTexto }}
+                  </span>
+
+                  <span>
+                    <ion-icon name="time-outline"></ion-icon>
+                    Pendiente: {{ movimiento.saldoPendienteTexto }}
+                  </span>
+
+                </div>
+
+  <p
+  class="trabajo-ref"
+  *ngIf="movimiento.codigoSeguimiento"
+>
+  Seguimiento: {{ movimiento.codigoSeguimiento }}
+</p>
+
+              </div>
+
+            </div>
+
+            <div class="finanza-side">
+              <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+            </div>
+
+          </button>
+
+        </div>
+
+        <ng-template #sinResultados>
+          <app-admin-empty-state
+            icono="wallet-outline"
+            titulo="No hay movimientos financieros"
+            descripcion="Registra cobros a clientes o pagos a empleados para que aparezcan en esta lista."
+            botonTexto="Nuevo movimiento"
+            botonIcono="add-outline"
+            (botonClick)="nuevoMovimiento()"
+          ></app-admin-empty-state>
+        </ng-template>
+
+      </section>
+
+      <app-admin-pagination
+        *ngIf="vm.totalPaginas > 1"
+        [paginaActual]="vm.paginaActual"
+        [totalPaginas]="vm.totalPaginas"
+        [paginas]="vm.paginas"
+        (anterior)="paginaAnterior()"
+        (siguiente)="paginaSiguiente(vm.totalPaginas)"
+        (irPagina)="irPagina($event)"
+      ></app-admin-pagination>
+
+    </div>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="inicio"></app-admin-bottom-nav>
+
+</ion-content>

@@ -1,0 +1,204 @@
+/* src/app/shared/componentes/empleado-acciones-modal/empleado-acciones-modal.component.css */
+
+:host {
+  display: block;
+  background: transparent;
+}
+
+.acciones-panel {
+  width: 100%;
+  background: #f5f7fb;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 10px 14px 18px;
+}
+
+.modal-bar {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: #cbd5e1;
+  margin: 0 auto 14px;
+}
+
+.acciones-header {
+  background: linear-gradient(135deg, #062b6f, #0b3d91);
+  border-radius: 18px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 48px 1fr 36px;
+  gap: 12px;
+  align-items: center;
+  color: #ffffff;
+  margin-bottom: 14px;
+}
+
+.empleado-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.16);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.empleado-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.empleado-info {
+  min-width: 0;
+}
+
+.empleado-info h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empleado-info p {
+  margin: 3px 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffd166;
+}
+
+.empleado-info span {
+  display: inline-flex;
+  height: 22px;
+  padding: 0 9px;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.empleado-info span.activo {
+  background: #daf5e4;
+  color: #1f9d57;
+}
+
+.empleado-info span.inactivo {
+  background: #fde2e2;
+  color: #d63a3a;
+}
+
+.btn-close {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+}
+
+.btn-close ion-icon {
+  font-size: 22px;
+}
+
+.acciones-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.accion-item {
+  width: 100%;
+  border: 1px solid #e6ebf3;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 42px 1fr 20px;
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+}
+
+.accion-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+}
+
+.accion-icon ion-icon {
+  font-size: 21px;
+}
+
+.accion-icon.editar {
+  background: #eef4ff;
+  color: #1759e8;
+}
+
+.accion-icon.password {
+  background: #fff7df;
+  color: #c88600;
+}
+
+.accion-icon.estado {
+  background: #eafaf0;
+  color: #1f9d57;
+}
+
+.accion-icon.eliminar {
+  background: #ffecec;
+  color: #d63a3a;
+}
+
+.accion-text h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.accion-text p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1.25;
+}
+
+.arrow {
+  color: #94a3b8;
+  font-size: 17px;
+}
+
+.accion-item:active {
+  transform: scale(0.985);
+}
+
+.accion-item.danger .accion-text h3 {
+  color: #b42318;
+}
+.empleado-info small {
+  display: inline-flex;
+  height: 20px;
+  padding: 0 8px;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font-size: 9.5px;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.accion-icon.foto {
+  background: #eef4ff;
+  color: #1759e8;
+}

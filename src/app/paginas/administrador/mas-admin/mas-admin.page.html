@@ -1,0 +1,71 @@
+<!-- src/app/paginas/administrador/mas-admin/mas-admin.page.html -->
+
+<ion-content [fullscreen]="true" class="mas-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <main class="mas-container">
+
+    <section class="section-title">
+      <div>
+        <h2>Módulos administrativos</h2>
+        <p>Selecciona una opción para continuar.</p>
+      </div>
+    </section>
+
+    <section class="mas-grid">
+
+      <button
+        type="button"
+        class="mas-card"
+        *ngFor="let modulo of modulos"
+        [class.disponible]="modulo.estado === 'disponible'"
+        [class.proximamente]="modulo.estado === 'proximamente'"
+        (click)="abrirModulo(modulo)"
+        [attr.aria-label]="modulo.titulo"
+      >
+
+        <div class="card-icon">
+          <ion-icon [name]="modulo.icono"></ion-icon>
+        </div>
+
+        <div class="card-content">
+
+          <div class="card-top">
+            <strong
+              [class.badge-ok]="modulo.estado === 'disponible'"
+              [class.badge-soon]="modulo.estado === 'proximamente'"
+            >
+              {{ modulo.estado === 'disponible' ? 'Disponible' : 'Próximamente' }}
+            </strong>
+          </div>
+
+          <h3>{{ modulo.titulo }}</h3>
+          <p>{{ modulo.descripcion }}</p>
+
+        </div>
+
+        <ion-icon
+          class="card-arrow"
+          [name]="modulo.estado === 'disponible' ? 'chevron-forward-outline' : 'lock-closed-outline'"
+        ></ion-icon>
+
+      </button>
+
+    </section>
+
+  </main>
+
+  <app-admin-bottom-nav activo="mas"></app-admin-bottom-nav>
+
+</ion-content>

@@ -1,0 +1,121 @@
+﻿// src/app/app.component.ts
+import { Component } from '@angular/core';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+
+import { addIcons } from 'ionicons';
+import {
+  peopleOutline,
+  addOutline,
+  searchOutline,
+  copyOutline,
+arrowBackOutline,
+  filterOutline,
+  checkmarkCircleOutline,
+  closeCircleOutline,
+  personOutline,
+  
+  cardOutline,
+  callOutline,
+  createOutline,
+  briefcaseOutline,
+banOutline,
+ellipseOutline,
+  keyOutline,
+  trashOutline,
+  chevronForwardOutline,
+  chevronBackOutline,
+  closeOutline,
+  home,
+  homeOutline,
+  cubeOutline,
+  clipboardOutline,
+  barChartOutline,
+  ellipsisHorizontal,
+  ellipsisVertical,
+  menuOutline,
+  notificationsOutline,
+  personCircleOutline,
+  appsOutline,
+  saveOutline,
+  informationCircleOutline,
+  shieldCheckmarkOutline,
+  alertCircleOutline,
+  lockClosedOutline,
+  eyeOutline,
+  eyeOffOutline,
+  calendarOutline,
+  timeOutline,
+  locationOutline,
+  mapOutline,
+  settingsOutline,
+  refreshOutline,
+  documentTextOutline,
+  mailOutline,
+  imageOutline,
+  cameraOutline
+} from 'ionicons/icons';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  standalone: true,
+  imports: [
+    IonApp,
+    IonRouterOutlet
+  ]
+})
+export class AppComponent {
+  constructor() {
+    addIcons({
+      peopleOutline,
+      addOutline,
+      searchOutline,
+      filterOutline,
+      briefcaseOutline,
+banOutline,
+ellipseOutline,
+copyOutline,
+arrowBackOutline,
+      checkmarkCircleOutline,
+      closeCircleOutline,
+      personOutline,
+      cardOutline,
+      callOutline,
+      createOutline,
+      keyOutline,
+      trashOutline,
+      chevronForwardOutline,
+      chevronBackOutline,
+      closeOutline,
+      home,
+      homeOutline,
+      cubeOutline,
+      clipboardOutline,
+      barChartOutline,
+      ellipsisHorizontal,
+      ellipsisVertical,
+      menuOutline,
+      notificationsOutline,
+      personCircleOutline,
+      appsOutline,
+      saveOutline,
+      informationCircleOutline,
+      shieldCheckmarkOutline,
+      alertCircleOutline,
+      lockClosedOutline,
+      eyeOutline,
+      eyeOffOutline,
+      calendarOutline,
+      timeOutline,
+      locationOutline,
+      mapOutline,
+      settingsOutline,
+      refreshOutline,
+      documentTextOutline,
+      mailOutline,
+      imageOutline,
+      cameraOutline
+    });
+  }
+}
+

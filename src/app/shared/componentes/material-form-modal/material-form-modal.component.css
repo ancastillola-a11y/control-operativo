@@ -1,0 +1,260 @@
+/* src/app/shared/componentes/material-form-modal/material-form-modal.component.css */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-background);
+  font-family: var(--font-main);
+}
+
+.modal-header ion-toolbar {
+  --background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  --color: #ffffff;
+  --min-height: 86px;
+  --padding-start: 14px;
+  --padding-end: 12px;
+}
+
+.modal-title-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.modal-avatar ion-icon {
+  font-size: 22px;
+}
+
+.modal-title-box h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.modal-title-box p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffd166;
+}
+
+.btn-close {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.13);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+}
+
+.btn-close ion-icon {
+  font-size: 22px;
+}
+
+.modal-content {
+  --background: var(--color-background);
+  flex: 1;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: var(--app-width);
+  margin: 0 auto;
+  padding: 14px 14px 18px;
+}
+
+.form-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.form-section-title ion-icon {
+  font-size: 17px;
+  color: var(--color-primary);
+}
+
+.image-uploader {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.image-preview {
+  width: 78px;
+  height: 78px;
+  border-radius: 18px;
+  background: var(--color-primary-soft);
+  border: 1px dashed var(--color-primary);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--color-primary);
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-preview ion-icon {
+  font-size: 30px;
+}
+
+.image-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-image,
+.btn-remove-image {
+  height: 36px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-main);
+}
+
+.btn-image {
+  background: var(--color-primary);
+  color: #ffffff;
+  border: none;
+}
+
+.btn-remove-image {
+  background: #ffffff;
+  color: var(--color-error);
+  border: 1px solid var(--color-error-bg);
+}
+
+.field-group {
+  margin-bottom: 12px;
+}
+
+.field-group:last-child {
+  margin-bottom: 0;
+}
+
+.field-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.input-card {
+  --background: #ffffff;
+  --border-radius: 10px;
+  --min-height: 44px;
+  --padding-start: 12px;
+  --inner-padding-end: 10px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.input-card:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(26, 62, 140, 0.12);
+}
+
+.input-card ion-input,
+.input-card ion-select,
+.input-card ion-textarea {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.textarea-card {
+  min-height: 78px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+.btn-cancelar,
+.btn-guardar {
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-main);
+}
+
+.btn-cancelar {
+  background: #ffffff;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.btn-guardar {
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-button);
+}
+
+@media (max-width: 360px) {
+  .image-uploader,
+  .form-grid,
+  .modal-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .image-preview {
+    width: 100%;
+    height: 140px;
+  }
+}

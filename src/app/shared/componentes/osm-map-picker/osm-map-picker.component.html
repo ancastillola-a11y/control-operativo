@@ -1,0 +1,61 @@
+<!-- src/app/shared/componentes/osm-map-picker/osm-map-picker.component.html -->
+
+<section class="osm-picker">
+
+  <div class="osm-toolbar">
+
+    <button
+      type="button"
+      class="btn-search-location"
+      (click)="buscarAhora()"
+      [disabled]="cargandoBusqueda"
+    >
+      <ion-icon name="search-outline"></ion-icon>
+      <span>{{ cargandoBusqueda ? 'Buscando...' : 'Buscar ubicación' }}</span>
+    </button>
+
+    <button
+      type="button"
+      class="btn-save-location"
+      (click)="guardarUbicacion()"
+    >
+      <ion-icon name="save-outline"></ion-icon>
+      <span>Guardar ubicación</span>
+    </button>
+
+  </div>
+
+  <div class="osm-map-box">
+
+    <div #mapContainer class="osm-map"></div>
+
+    <button
+      type="button"
+      class="btn-center-map"
+      (click)="usarCentroMapa()"
+    >
+      Usar centro
+    </button>
+
+  </div>
+
+  <div
+    class="osm-selected"
+    *ngIf="latitudSeleccionada !== null && longitudSeleccionada !== null"
+  >
+    <ion-icon name="checkmark-circle-outline"></ion-icon>
+
+    <div>
+      <strong>Ubicación seleccionada</strong>
+      <span>
+        Lat: {{ latitudSeleccionada }} · Lng: {{ longitudSeleccionada }}
+      </span>
+    </div>
+  </div>
+
+  <div class="osm-message" *ngIf="mensaje">
+    <ion-icon name="information-circle-outline"></ion-icon>
+    <span>{{ mensaje }}</span>
+  </div>
+
+</section>

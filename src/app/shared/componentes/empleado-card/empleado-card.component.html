@@ -1,0 +1,72 @@
+<!-- src/app/shared/componentes/empleado-card/empleado-card.component.html -->
+
+<article class="empleado-card">
+
+  <div class="empleado-main">
+
+    <div class="empleado-avatar">
+      <img
+        *ngIf="empleado.fotoUrl; else avatarIniciales"
+        [src]="empleado.fotoUrl"
+        alt="Foto empleado"
+      />
+
+      <ng-template #avatarIniciales>
+        <span>{{ empleado.iniciales }}</span>
+      </ng-template>
+    </div>
+
+    <div class="empleado-info">
+
+      <div class="codigo-row">
+        <span class="codigo-chip">
+          <ion-icon name="pricetag-outline"></ion-icon>
+          {{ empleado.codigoEmpleadoTexto || empleado.codigoEmpleado || 'E-00000' }}
+        </span>
+      </div>
+
+      <h3>{{ empleado.nombreCompleto }}</h3>
+
+      <p class="empleado-cargo">
+        {{ empleado.cargoTexto }}
+      </p>
+
+      <div class="empleado-meta">
+
+        <span>
+          <ion-icon name="person-outline"></ion-icon>
+          {{ empleado.usuario || 'Sin usuario' }}
+        </span>
+
+        <span>
+          <ion-icon name="call-outline"></ion-icon>
+          {{ empleado.telefono || 'Sin número' }}
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="empleado-side">
+
+    <span
+      class="estado-badge"
+      [ngClass]="empleado.habilitado ? 'activo' : 'inactivo'"
+    >
+      {{ empleado.habilitado ? 'Activo' : 'Inactivo' }}
+    </span>
+
+    <button
+      type="button"
+      class="btn-more"
+      aria-label="Acciones del empleado"
+      (click)="abrirAcciones()"
+    >
+      <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+    </button>
+
+  </div>
+
+</article>

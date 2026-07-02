@@ -1,0 +1,487 @@
+/* src/app/vista/administrador/dashboard-admin/dashboard-admin.page.css */
+
+ion-content.admin-root {
+  --background: #f5f7fa;
+}
+
+.admin-container {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding-bottom: 88px;
+  background: #f5f7fa;
+}
+
+/* HEADER */
+
+.top-header {
+  width: 100%;
+  height: 76px;
+  background: linear-gradient(135deg, #062b6f, #0b3d91);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 14px 12px;
+}
+
+.header-btn,
+.profile-btn {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.header-btn {
+  width: 34px;
+  height: 34px;
+}
+
+.header-btn ion-icon {
+  font-size: 28px;
+}
+
+.welcome-box {
+  flex: 1;
+  min-width: 0;
+}
+
+.welcome-box h1 {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.welcome-box p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffd166;
+}
+
+.notification-btn {
+  position: relative;
+}
+
+.notification-btn ion-icon {
+  font-size: 23px;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: #f04438;
+  color: #ffffff;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  border: 2px solid #062b6f;
+}
+
+.profile-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-btn ion-icon {
+  font-size: 31px;
+}
+
+.profile-btn img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+/* TARJETA EMPRESA */
+
+.company-card {
+  margin: 14px 14px 12px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 13px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08);
+}
+
+.company-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.company-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: #eaf1ff;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.company-logo img {
+  width: 37px;
+  height: 37px;
+  object-fit: contain;
+}
+
+.company-info {
+  min-width: 0;
+}
+
+.company-info h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.company-info p {
+  margin: 3px 0 0;
+  color: #0b3d91;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.company-info span {
+  display: block;
+  margin-top: 2px;
+  color: #667085;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.company-date {
+  max-width: 116px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.date-line {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  color: #0b3d91;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.date-line ion-icon {
+  font-size: 13px;
+}
+
+.company-date p {
+  margin: 4px 0 0;
+  color: #667085;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: capitalize;
+}
+
+/* BANNER */
+
+.monitor-card {
+  margin: 0 14px 18px;
+  min-height: 150px;
+  border-radius: 17px;
+  background: linear-gradient(135deg, #062b6f, #0b3d91);
+  color: #ffffff;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  padding: 18px 15px;
+  box-shadow: 0 10px 24px rgba(6, 43, 111, 0.24);
+}
+
+.monitor-text {
+  width: 57%;
+  position: relative;
+  z-index: 2;
+}
+
+.monitor-text h2 {
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.monitor-text p {
+  margin: 9px 0 14px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.btn-map {
+  height: 34px;
+  border: none;
+  border-radius: 8px;
+  background: #0a6bff;
+  color: #ffffff;
+  padding: 0 16px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.monitor-image {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-width: 0;
+}
+
+.monitor-image img {
+  width: 118px;
+  max-height: 128px;
+  object-fit: contain;
+}
+
+/* MÓDULOS */
+
+.modules-section {
+  margin: 0 14px;
+}
+
+.modules-section h3 {
+  margin: 0 0 12px;
+  color: #101828;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+}
+
+.module-card {
+  min-height: 78px;
+  border: 1px solid #e4e7ec;
+  border-radius: 13px;
+  background: #ffffff;
+  padding: 9px 4px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.module-card:active {
+  transform: scale(0.97);
+}
+
+.module-icon {
+  width: 32px;
+  height: 32px;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.module-icon img {
+  width: 29px;
+  height: 29px;
+  object-fit: contain;
+}
+
+.module-badge {
+  position: absolute;
+  top: -8px;
+  right: -9px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  background: #f04438;
+  color: #ffffff;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+
+.module-card p {
+  margin: 0;
+  color: #101828;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.08;
+}
+
+/* BARRA INFERIOR */
+
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  height: 68px;
+  background: #ffffff;
+  border-top: 1px solid #e4e7ec;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 6px 4px 8px;
+  z-index: 30;
+}
+
+.nav-item {
+  border: none;
+  background: transparent;
+  color: #667085;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0;
+}
+
+.nav-item ion-icon {
+  font-size: 22px;
+}
+
+.nav-item span {
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.nav-item.active {
+  color: #0a6bff;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 390px) {
+  .top-header {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .company-card,
+  .monitor-card,
+  .modules-section {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  .welcome-box h1 {
+    font-size: 14.5px;
+  }
+
+  .monitor-text h2 {
+    font-size: 15.5px;
+  }
+
+  .monitor-image img {
+    width: 108px;
+  }
+
+  .modules-grid {
+    gap: 8px;
+  }
+
+  .module-card {
+    min-height: 74px;
+  }
+
+  .module-card p {
+    font-size: 9.5px;
+  }
+}
+
+@media (max-width: 340px) {
+  .company-card {
+    align-items: flex-start;
+  }
+
+  .company-date {
+    max-width: 92px;
+  }
+
+  .date-line {
+    font-size: 8px;
+  }
+
+  .company-date p {
+    font-size: 8px;
+  }
+
+  .monitor-card {
+    min-height: 142px;
+    padding: 16px 12px;
+  }
+
+  .monitor-text h2 {
+    font-size: 14.5px;
+  }
+
+  .monitor-text p {
+    font-size: 10px;
+  }
+
+  .monitor-image img {
+    width: 98px;
+  }
+
+  .modules-grid {
+    gap: 6px;
+  }
+
+  .module-card {
+    min-height: 70px;
+    border-radius: 11px;
+  }
+
+  .module-icon {
+    width: 29px;
+    height: 29px;
+  }
+
+  .module-icon img {
+    width: 26px;
+    height: 26px;
+  }
+}

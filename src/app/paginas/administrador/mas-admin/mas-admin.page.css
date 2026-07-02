@@ -1,0 +1,170 @@
+/* src/app/paginas/administrador/mas-admin/mas-admin.page.css */
+
+:host {
+  display: block;
+}
+
+ion-content.mas-root {
+  --background: var(--color-page-outside);
+}
+
+.mas-container {
+  width: 100%;
+  max-width: var(--app-width);
+  min-height: calc(100vh - 76px);
+  margin: 0 auto;
+  padding: 14px 14px 94px;
+  background: var(--color-background);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0 11px;
+}
+
+.section-title h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.section-title p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.mas-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mas-card {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 17px;
+  background: #ffffff;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 48px 1fr 22px;
+  gap: 11px;
+  align-items: center;
+  text-align: left;
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-main);
+}
+
+.mas-card.disponible {
+  border-color: #dbe8ff;
+}
+
+.mas-card.proximamente {
+  opacity: 0.86;
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  display: grid;
+  place-items: center;
+}
+
+.mas-card.proximamente .card-icon {
+  background: #f8fafc;
+  color: var(--color-text-muted);
+}
+
+.card-icon ion-icon {
+  font-size: 24px;
+}
+
+.card-content {
+  min-width: 0;
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+
+.card-top strong {
+  height: 21px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.badge-ok {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.badge-soon {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.card-content h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.card-content p {
+  margin: 4px 0 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+
+.card-arrow {
+  font-size: 19px;
+  color: var(--color-text-muted);
+}
+
+.mas-card.disponible .card-arrow {
+  color: var(--color-primary);
+}
+
+.info-card {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--color-primary-soft);
+  border: 1px solid #dbe8ff;
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+
+.info-card ion-icon {
+  font-size: 18px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.info-card p {
+  margin: 0;
+  font-size: 11.2px;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.45;
+}

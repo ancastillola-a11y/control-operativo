@@ -1,0 +1,116 @@
+<!-- src/app/paginas/almacen/materiales/materiales.page.html -->
+<ion-content [fullscreen]="true" class="materiales-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <div class="materiales-container">
+
+      <app-admin-module-hero
+        titulo="Gestión de materiales"
+        descripcion="Administra stock, imágenes y materiales del almacén."
+        icono="cube-outline"
+        botonTexto="Nuevo"
+        botonIcono="add-outline"
+        (botonClick)="nuevoMaterial()"
+      ></app-admin-module-hero>
+
+      <section class="summary-grid">
+
+        <app-admin-summary-card
+          titulo="Total"
+          [valor]="vm.totalMateriales"
+          icono="cube-outline"
+          tipo="total"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="Disponibles"
+          [valor]="vm.totalDisponibles"
+          icono="checkmark-circle-outline"
+          tipo="success"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="Stock bajo"
+          [valor]="vm.totalStockBajo"
+          icono="alert-circle-outline"
+          tipo="danger"
+        ></app-admin-summary-card>
+
+      </section>
+
+      <app-admin-search-filter
+        placeholder="Buscar material, categoría..."
+        [filtroActual]="vm.filtro"
+        (buscar)="buscarMaterial($event)"
+        (filtrar)="abrirFiltro()"
+      ></app-admin-search-filter>
+
+      <section class="list-title-row">
+        <div>
+          <h3>Lista de materiales</h3>
+          <p>{{ vm.materialesFiltrados.length }} registro(s) encontrado(s)</p>
+        </div>
+
+        <span class="page-indicator">
+          Pág. {{ vm.paginaActual }} / {{ vm.totalPaginas }}
+        </span>
+      </section>
+
+      <section class="list-section">
+
+        <div
+          class="materiales-list"
+          *ngIf="vm.materialesPagina.length > 0; else sinResultados"
+        >
+
+          <app-material-card
+            *ngFor="let material of vm.materialesPagina; trackBy: trackByMaterial"
+            [material]="material"
+            (acciones)="abrirAcciones($event)"
+          ></app-material-card>
+
+        </div>
+
+        <ng-template #sinResultados>
+          <app-admin-empty-state
+            icono="cube-outline"
+            titulo="No hay materiales para mostrar"
+            descripcion="No se encontraron materiales con el criterio actual."
+            botonTexto="Registrar material"
+            botonIcono="add-outline"
+            (botonClick)="nuevoMaterial()"
+          ></app-admin-empty-state>
+        </ng-template>
+
+      </section>
+
+      <app-admin-pagination
+        *ngIf="vm.totalPaginas > 1"
+        [paginaActual]="vm.paginaActual"
+        [totalPaginas]="vm.totalPaginas"
+        [paginas]="vm.paginas"
+        (anterior)="paginaAnterior()"
+        (siguiente)="paginaSiguiente(vm.totalPaginas)"
+        (irPagina)="irPagina($event)"
+      ></app-admin-pagination>
+
+    </div>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="almacen"></app-admin-bottom-nav>
+
+</ion-content>

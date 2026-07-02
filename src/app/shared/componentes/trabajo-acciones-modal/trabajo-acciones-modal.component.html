@@ -1,0 +1,107 @@
+<!-- src/app/shared/componentes/trabajo-acciones-modal/trabajo-acciones-modal.component.html -->
+
+<div class="acciones-panel">
+
+  <div class="modal-bar"></div>
+
+  <header class="acciones-header">
+
+    <div class="trabajo-avatar">
+      <ion-icon name="briefcase-outline"></ion-icon>
+    </div>
+
+    <div class="trabajo-info">
+      <h2>{{ trabajo.clienteNombre }}</h2>
+      <p>{{ trabajo.tipoTrabajo }}</p>
+
+      <span [ngClass]="trabajo.estadoClase">
+        {{ trabajo.estadoTexto }}
+      </span>
+    </div>
+
+    <button type="button" class="btn-close" (click)="cancelar()">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+
+  </header>
+
+  <section class="acciones-lista">
+
+    <button type="button" class="accion-item" (click)="seleccionar('detalle')">
+      <div class="accion-icon detalle">
+        <ion-icon name="document-text-outline"></ion-icon>
+      </div>
+
+      <div class="accion-text">
+        <h3>Ver detalle</h3>
+        <p>Consultar datos, empleados y materiales asignados.</p>
+      </div>
+
+      <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+    </button>
+
+    <button type="button" class="accion-item" (click)="seleccionar('codigos')">
+      <div class="accion-icon detalle">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+      </div>
+
+      <div class="accion-text">
+        <h3>Ver códigos de seguridad</h3>
+        <p>Gestionar código de cliente y código de devolución.</p>
+      </div>
+
+      <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+    </button>
+
+    <button type="button" class="accion-item" (click)="seleccionar('editar')">
+      <div class="accion-icon editar">
+        <ion-icon name="create-outline"></ion-icon>
+      </div>
+
+      <div class="accion-text">
+        <h3>Editar trabajo</h3>
+        <p>Actualizar datos generales y empleados asignados.</p>
+      </div>
+
+      <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+    </button>
+
+    <button
+      type="button"
+      class="accion-item warning"
+      [disabled]="!puedeCancelar"
+      (click)="seleccionar('cancelar')"
+    >
+      <div class="accion-icon cancelar">
+        <ion-icon name="ban-outline"></ion-icon>
+      </div>
+
+      <div class="accion-text">
+        <h3>Cancelar trabajo</h3>
+        <p>Disponible solo para trabajos pendientes.</p>
+      </div>
+
+      <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+    </button>
+
+    <button
+      type="button"
+      class="accion-item danger"
+      [disabled]="!puedeEliminar"
+      (click)="seleccionar('eliminar')"
+    >
+      <div class="accion-icon eliminar">
+        <ion-icon name="trash-outline"></ion-icon>
+      </div>
+
+      <div class="accion-text">
+        <h3>Eliminar registro</h3>
+        <p>Ocultar trabajo del módulo administrativo.</p>
+      </div>
+
+      <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+    </button>
+
+  </section>
+
+</div>

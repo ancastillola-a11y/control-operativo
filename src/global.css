@@ -1,0 +1,387 @@
+/*
+ * src/global.css
+ * Estilos globales de la app Control Operativo
+ */
+
+/* Ionic core */
+@import "@ionic/angular/css/core.css";
+@import "leaflet/dist/leaflet.css";
+
+/* Ionic base */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Ionic utilities */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/* BASE GLOBAL */
+:root {
+  --app-max-width: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+ion-app {
+  width: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--color-background);
+  font-family: var(--font-main);
+  color: var(--color-text);
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+ion-app {
+  width: 100vw;
+  max-width: 100%;
+  min-height: 100dvh;
+  margin: 0;
+  background: var(--color-background);
+  font-family: var(--font-main);
+  overflow: visible;
+  box-shadow: none;
+}
+
+ion-router-outlet {
+  width: 100%;
+  min-height: 100%;
+  background: var(--color-background);
+}
+
+ion-content {
+  --background: var(--color-background);
+  font-family: var(--font-main);
+  width: 100%;
+  min-height: 100%;
+  background: var(--color-background);
+}
+
+button,
+input,
+textarea,
+select,
+ion-input,
+ion-textarea,
+ion-button {
+  font-family: var(--font-main);
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+}
+
+.admin-container,
+.empleados-container,
+.materiales-container,
+.trabajos-container,
+.finanzas-container,
+.mas-container,
+.reportes-container,
+.gps-container {
+  width: 100%;
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(12px, 4vw, 24px);
+  padding-right: clamp(12px, 4vw, 24px);
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
+}
+
+.summary-grid,
+.mas-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .admin-container,
+  .empleados-container,
+  .materiales-container,
+  .trabajos-container,
+  .finanzas-container,
+  .mas-container,
+  .reportes-container,
+  .gps-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .summary-grid,
+  .mas-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* ===============================
+   MODALES DE REGISTRO COMPLETOS
+   Empleado / Material / Trabajo
+   =============================== */
+
+ion-modal.empleado-modal,
+ion-modal.material-modal,
+ion-modal.trabajo-modal {
+  --width: min(430px, 100vw);
+  --height: 100vh;
+  --max-height: 100vh;
+  --border-radius: 0;
+  --box-shadow: none;
+  --background: var(--color-background);
+}
+
+ion-modal.empleado-modal::part(content),
+ion-modal.material-modal::part(content),
+ion-modal.trabajo-modal::part(content) {
+  width: min(430px, 100vw);
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: 0;
+  overflow: hidden;
+  background: var(--color-background);
+}
+
+ion-modal.empleado-modal ion-content,
+ion-modal.material-modal ion-content,
+ion-modal.trabajo-modal ion-content {
+  --background: var(--color-background);
+  height: 100%;
+}
+
+/* Contenedores internos frecuentes del formulario */
+ion-modal.trabajo-modal .modal-root,
+ion-modal.trabajo-modal .modal-wrapper,
+ion-modal.trabajo-modal .modal-container,
+ion-modal.trabajo-modal .form-root,
+ion-modal.trabajo-modal .form-wrapper,
+ion-modal.trabajo-modal .form-container,
+ion-modal.trabajo-modal .trabajo-form-root,
+ion-modal.trabajo-modal .trabajo-form-container {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Cabecera fija del formulario */
+ion-modal.trabajo-modal .modal-header,
+ion-modal.trabajo-modal .form-header,
+ion-modal.trabajo-modal .trabajo-form-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Cuerpo del formulario con espacio para botones inferiores */
+ion-modal.trabajo-modal .modal-body,
+ion-modal.trabajo-modal .form-body,
+ion-modal.trabajo-modal .trabajo-form-body {
+  padding-bottom: 120px;
+}
+
+/* Footer fijo del formulario */
+ion-modal.trabajo-modal .modal-footer,
+ion-modal.trabajo-modal .form-footer,
+ion-modal.trabajo-modal .acciones-footer,
+ion-modal.trabajo-modal .trabajo-form-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 60;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Corrección para inputs y selects dentro del modal */
+ion-modal.trabajo-modal ion-item,
+ion-modal.trabajo-modal ion-input,
+ion-modal.trabajo-modal ion-textarea,
+ion-modal.trabajo-modal ion-select,
+ion-modal.trabajo-modal ion-datetime {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Escritorio: se ve como modal centrado */
+@media (min-width: 431px) {
+  ion-modal.empleado-modal,
+  ion-modal.material-modal,
+  ion-modal.trabajo-modal {
+    --height: min(932px, 96vh);
+    --max-height: 96vh;
+    --border-radius: 22px;
+    --box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
+  }
+
+  ion-modal.empleado-modal::part(content),
+  ion-modal.material-modal::part(content),
+  ion-modal.trabajo-modal::part(content) {
+    height: min(932px, 96vh);
+    max-height: 96vh;
+    border-radius: 22px;
+  }
+}
+
+/* ===============================
+   MODALES DE ACCIONES INFERIORES
+   =============================== */
+
+ion-modal.empleado-actions-modal,
+ion-modal.material-actions-modal,
+ion-modal.trabajo-actions-modal {
+  --width: min(430px, 100vw);
+  --height: auto;
+  --max-height: 82vh;
+  align-items: flex-end;
+}
+
+ion-modal.empleado-actions-modal::part(content),
+ion-modal.material-actions-modal::part(content),
+ion-modal.trabajo-actions-modal::part(content) {
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* ===============================
+   MODALES DE DETALLE
+   =============================== */
+
+ion-modal.trabajo-detalle-modal {
+  --width: min(430px, 96vw);
+  --height: 88vh;
+  --max-height: 88vh;
+  --border-radius: 22px;
+  --box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
+}
+
+ion-modal.trabajo-detalle-modal::part(content) {
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--color-background);
+}
+
+/* ===============================
+   MODAL CONTRASEÑA
+   =============================== */
+
+ion-modal.empleado-password-modal {
+  --width: min(430px, 96vw);
+  --height: 58vh;
+  --max-height: 80vh;
+  --border-radius: 22px;
+}
+
+ion-modal.empleado-password-modal::part(content) {
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--color-background);
+}
+
+/* ===============================
+   MODAL CONFIRMACIÓN ADMIN
+   =============================== */
+
+ion-modal.admin-confirm-modal {
+  --width: min(390px, 92vw);
+  --height: auto;
+  --border-radius: 22px;
+  --box-shadow: 0 18px 45px rgba(15, 23, 42, 0.28);
+}
+
+ion-modal.admin-confirm-modal::part(content) {
+  border-radius: 22px;
+  overflow: hidden;
+  background: transparent;
+}
+ion-modal.finanza-acciones-modal {
+  --width: 100%;
+  --height: 72%;
+  --max-height: 92%;
+  --border-radius: 24px 24px 0 0;
+  align-items: flex-end;
+}
+
+ion-modal.finanza-acciones-modal::part(content) {
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  overflow: hidden;
+}
+
+@media (min-width: 520px) {
+  ion-modal.finanza-acciones-modal {
+    --width: min(430px, 100vw);
+    --height: 72%;
+    --max-width: 430px;
+    --max-height: 92%;
+    --border-radius: 24px;
+  }
+
+  ion-modal.finanza-acciones-modal::part(content) {
+    border-radius: 24px;
+    overflow: hidden;
+  }
+}
+
+/* FIX APK RESPONSIVE GLOBAL */
+html,
+body,
+ion-app,
+ion-router-outlet,
+ion-content {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+ion-app {
+  width: 100vw !important;
+  max-width: 100% !important;
+  min-height: 100dvh !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+body {
+  overflow-x: hidden !important;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}

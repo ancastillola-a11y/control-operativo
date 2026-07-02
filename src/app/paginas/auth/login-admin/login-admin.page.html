@@ -1,0 +1,123 @@
+<!-- src/app/paginas/auth/login-admin/login-admin.page.html -->
+
+<ion-content [fullscreen]="true" class="login-rol-root">
+
+  <main class="login-wrapper">
+
+    <button
+      type="button"
+      class="btn-volver"
+      (click)="volver()"
+      [disabled]="cargando"
+    >
+<ion-icon [icon]="arrowBackIcon"></ion-icon>
+      <span>Volver</span>
+    </button>
+
+    <section class="login-header">
+      <img
+        src="assets/img/logo.png"
+        alt="Logo Comproy"
+        class="logo-img"
+      />
+
+      <div>
+        <span class="empresa-nombre">COMPROY S.A.C.</span>
+        <span class="empresa-subtitulo">
+          Acceso administrativo
+        </span>
+      </div>
+    </section>
+
+    <section class="login-card">
+
+      <div class="rol-icon admin">
+        <ion-icon [icon]="shieldIcon"></ion-icon>
+      </div>
+
+      <h2>Administrador</h2>
+      <p>Ingrese su usuario administrador para acceder al panel de gestión.</p>
+
+      <form
+        [formGroup]="formulario"
+        (ngSubmit)="ingresar()"
+      >
+
+        <div class="campo-bloque">
+          <label>Usuario administrador</label>
+
+          <div
+            class="campo-caja"
+            [class.error]="formulario.get('usuario')?.invalid && formulario.get('usuario')?.touched"
+          >
+            <ion-icon [icon]="personIcon"></ion-icon>
+
+            <input
+              type="text"
+              formControlName="usuario"
+              placeholder="Ingrese su usuario"
+              autocomplete="username"
+              [disabled]="cargando"
+            />
+          </div>
+        </div>
+
+        <div class="campo-bloque">
+          <label>Contraseña</label>
+
+          <div
+            class="campo-caja"
+            [class.error]="formulario.get('password')?.invalid && formulario.get('password')?.touched"
+          >
+            <ion-icon [icon]="lockIcon"></ion-icon>
+
+            <input
+              [type]="mostrarPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Ingrese su contraseña"
+              autocomplete="current-password"
+              [disabled]="cargando"
+            />
+
+            <button
+              type="button"
+              class="btn-ojo"
+              (click)="togglePassword()"
+              [disabled]="cargando"
+            >
+<ion-icon [icon]="mostrarPassword ? eyeOffIcon : eyeIcon"></ion-icon>            </button>
+          </div>
+        </div>
+
+        <div class="login-opciones">
+          <label class="recordarme-label">
+            <ion-checkbox formControlName="recordarme"></ion-checkbox>
+            <span>Recordarme</span>
+          </label>
+
+          <button
+            type="button"
+            class="btn-link"
+            (click)="recuperarContrasena()"
+            [disabled]="cargando"
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
+
+       <button
+  type="button"
+  class="btn-ingresar admin"
+  (click)="ingresar()"
+  [disabled]="formulario.invalid || cargando"
+>
+          {{ cargando ? 'Ingresando...' : 'Ingresar como administrador' }}
+        </button>
+
+      </form>
+
+    </section>
+
+  </main>
+
+</ion-content>

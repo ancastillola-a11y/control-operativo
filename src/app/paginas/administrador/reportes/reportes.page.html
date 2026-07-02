@@ -1,0 +1,139 @@
+<!-- src/app/paginas/administrador/reportes/reportes.page.html -->
+<ion-content [fullscreen]="true" class="reportes-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas || 0"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <main class="reportes-container">
+
+      <section class="page-title-row">
+        <div>
+          <h2>Reportes</h2>
+          <p>Consulta todos los reportes operativos del sistema.</p>
+        </div>
+      </section>
+
+      <section
+        class="reportes-grid"
+        *ngIf="vm.modulos.length > 0; else sinReportes"
+      >
+
+        <button
+          type="button"
+          class="reporte-card"
+          *ngFor="let modulo of vm.modulos; trackBy: trackByModulo"
+          [ngClass]="modulo.color"
+          (click)="abrirModulo(modulo)"
+        >
+
+          <div class="reporte-icon">
+            <ion-icon [name]="modulo.icono"></ion-icon>
+          </div>
+
+          <div class="reporte-info">
+            <h3>{{ modulo.titulo }}</h3>
+            <p>{{ modulo.descripcion }}</p>
+
+           
+          </div>
+
+          <ion-icon
+            name="chevron-forward-outline"
+            class="reporte-arrow"
+          ></ion-icon>
+
+        </button>
+
+      </section>
+
+      <ng-template #sinReportes>
+        <app-admin-empty-state
+          icono="bar-chart-outline"
+          titulo="Sin reportes"
+          descripcion="No hay reportes disponibles por el momento."
+        ></app-admin-empty-state>
+      </ng-template>
+
+      <section class="resumen-header">
+        <div>
+          <h3>Resumen general</h3>
+          <p>{{ vm.resumen.periodoTexto }}</p>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+
+        <app-admin-summary-card
+          titulo="Trabajos"
+          [valor]="vm.resumen.totalTrabajos"
+          icono="clipboard-outline"
+          tipo="total"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="Pendientes"
+          [valor]="vm.resumen.pendientes"
+          icono="warning-outline"
+          tipo="danger"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="En proceso"
+          [valor]="vm.resumen.enProceso"
+          icono="bar-chart-outline"
+          tipo="success"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="Finalizados"
+          [valor]="vm.resumen.finalizados"
+          icono="document-text-outline"
+          tipo="total"
+        ></app-admin-summary-card>
+
+      </section>
+
+      <section class="extra-summary">
+
+        <div class="extra-card">
+          <span>{{ vm.resumen.totalMateriales }}</span>
+          <p>Materiales</p>
+        </div>
+
+        <div class="extra-card danger">
+          <span>{{ vm.resumen.materialesStockBajo }}</span>
+          <p>Stock bajo</p>
+        </div>
+
+        <div class="extra-card">
+          <span>{{ vm.resumen.totalEmpleados }}</span>
+          <p>Empleados</p>
+        </div>
+
+        <div class="extra-card">
+          <span>{{ vm.resumen.totalDevoluciones }}</span>
+          <p>Devoluciones</p>
+        </div>
+
+      </section>
+
+  
+
+    </main>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="reportes"></app-admin-bottom-nav>
+
+</ion-content>

@@ -1,0 +1,157 @@
+<!-- src/app/paginas/administrador/devoluciones/devoluciones.page.html -->
+
+<ion-content [fullscreen]="true" class="devoluciones-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas || 0"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <div class="devoluciones-container">
+
+      <section class="page-title-row">
+        <button
+          type="button"
+          class="btn-back"
+          (click)="volver()"
+        >
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+
+        <div>
+          <h2>Devoluciones de materiales</h2>
+          <p>Valida retornos y actualiza el stock del almacén.</p>
+        </div>
+      </section>
+
+      <section class="tabs-row">
+
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="vm.filtro === 'pendientes'"
+          (click)="cambiarFiltro('pendientes')"
+        >
+          Pendientes
+          <span>{{ vm.totalPendientes }}</span>
+        </button>
+
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="vm.filtro === 'validadas'"
+          (click)="cambiarFiltro('validadas')"
+        >
+          Validadas
+          <span>{{ vm.totalValidadas }}</span>
+        </button>
+
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="vm.filtro === 'historial'"
+          (click)="cambiarFiltro('historial')"
+        >
+          Historial
+          <span>{{ vm.totalHistorial }}</span>
+        </button>
+
+      </section>
+
+      <section
+        class="devoluciones-list"
+        *ngIf="vm.devolucionesFiltradas.length > 0; else sinDevoluciones"
+      >
+
+        <article
+          class="devolucion-card"
+          *ngFor="let item of vm.devolucionesFiltradas; trackBy: trackByDevolucion"
+        >
+
+          <div class="card-top">
+            <div>
+              <h3>{{ item.codigoTrabajo }}</h3>
+              <p>{{ item.tipoTrabajo }}</p>
+            </div>
+
+            <span
+              class="estado-badge"
+              [class.validada]="item.estadoDevolucion === 'validada'"
+            >
+              {{ item.estadoTexto }}
+            </span>
+          </div>
+
+          <div class="card-info">
+            <p>
+              <strong>Empleado:</strong>
+              {{ item.empleadoTexto }}
+            </p>
+
+            <p>
+              <strong>Fecha:</strong>
+              {{ item.fechaTexto }}
+            </p>
+          </div>
+
+          <div class="card-bottom">
+            <span>
+              {{ item.totalMateriales }}
+              {{ item.totalMateriales === 1 ? 'material' : 'materiales' }}
+            </span>
+
+            <div class="card-actions">
+              <button
+                type="button"
+                class="btn-detail"
+                (click)="verDetalle(item)"
+              >
+                <ion-icon name="eye-outline"></ion-icon>
+              </button>
+
+              <button
+                type="button"
+                class="btn-validate"
+                *ngIf="item.estadoDevolucion === 'pendiente'"
+                (click)="validar(item)"
+              >
+                Validar
+              </button>
+            </div>
+          </div>
+
+        </article>
+
+      </section>
+
+      <ng-template #sinDevoluciones>
+        <section class="empty-card">
+          <ion-icon name="cube-outline"></ion-icon>
+          <h3>Sin devoluciones</h3>
+          <p>No se encontraron registros para este filtro.</p>
+        </section>
+      </ng-template>
+
+      <section class="info-box">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <p>
+          Las devoluciones validadas se suman automáticamente al stock del almacén.
+        </p>
+      </section>
+
+    </div>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="mas"></app-admin-bottom-nav>
+
+</ion-content>

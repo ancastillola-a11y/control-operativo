@@ -1,0 +1,187 @@
+<!-- src/app/shared/componentes/material-form-modal/material-form-modal.component.html -->
+
+<ion-header class="modal-header">
+  <ion-toolbar>
+
+    <div class="modal-title-box">
+      <div class="modal-avatar">
+        <ion-icon name="cube-outline"></ion-icon>
+      </div>
+
+      <div>
+        <h2>{{ titulo }}</h2>
+        <p>{{ subtitulo }}</p>
+      </div>
+    </div>
+
+    <button type="button" class="btn-close" slot="end" (click)="cancelar()">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="modal-content">
+
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="form-wrapper">
+
+    <section class="form-card">
+
+      <div class="form-section-title">
+        <ion-icon name="image-outline"></ion-icon>
+        <span>Imagen del material</span>
+      </div>
+
+      <div class="image-uploader">
+
+        <div class="image-preview">
+          <img
+            *ngIf="imagenPreview; else imagenVacia"
+            [src]="imagenPreview"
+            alt="Imagen material"
+          />
+
+          <ng-template #imagenVacia>
+            <ion-icon name="image-outline"></ion-icon>
+          </ng-template>
+        </div>
+
+        <div class="image-actions">
+          <label class="btn-image">
+            <ion-icon name="camera-outline"></ion-icon>
+            <span>{{ imagenPreview ? 'Cambiar imagen' : 'Subir imagen' }}</span>
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              (change)="seleccionarImagen($event)"
+            />
+          </label>
+
+          <button
+            *ngIf="imagenPreview"
+            type="button"
+            class="btn-remove-image"
+            (click)="quitarImagenActual()"
+          >
+            Quitar imagen
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="form-card">
+
+      <div class="form-section-title">
+        <ion-icon name="cube-outline"></ion-icon>
+        <span>Datos del material</span>
+      </div>
+
+      <div class="field-group">
+        <label>Nombre del material</label>
+        <ion-item lines="none" class="input-card">
+          <ion-input
+            formControlName="nombre"
+            placeholder="Ejemplo: Cemento Portland"
+          ></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="form-grid">
+
+        <div class="field-group">
+          <label>Unidad</label>
+          <ion-item lines="none" class="input-card">
+            <ion-select
+              formControlName="unidad"
+              interface="popover"
+              placeholder="Unidad"
+            >
+              <ion-select-option
+                *ngFor="let unidad of unidades"
+                [value]="unidad"
+              >
+                {{ unidad }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <div class="field-group">
+          <label>Categoría</label>
+          <ion-item lines="none" class="input-card">
+            <ion-select
+              formControlName="categoria"
+              interface="popover"
+              placeholder="Categoría"
+            >
+              <ion-select-option
+                *ngFor="let categoria of categorias"
+                [value]="categoria"
+              >
+                {{ categoria }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+      </div>
+
+      <div class="form-grid">
+
+        <div class="field-group">
+          <label>{{ esCrear ? 'Stock inicial' : 'Stock actual' }}</label>
+          <ion-item lines="none" class="input-card">
+            <ion-input
+              formControlName="stockInicial"
+              type="number"
+              inputmode="decimal"
+              [readonly]="esEditar"
+              placeholder="0"
+            ></ion-input>
+          </ion-item>
+        </div>
+
+        <div class="field-group">
+          <label>Stock mínimo</label>
+          <ion-item lines="none" class="input-card">
+            <ion-input
+              formControlName="stockMinimo"
+              type="number"
+              inputmode="decimal"
+              placeholder="0"
+            ></ion-input>
+          </ion-item>
+        </div>
+
+      </div>
+
+      <div class="field-group">
+        <label>Descripción</label>
+        <ion-item lines="none" class="input-card textarea-card">
+          <ion-textarea
+            formControlName="descripcion"
+            placeholder="Detalle opcional del material"
+            autoGrow="true"
+          ></ion-textarea>
+        </ion-item>
+      </div>
+
+    </section>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-cancelar" (click)="cancelar()">
+        Cancelar
+      </button>
+
+      <button type="submit" class="btn-guardar">
+        <ion-icon name="save-outline"></ion-icon>
+        <span>{{ textoBoton }}</span>
+      </button>
+    </div>
+
+  </form>
+
+</ion-content>

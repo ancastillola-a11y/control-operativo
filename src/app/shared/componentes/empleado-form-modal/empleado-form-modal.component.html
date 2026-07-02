@@ -1,0 +1,236 @@
+<!-- src/app/shared/componentes/empleado-form-modal/empleado-form-modal.component.html -->
+
+<ion-header class="modal-header">
+  <ion-toolbar>
+
+    <div class="modal-toolbar-content">
+
+      <div class="modal-title-box">
+        <div class="modal-avatar">
+          <img
+            *ngIf="fotoPreview; else inicialesHeader"
+            [src]="fotoPreview"
+            alt="Foto empleado"
+          />
+
+          <ng-template #inicialesHeader>
+            <span>{{ iniciales }}</span>
+          </ng-template>
+        </div>
+
+        <div class="modal-title-text">
+          <h2>{{ titulo }}</h2>
+          <p>{{ subtitulo }}</p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="btn-close"
+        (click)="cancelar()"
+      >
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+
+    </div>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="modal-content">
+
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="form-wrapper">
+
+    <section class="form-card foto-card">
+
+      <div class="form-section-title">
+        <ion-icon name="camera-outline"></ion-icon>
+        <span>Foto del empleado</span>
+      </div>
+
+      <div class="foto-box">
+
+        <div class="foto-preview">
+          <img
+            *ngIf="fotoPreview; else sinFoto"
+            [src]="fotoPreview"
+            alt="Vista previa"
+          />
+
+          <ng-template #sinFoto>
+            <div class="foto-empty">
+              <ion-icon name="camera-outline"></ion-icon>
+              <span>{{ iniciales }}</span>
+            </div>
+          </ng-template>
+        </div>
+
+        <div class="foto-actions">
+          <input
+            #fotoInput
+            type="file"
+            accept="image/png,image/jpeg,image/jpg,image/webp"
+            class="foto-input"
+            (change)="seleccionarFoto($event)"
+          />
+
+          <button
+            type="button"
+            class="btn-foto"
+            (click)="fotoInput.click()"
+          >
+            <ion-icon name="cloud-upload-outline"></ion-icon>
+            <span>{{ fotoPreview ? 'Cambiar foto' : 'Subir foto' }}</span>
+          </button>
+
+          <button
+            *ngIf="fotoPreview"
+            type="button"
+            class="btn-quitar-foto"
+            (click)="quitarFoto()"
+          >
+            <ion-icon name="trash-outline"></ion-icon>
+            <span>Quitar</span>
+          </button>
+
+          <small>
+            Opcional. JPG, PNG o WEBP. Máximo 3 MB.
+          </small>
+
+          <small *ngIf="fotoNombre">
+            {{ fotoNombre }}
+          </small>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="form-card">
+
+      <div class="form-section-title">
+        <ion-icon name="person-outline"></ion-icon>
+        <span>Datos personales</span>
+      </div>
+
+      <div class="field-group">
+        <label>Nombres</label>
+        <ion-item lines="none" class="input-card">
+          <ion-input
+            formControlName="nombres"
+            placeholder="Ejemplo: Juan"
+          ></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="field-group">
+        <label>Apellidos</label>
+        <ion-item lines="none" class="input-card">
+          <ion-input
+            formControlName="apellidos"
+            placeholder="Ejemplo: Pérez Ramos"
+          ></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label>DNI</label>
+          <ion-item lines="none" class="input-card">
+            <ion-input
+              formControlName="dni"
+              inputmode="numeric"
+              maxlength="8"
+              placeholder="DNI"
+            ></ion-input>
+          </ion-item>
+        </div>
+
+        <div class="field-group">
+          <label>Teléfono</label>
+          <ion-item lines="none" class="input-card">
+            <ion-input
+              formControlName="telefono"
+              inputmode="tel"
+              maxlength="9"
+              placeholder="Celular"
+            ></ion-input>
+          </ion-item>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Cargo</label>
+        <ion-item lines="none" class="input-card">
+          <ion-input
+            formControlName="cargo"
+            placeholder="Ejemplo: Técnico electricista"
+          ></ion-input>
+        </ion-item>
+      </div>
+
+    </section>
+
+    <section class="form-card">
+
+      <div class="form-section-title">
+        <ion-icon name="key-outline"></ion-icon>
+        <span>Acceso al sistema</span>
+      </div>
+
+      <div class="field-group">
+        <label>Usuario</label>
+        <ion-item lines="none" class="input-card">
+          <ion-input
+            formControlName="usuario"
+            placeholder="Ejemplo: jperez"
+          ></ion-input>
+        </ion-item>
+
+        <small>
+          El usuario se usará para iniciar sesión en la aplicación.
+        </small>
+      </div>
+
+      <div class="field-group" *ngIf="esCrear">
+        <label>Contraseña temporal</label>
+        <ion-item lines="none" class="input-card">
+          <ion-input
+            formControlName="password"
+            type="password"
+            placeholder="Mínimo 6 caracteres"
+          ></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="info-box" *ngIf="esEditar">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <p>
+          La contraseña no se modifica desde esta ventana.
+          Aquí solo se actualizan los datos del empleado.
+        </p>
+      </div>
+
+    </section>
+
+    <div class="modal-actions">
+      <button
+        type="button"
+        class="btn-cancelar"
+        (click)="cancelar()"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        class="btn-guardar"
+      >
+        <ion-icon name="save-outline"></ion-icon>
+        <span>{{ textoBoton }}</span>
+      </button>
+    </div>
+
+  </form>
+
+</ion-content>

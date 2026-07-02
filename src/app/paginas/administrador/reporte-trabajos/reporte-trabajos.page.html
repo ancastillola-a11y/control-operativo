@@ -1,0 +1,424 @@
+<!-- src/app/paginas/administrador/reporte-trabajos/reporte-trabajos.page.html -->
+
+<ion-content [fullscreen]="true" class="reporte-trabajos-root">
+
+<ng-container *ngIf="adminVm$ | async as adminVm">
+<app-admin-header
+[nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+[rol]="'Administrador'"
+[fotoUrl]="adminVm.administrador.fotoUrl || ''"
+[notificaciones]="adminVm.resumen.notificacionesNoLeidas"
+(menuClick)="abrirMenu()"
+(notificacionesClick)="abrirNotificaciones()"
+(perfilClick)="abrirPerfil()"
+></app-admin-header> </ng-container>
+
+<ng-container *ngIf="vm$ | async as vm"> <main class="reporte-container">
+
+
+ <div class="page-back-row">
+  <button
+    type="button"
+    class="back-button"
+    (click)="volverReportes()"
+    
+  >
+    <ion-icon name="arrow-back-outline"></ion-icon>
+  </button>
+        <span>Volver a reportes</span>
+
+ 
+</div>
+
+<section class="hero-card">
+  <div class="hero-content">
+    <div class="hero-icon">
+      <ion-icon name="bar-chart-outline"></ion-icon>
+    </div>
+
+    <div>
+      <h1>Reporte operativo de trabajos</h1>
+      <p>
+        Analiza trabajos por estado, periodo, avance, devoluciones, tipos de servicio y empleados asignados.
+      </p>
+    </div>
+  </div>
+</section>
+
+  <section class="report-tools-card">
+    <div class="tools-header">
+      <div>
+        <h2>Periodo del reporte</h2>
+        <p>
+          Filtra los trabajos por fecha programada. Si el trabajo no tiene fecha programada, se usa la fecha de registro.
+        </p>
+      </div>
+    </div>
+
+ <div class="date-grid">
+  <label class="date-field">
+    <span>Desde</span>
+
+    <div class="date-input-wrap">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <input
+        type="date"
+        [value]="vm.fechaInicio"
+        (change)="cambiarFechaInicio($any($event.target).value)"
+      />
+    </div>
+  </label>
+
+  <label class="date-field">
+    <span>Hasta</span>
+
+    <div class="date-input-wrap">
+  <ion-icon name="calendar-outline"></ion-icon>
+  <input
+    type="date"
+    [value]="vm.fechaInicio"
+    (change)="cambiarFechaInicio($any($event.target).value)"
+  />
+</div>
+  </label>
+</div>
+
+    <div class="tools-actions">
+      <button
+        type="button"
+        class="tool-button secondary"
+        (click)="limpiarFechas()"
+      >
+        <ion-icon name="trash-outline"></ion-icon>
+        Limpiar
+      </button>
+
+      <button
+        type="button"
+        class="tool-button success"
+        (click)="exportarExcel(vm.trabajosFiltrados, vm.fechaInicio, vm.fechaFin)"
+      >
+        <ion-icon name="download-outline"></ion-icon>
+        Excel
+      </button>
+
+      <button
+        type="button"
+        class="tool-button danger"
+        (click)="exportarPDF(vm.trabajosFiltrados, vm.fechaInicio, vm.fechaFin)"
+      >
+        <ion-icon name="document-text-outline"></ion-icon>
+        PDF
+      </button>
+    </div>
+  </section>
+
+  <section class="summary-grid">
+
+    <article class="summary-card total">
+      <div>
+        <span>Total</span>
+        <h2>{{ vm.resumen.totalTrabajos }}</h2>
+      </div>
+      <ion-icon name="briefcase-outline"></ion-icon>
+    </article>
+
+    <article class="summary-card process">
+      <div>
+        <span>Activos</span>
+        <h2>{{ vm.resumen.trabajosActivos }}</h2>
+      </div>
+      <ion-icon name="refresh-outline"></ion-icon>
+    </article>
+
+    <article class="summary-card warning">
+      <div>
+        <span>Pendientes</span>
+        <h2>{{ vm.resumen.pendientes }}</h2>
+      </div>
+      <ion-icon name="time-outline"></ion-icon>
+    </article>
+
+    <article class="summary-card primary">
+      <div>
+        <span>Asignados</span>
+        <h2>{{ vm.resumen.asignados }}</h2>
+      </div>
+      <ion-icon name="people-outline"></ion-icon>
+    </article>
+
+    <article class="summary-card info">
+      <div>
+        <span>En camino</span>
+        <h2>{{ vm.resumen.enCamino }}</h2>
+      </div>
+      <ion-icon name="location-outline"></ion-icon>
+    </article>
+
+    <article class="summary-card process">
+      <div>
+        <span>En proceso</span>
+        <h2>{{ vm.resumen.enProceso }}</h2>
+      </div>
+      <ion-icon name="clipboard-outline"></ion-icon>
+    </article>
+
+    <article class="summary-card success">
+      <div>
+        <span>Finalizados</span>
+        <h2>{{ vm.resumen.finalizados }}</h2>
+      </div>
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+    </article>
+
+    <article class="summary-card danger">
+      <div>
+        <span>Cancelados</span>
+        <h2>{{ vm.resumen.cancelados }}</h2>
+      </div>
+      <ion-icon name="warning-outline"></ion-icon>
+    </article>
+
+  </section>
+
+  <section class="analysis-grid">
+
+    <article class="analysis-card success">
+      <div>
+        <span>Finalización</span>
+        <h3>{{ vm.resumen.porcentajeFinalizacion }}%</h3>
+        <p>Trabajos finalizados respecto al total filtrado.</p>
+      </div>
+    </article>
+
+    <article class="analysis-card process">
+      <div>
+        <span>Actividad</span>
+        <h3>{{ vm.resumen.porcentajeActivos }}%</h3>
+        <p>Trabajos activos, pendientes, asignados o en ejecución.</p>
+      </div>
+    </article>
+
+    <article class="analysis-card purple">
+      <div>
+        <span>Devoluciones</span>
+        <h3>{{ vm.resumen.devolucionesTotal }}</h3>
+        <p>Trabajos con devolución pendiente o realizada.</p>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="section-card">
+    <div class="section-header">
+      <div>
+        <h2>Trabajos por estado</h2>
+        <p>
+          Distribución operativa según el periodo y filtro seleccionado.
+        </p>
+      </div>
+    </div>
+
+    <div class="estado-list">
+      <article
+        class="estado-row"
+        *ngFor="let estado of vm.estados"
+      >
+        <div class="estado-info">
+          <span>{{ estado.titulo }}</span>
+          <strong>{{ estado.total }}</strong>
+        </div>
+
+        <div class="progress-track">
+          <div
+            class="progress-fill"
+            [class.warning]="estado.clase === 'warning'"
+            [class.primary]="estado.clase === 'primary'"
+            [class.info]="estado.clase === 'info'"
+            [class.process]="estado.clase === 'process'"
+            [class.success]="estado.clase === 'success'"
+            [class.purple]="estado.clase === 'purple'"
+            [class.danger]="estado.clase === 'danger'"
+            [style.width.%]="estado.porcentaje"
+          ></div>
+        </div>
+
+        <small>{{ estado.porcentaje }}%</small>
+      </article>
+    </div>
+  </section>
+
+  <section class="section-card">
+    <div class="section-header">
+      <div>
+        <h2>Tipos de trabajo más frecuentes</h2>
+        <p>
+          Servicios con mayor recurrencia dentro del reporte.
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="ranking-list"
+      *ngIf="vm.tiposTrabajo.length > 0; else sinTipos"
+    >
+      <article
+        class="ranking-row"
+        *ngFor="let tipo of vm.tiposTrabajo"
+      >
+        <div>
+          <span>{{ tipo.tipo }}</span>
+          <small>{{ tipo.porcentaje }}% del total</small>
+        </div>
+
+        <strong>{{ tipo.total }}</strong>
+      </article>
+    </div>
+
+    <ng-template #sinTipos>
+      <app-admin-empty-state
+        icono="clipboard-outline"
+        titulo="Sin tipos de trabajo"
+        descripcion="No hay datos suficientes para mostrar tipos de trabajo."
+      ></app-admin-empty-state>
+    </ng-template>
+  </section>
+
+  <section class="section-card">
+    <div class="section-header">
+      <div>
+        <h2>Empleados con más trabajos</h2>
+        <p>
+          Ranking de empleados según trabajos asignados en el periodo.
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="ranking-list"
+      *ngIf="vm.empleadosResumen.length > 0; else sinEmpleados"
+    >
+      <article
+        class="ranking-row"
+        *ngFor="let empleado of vm.empleadosResumen"
+      >
+        <div>
+          <span>{{ empleado.empleado }}</span>
+          <small>Trabajos asignados</small>
+        </div>
+
+        <strong>{{ empleado.total }}</strong>
+      </article>
+    </div>
+
+    <ng-template #sinEmpleados>
+      <app-admin-empty-state
+        icono="people-outline"
+        titulo="Sin empleados asignados"
+        descripcion="No hay empleados asociados a los trabajos filtrados."
+      ></app-admin-empty-state>
+    </ng-template>
+  </section>
+
+  <section class="filter-card">
+    <h2>Filtrar por estado</h2>
+
+    <div class="filter-scroll">
+      <button
+        type="button"
+        class="filter-chip"
+        *ngFor="let filtro of filtros"
+        [class.active]="vm.filtro === filtro.valor"
+        (click)="cambiarFiltro(filtro.valor)"
+      >
+        {{ filtro.texto }}
+      </button>
+    </div>
+  </section>
+
+  <section class="section-card">
+    <div class="section-header">
+      <div>
+        <h2>Detalle de trabajos</h2>
+        <p>{{ vm.totalFiltrados }} registro(s) encontrados.</p>
+      </div>
+
+      <button
+        type="button"
+        class="outline-button"
+        (click)="abrirModuloTrabajos()"
+      >
+        Ver módulo
+      </button>
+    </div>
+
+    <div
+      class="trabajos-list"
+      *ngIf="vm.trabajosFiltrados.length > 0; else sinTrabajos"
+    >
+      <article
+        class="trabajo-card"
+        *ngFor="let trabajo of vm.trabajosFiltrados; trackBy: trackByTrabajo"
+      >
+        <div class="trabajo-top">
+          <div>
+            <span class="codigo">#{{ trabajo.codigo }}</span>
+            <h3>{{ trabajo.clienteNombre }}</h3>
+            <p>{{ trabajo.tipoTrabajo }}</p>
+          </div>
+
+          <span
+            class="estado-badge"
+            [class.warning]="trabajo.estadoClase === 'warning'"
+            [class.primary]="trabajo.estadoClase === 'primary'"
+            [class.info]="trabajo.estadoClase === 'info'"
+            [class.process]="trabajo.estadoClase === 'process'"
+            [class.success]="trabajo.estadoClase === 'success'"
+            [class.purple]="trabajo.estadoClase === 'purple'"
+            [class.danger]="trabajo.estadoClase === 'danger'"
+          >
+            {{ trabajo.estadoTexto }}
+          </span>
+        </div>
+
+        <div class="trabajo-info">
+          <div>
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>{{ trabajo.fechaProgramadaTexto }} {{ trabajo.horaProgramadaTexto }}</span>
+          </div>
+
+          <div>
+            <ion-icon name="location-outline"></ion-icon>
+            <span>{{ trabajo.direccion || 'Sin dirección registrada' }}</span>
+          </div>
+
+          <div>
+            <ion-icon name="people-outline"></ion-icon>
+            <span>{{ trabajo.empleadosTexto }}</span>
+          </div>
+
+          <div>
+            <ion-icon name="document-text-outline"></ion-icon>
+            <span>{{ trabajo.materialesTexto }}</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <ng-template #sinTrabajos>
+      <app-admin-empty-state
+        icono="briefcase-outline"
+        titulo="Sin trabajos"
+        descripcion="No hay trabajos para los filtros seleccionados."
+      ></app-admin-empty-state>
+    </ng-template>
+  </section>
+
+</main>
+
+
+  </ng-container>
+
+<app-admin-bottom-nav activo="reportes"></app-admin-bottom-nav>
+
+</ion-content>

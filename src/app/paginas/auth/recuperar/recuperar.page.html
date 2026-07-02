@@ -1,0 +1,54 @@
+<!--control-operativo\src\app\vista\auth\recuperar\recuperar.page.html-->
+<ion-content [fullscreen]="true" class="login-root">
+  <div class="login-wrapper" @fadeIn>
+
+    <!-- Botón volver atrás -->
+    <div class="header-back">
+      <button class="btn-back" type="button" (click)="volverLogin()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+    </div>
+
+    <!-- Título y descripción -->
+    <h2 class="card-titulo">Recuperación de contraseña</h2>
+    <p class="card-descripcion">
+      Ingrese su correo electrónico para recuperar su contraseña
+    </p>
+
+    <!-- Imagen / ilustración -->
+    <div class="imagen-recuperar">
+      <img src="assets/img/recuperar.png" alt="Recuperar contraseña">
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="formulario" (ngSubmit)="enviarEnlace()">
+
+      <div class="campo-bloque">
+        <label class="campo-etiqueta">Correo electrónico</label>
+        <div class="campo-caja" [class.error]="formulario.get('correo')?.invalid && formulario.get('correo')?.touched">
+          <ion-icon name="mail-outline" class="campo-icono-iz"></ion-icon>
+          <input
+            type="email"
+            class="campo-input"
+            placeholder="correo@ejemplo.com"
+            formControlName="correo"
+          />
+        </div>
+      </div>
+
+      <!-- Info box -->
+      <div class="info-box">
+        <ion-icon name="information-circle-outline" class="info-icono"></ion-icon>
+        <p class="info-texto">
+          Le enviaremos un enlace para restablecer su contraseña.
+        </p>
+      </div>
+
+      <!-- Botones -->
+      <button type="submit" class="btn-ingresar" [disabled]="formulario.invalid">Enviar enlace</button>
+      <button type="button" class="btn-volver" (click)="volverLogin()">Volver al inicio de sesión</button>
+
+    </form>
+
+  </div>
+</ion-content>

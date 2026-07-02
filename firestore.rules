@@ -1,0 +1,211 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function estaLogueado() {
+      return request.auth != null;
+    }
+
+    function rutaMiUsuario() {
+      return /databases/$(database)/documents/usuarios/$(request.auth.uid);
+    }
+
+    function tienePerfil() {
+      return estaLogueado() && exists(rutaMiUsuario());
+    }
+
+    function miUsuario() {
+      return get(rutaMiUsuario()).data;
+    }
+
+    function usuarioActivo() {
+      return tienePerfil()
+        && miUsuario().eliminado != true
+        && miUsuario().habilitado != false
+        && miUsuario().activo != false
+        && miUsuario().estado != false;
+    }
+
+    function esAdmin() {
+      return usuarioActivo()
+        && (
+          miUsuario().rol == 'admin' ||
+          miUsuario().rol == 'administrador'
+        );
+    }
+
+    function esEmpleado() {
+      return usuarioActivo()
+        && miUsuario().rol == 'empleado';
+    }
+
+    function esAdminOEmpleado() {
+      return esAdmin() || esEmpleado();
+    }
+
+    function esMiDocumento(uid) {
+      return estaLogueado() && request.auth.uid == uid;
+    }
+
+    // ==========================
+    // USUARIOS
+    // ==========================
+    match /usuarios/{uid} {
+      /*
+        Necesario para tu login actual:
+        tu app busca usuario/correo en Firestore antes o durante el login.
+        Por eso se permite lectura de usuarios.
+      */
+      allow get, list: if true;
+
+      allow create: if estaLogueado();
+
+      allow update: if esAdmin() || esMiDocumento(uid);
+
+      allow delete: if false;
+    }
+
+    // ==========================
+    // DASHBOARD / CONFIGURACIÓN
+    // ==========================
+    match /dashboard_admin/{docId} {
+      allow read: if esAdmin();
+      allow write: if esAdmin();
+    }
+
+    match /configuracion/{docId} {
+      allow read: if esAdminOEmpleado();
+      allow write: if esAdmin();
+    }
+
+    match /modulos_admin/{docId} {
+      allow read: if esAdmin();
+      allow write: if esAdmin();
+    }
+
+    // ==========================
+    // EMPLEADOS ANTIGUO
+    // ==========================
+    match /empleados/{docId} {
+      allow read: if esAdmin();
+      allow write: if esAdmin();
+    }
+
+    // ==========================
+    // TRABAJOS
+    // ==========================
+    match /trabajos/{trabajoId} {
+      allow read: if esAdminOEmpleado();
+
+      allow create: if esAdmin();
+
+      allow update: if esAdminOEmpleado();
+
+      allow delete: if false;
+    }
+
+    // ==========================
+    // MATERIALES / ALMACÉN
+    // ==========================
+    match /materiales/{materialId} {
+      allow read: if esAdminOEmpleado();
+
+      allow create: if esAdmin();
+
+      allow update: if esAdmin();
+
+      allow delete: if false;
+    }
+
+    match /movimientos_materiales/{movimientoId} {
+      allow read: if esAdmin();
+      allow create: if esAdmin();
+      allow update: if esAdmin();
+      allow delete: if false;
+    }
+
+    // ==========================
+    // DEVOLUCIONES
+    // ==========================
+    match /devoluciones/{devolucionId} {
+      allow read: if esAdminOEmpleado();
+      allow create: if esAdminOEmpleado();
+      allow update: if esAdminOEmpleado();
+      allow delete: if false;
+    }
+
+    // ==========================
+    // FINANZAS
+    // ==========================
+    match /finanzas_movimientos/{movimientoId} {
+      allow read: if esAdmin();
+      allow create: if esAdmin();
+      allow update: if esAdmin();
+      allow delete: if false;
+    }
+
+    // ==========================
+    // GPS
+    // ==========================
+    match /gps_ubicaciones_actuales/{ubicacionId} {
+      allow read: if esAdminOEmpleado();
+
+      allow create: if esAdminOEmpleado();
+
+      allow update: if esAdminOEmpleado();
+
+      allow delete: if false;
+    }
+
+    match /gps_historial/{historialId} {
+      allow read: if esAdmin();
+      allow create: if esAdminOEmpleado();
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ==========================
+    // NOTIFICACIONES
+    // ==========================
+    match /notificaciones/{notificacionId} {
+      allow read: if esAdminOEmpleado();
+
+      allow create: if esAdmin();
+
+      allow update: if esAdminOEmpleado();
+
+      allow delete: if false;
+    }
+
+    match /notificaciones_admin/{notificacionId} {
+      allow read: if esAdmin();
+
+      allow create: if esAdmin();
+
+      allow update: if esAdmin();
+
+      allow delete: if false;
+    }
+
+    // ==========================
+    // HISTORIAL
+    // ==========================
+    match /historial_actividades/{historialId} {
+      allow read: if esAdmin();
+
+      allow create: if esAdminOEmpleado();
+
+      allow update: if false;
+
+      allow delete: if false;
+    }
+
+    // ==========================
+    // TODO LO DEMÁS BLOQUEADO
+    // ==========================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

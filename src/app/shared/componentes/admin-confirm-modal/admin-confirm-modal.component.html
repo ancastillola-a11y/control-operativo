@@ -1,0 +1,40 @@
+<!-- src/app/shared/componentes/admin-confirm-modal/admin-confirm-modal.component.html -->
+
+<div class="confirm-panel" [ngClass]="tipo">
+
+  <div class="confirm-icon">
+    <ion-icon [name]="icono"></ion-icon>
+  </div>
+
+  <div class="confirm-body">
+    <h2>{{ titulo }}</h2>
+
+    <p class="confirm-message">
+      {{ mensaje }}
+    </p>
+
+    <div class="confirm-detail" *ngIf="detalle">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <span>{{ detalle }}</span>
+    </div>
+  </div>
+
+  <div class="confirm-actions">
+    <button
+      type="button"
+      class="btn-cancelar"
+      (click)="cancelar()"
+    >
+      {{ textoCancelar }}
+    </button>
+
+    <button
+      type="button"
+      class="btn-confirmar"
+      (click)="confirmar()"
+    >
+      {{ textoConfirmar }}
+    </button>
+  </div>
+
+</div>

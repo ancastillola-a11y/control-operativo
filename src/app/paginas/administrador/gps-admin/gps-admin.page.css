@@ -1,0 +1,338 @@
+/* src/app/paginas/administrador/gps-admin/gps-admin.page.css */
+
+:host {
+  display: block;
+}
+
+ion-content.gps-root {
+  --background: var(--color-page-outside);
+}
+
+.gps-container {
+  width: 100%;
+  max-width: var(--app-width);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 10px 12px calc(92px + env(safe-area-inset-bottom));
+  background: var(--color-background);
+}
+
+.gps-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.btn-back {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--color-primary);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-card);
+  flex-shrink: 0;
+}
+
+.btn-back ion-icon {
+  font-size: 20px;
+}
+
+.gps-title-row h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--color-text);
+}
+
+.gps-title-row p {
+  margin: 2px 0 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.employee-select-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  box-shadow: var(--shadow-card);
+  padding: 2px 10px;
+  margin-bottom: 10px;
+}
+
+.employee-select-card ion-select {
+  width: 100%;
+  min-height: 42px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.map-card {
+  overflow: hidden;
+  border-radius: 18px;
+  background: #e5e7eb;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.employee-card {
+  margin: 10px 0 12px;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.employee-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: var(--color-primary-soft);
+  border: 1px solid #d7e4ff;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.employee-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.employee-avatar span {
+  font-size: 32px;
+}
+
+.employee-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.employee-info h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--color-text);
+}
+
+.employee-info p {
+  margin: 2px 0 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.employee-info small {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: capitalize;
+}
+
+.status-pill.warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.status-pill.inactive {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.empty-gps-card {
+  margin: 10px 0 12px;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  padding: 18px;
+  text-align: center;
+}
+
+.empty-gps-card ion-icon {
+  font-size: 28px;
+  color: var(--color-primary);
+}
+
+.empty-gps-card h3 {
+  margin: 8px 0 4px;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--color-text);
+}
+
+.empty-gps-card p {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+.gps-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.metric-card {
+  min-height: 70px;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.metric-card span {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.metric-card strong {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--color-text);
+}
+
+@media (max-width: 360px) {
+  .gps-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+/* RUTA GPS */
+
+.route-card {
+  margin: 10px 0 12px;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  padding: 12px;
+}
+
+.route-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  gap: 10px;
+  align-items: center;
+}
+
+.route-header span {
+  display: block;
+  font-size: 10px;
+  font-weight: 900;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.route-header h3 {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 900;
+  color: var(--color-text);
+}
+
+.route-header p {
+  margin: 4px 0 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+
+.route-header ion-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  padding: 9px;
+  box-sizing: border-box;
+}
+
+.route-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.route-metrics article {
+  min-height: 68px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.route-metrics ion-icon {
+  font-size: 17px;
+  color: var(--color-primary);
+}
+
+.route-metrics span {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--color-text-muted);
+}
+
+.route-metrics strong {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--color-text);
+}
+
+.btn-route {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 13px;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.btn-route:disabled {
+  background: #cbd5e1;
+  color: #64748b;
+}

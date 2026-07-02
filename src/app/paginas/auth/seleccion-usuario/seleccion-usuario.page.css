@@ -1,0 +1,279 @@
+/* src/app/paginas/auth/seleccion-usuario/seleccion-usuario.page.css */
+
+ion-content.seleccion-root,
+ion-content {
+  --background: #f3f5f9;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.pantalla-login,
+.pantalla-seleccion {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f3f5f9;
+}
+
+/* HERO SUPERIOR AJUSTADO */
+.hero {
+  width: 100%;
+  max-width: 430px;
+  height: 10vh;
+  min-height: 240px;
+  border-radius: 14px 14px 30px 30px;
+  background-image: url('/assets/img/fondo-obras.jpg');
+  background-size: cover;
+  background-position: top center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 40px;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 20, 50, 0.72);
+  z-index: 1;
+}
+
+.logo {
+  position: relative;
+  z-index: 2;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 12px;
+  object-fit: contain;
+}
+
+.hero h1 {
+  position: relative;
+  z-index: 2;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 800;
+  margin: 6px 0 0;
+  text-align: center;
+}
+
+.hero p {
+  position: relative;
+  z-index: 2;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+  margin: 4px 22px 0;
+}
+
+/* PANEL PRINCIPAL AJUSTADO */
+.panel {
+  width: 100%;
+  max-width: 430px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 36px 20px 24px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+  margin-top: -10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 3;
+  box-sizing: border-box;
+}
+
+/* TÍTULO Y DESCRIPCIÓN */
+.panel h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #071b3b;
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.descripcion {
+  font-size: 12px;
+  color: #273955;
+  line-height: 1.45;
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+/* OPCIONES ADMIN / EMPLEADO */
+.opcion {
+  width: 100%;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  border: none;
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 5px 13px rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  cursor: pointer;
+  transition: transform 0.1s;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.opcion:active {
+  transform: scale(0.985);
+}
+
+.opcion-img,
+.icono {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  margin-right: 14px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.icono {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icono.admin {
+  background: linear-gradient(180deg, #0b6ff5, #0057df);
+}
+
+.icono.empleado {
+  background: linear-gradient(180deg, #078b2f, #007725);
+}
+
+.texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.texto h3 {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0 0 5px;
+  color: #071b3b;
+}
+
+.texto p {
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 0;
+  color: #253b59;
+}
+
+.flecha {
+  font-size: 34px;
+  color: #071b3b;
+  padding-left: 8px;
+  line-height: 1;
+}
+
+/* NOTA INFERIOR */
+.nota {
+  width: 100%;
+  max-width: 430px;
+  background: #f7fbff;
+  border: 1px solid #d7e3f5;
+  border-radius: 20px;
+  padding: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 16px;
+  box-sizing: border-box;
+}
+
+.nota-icono {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.8px solid #5b6f91;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #5b6f91;
+  flex-shrink: 0;
+}
+
+.nota p {
+  font-size: 11px;
+  color: #344767;
+  line-height: 1.45;
+  margin: 0;
+}
+/* FIX APK RESPONSIVE SIN CAMBIAR DISEÑO */
+ion-content.seleccion-root {
+  --overflow: auto;
+}
+
+.pantalla-login,
+.pantalla-seleccion {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  height: auto;
+}
+
+.hero {
+  padding-top: calc(40px + env(safe-area-inset-top));
+}
+
+.panel {
+  margin-bottom: calc(18px + env(safe-area-inset-bottom));
+}
+
+@media (max-height: 720px) {
+  .hero {
+    min-height: 210px;
+    padding-top: calc(28px + env(safe-area-inset-top));
+  }
+
+  .panel {
+    padding-top: 26px;
+    padding-bottom: 20px;
+  }
+
+  .opcion {
+    min-height: 82px;
+    margin-bottom: 12px;
+  }
+
+  .nota {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .panel {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .texto h3 {
+    font-size: 13px;
+  }
+
+  .texto p {
+    font-size: 10.5px;
+  }
+}

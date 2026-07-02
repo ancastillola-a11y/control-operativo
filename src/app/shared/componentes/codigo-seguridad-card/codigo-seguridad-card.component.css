@@ -1,0 +1,128 @@
+/* src/app/shared/componentes/codigo-seguridad-card/codigo-seguridad-card.component.css */
+
+:host {
+  display: block;
+  font-family: var(--font-main);
+}
+
+.codigo-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  padding: 15px;
+  box-shadow: var(--shadow-card);
+}
+
+.codigo-header {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.codigo-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+}
+
+.codigo-card.primary .codigo-icon {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.codigo-card.warning .codigo-icon {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.codigo-icon ion-icon {
+  font-size: 27px;
+}
+
+.codigo-info h3 {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.codigo-info p {
+  margin: 4px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+
+.codigo-digits {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 7px;
+  margin-bottom: 16px;
+}
+
+.codigo-digits span {
+  height: 42px;
+  border-radius: 11px;
+  background: #f8fafc;
+  border: 1px solid #dbe3ef;
+  color: var(--color-primary);
+  font-size: 24px;
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+
+.codigo-card.warning .codigo-digits span {
+  color: var(--color-warning);
+}
+
+.codigo-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.codigo-actions button {
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-radius: 12px;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.btn-copy {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.btn-generate {
+  background: #ffffff;
+  color: var(--color-primary);
+  border: 1px solid #dbe8ff !important;
+}
+
+.codigo-card.warning .btn-copy {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.codigo-card.warning .btn-generate {
+  color: var(--color-warning);
+  border-color: #fdecc8 !important;
+}
+
+.codigo-actions ion-icon {
+  font-size: 17px;
+}

@@ -1,0 +1,331 @@
+<!-- src/app/paginas/administrador/reporte-empleados/reporte-empleados.page.html -->
+<ion-content [fullscreen]="true" class="reporte-empleados-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas || 0"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <main class="reporte-container">
+
+      <div class="page-back-row">
+        <button
+          type="button"
+          class="back-button"
+          (click)="volverReportes()"
+        >
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+
+        <span>Volver a reportes</span>
+      </div>
+
+      <section class="hero-card">
+        <div class="hero-content">
+          <div class="hero-icon">
+            <ion-icon name="people-outline"></ion-icon>
+          </div>
+
+          <div>
+            <h1>Reporte de empleados</h1>
+            <p>
+              Analiza personal activo, trabajos asignados, pendientes, finalizados y productividad operativa.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="report-tools-card">
+        <div class="tools-header">
+          <div>
+            <h2>Periodo del reporte</h2>
+            <p>
+              Filtra los trabajos asignados a empleados según fecha de registro, programación o actualización.
+            </p>
+          </div>
+        </div>
+
+        <div class="date-grid">
+          <label class="date-field">
+            <span>Desde</span>
+
+            <div class="date-input-wrap">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <input
+                type="date"
+                [value]="vm.fechaInicio"
+                (change)="cambiarFechaInicio($any($event.target).value)"
+              />
+            </div>
+          </label>
+
+          <label class="date-field">
+            <span>Hasta</span>
+
+            <div class="date-input-wrap">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <input
+                type="date"
+                [value]="vm.fechaFin"
+                (change)="cambiarFechaFin($any($event.target).value)"
+              />
+            </div>
+          </label>
+        </div>
+
+        <div class="tools-actions">
+          <button
+            type="button"
+            class="tool-button secondary"
+            (click)="limpiarFechas()"
+          >
+            <ion-icon name="trash-outline"></ion-icon>
+            Limpiar
+          </button>
+
+          <button
+            type="button"
+            class="tool-button success"
+            (click)="exportarExcel(vm.empleadosFiltrados, vm.fechaInicio, vm.fechaFin)"
+          >
+            <ion-icon name="download-outline"></ion-icon>
+            Excel
+          </button>
+
+          <button
+            type="button"
+            class="tool-button danger"
+            (click)="exportarPDF(vm.empleadosFiltrados, vm.fechaInicio, vm.fechaFin)"
+          >
+            <ion-icon name="document-text-outline"></ion-icon>
+            PDF
+          </button>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+
+        <article class="summary-card total">
+          <div>
+            <span>Total</span>
+            <h2>{{ vm.resumen.totalEmpleados }}</h2>
+          </div>
+          <ion-icon name="people-outline"></ion-icon>
+        </article>
+
+        <article class="summary-card success">
+          <div>
+            <span>Activos</span>
+            <h2>{{ vm.resumen.empleadosActivos }}</h2>
+          </div>
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </article>
+
+        <article class="summary-card danger">
+          <div>
+            <span>Inactivos</span>
+            <h2>{{ vm.resumen.empleadosInactivos }}</h2>
+          </div>
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </article>
+
+        <article class="summary-card process">
+          <div>
+            <span>Con trabajos</span>
+            <h2>{{ vm.resumen.empleadosConTrabajos }}</h2>
+          </div>
+          <ion-icon name="briefcase-outline"></ion-icon>
+        </article>
+
+        <article class="summary-card warning">
+          <div>
+            <span>Pendientes</span>
+            <h2>{{ vm.resumen.trabajosPendientes }}</h2>
+          </div>
+          <ion-icon name="warning-outline"></ion-icon>
+        </article>
+
+        <article class="summary-card primary">
+          <div>
+            <span>Finalizados</span>
+            <h2>{{ vm.resumen.trabajosFinalizados }}</h2>
+          </div>
+          <ion-icon name="document-text-outline"></ion-icon>
+        </article>
+
+      </section>
+
+      <section class="analysis-grid">
+
+        <article class="analysis-card process">
+          <span>Trabajos asignados</span>
+          <h3>{{ vm.resumen.totalTrabajosAsignados }}</h3>
+          <p>Total acumulado de asignaciones de trabajos al personal.</p>
+        </article>
+
+        <article class="analysis-card success">
+          <span>Promedio de finalización</span>
+          <h3>{{ vm.resumen.promedioFinalizacion }}%</h3>
+          <p>Promedio de trabajos finalizados respecto al total asignado.</p>
+        </article>
+
+      </section>
+
+      <section class="section-card">
+        <div class="section-header">
+          <div>
+            <h2>Ranking de productividad</h2>
+            <p>Empleados con más trabajos finalizados en el periodo seleccionado.</p>
+          </div>
+        </div>
+
+        <div
+          class="ranking-list"
+          *ngIf="vm.rankingProductividad.length > 0; else sinRanking"
+        >
+          <article
+            class="ranking-row"
+            *ngFor="let item of vm.rankingProductividad"
+          >
+            <div>
+              <span>{{ item.nombre }}</span>
+              <small>{{ item.cargo }} · {{ item.porcentajeFinalizacion }}% finalización</small>
+            </div>
+
+            <strong>{{ item.finalizados }}/{{ item.totalTrabajos }}</strong>
+          </article>
+        </div>
+
+        <ng-template #sinRanking>
+          <app-admin-empty-state
+            icono="people-outline"
+            titulo="Sin productividad"
+            descripcion="No hay trabajos asignados para calcular productividad."
+          ></app-admin-empty-state>
+        </ng-template>
+      </section>
+
+      <section class="filter-card">
+        <h2>Filtrar empleados</h2>
+
+        <div class="filter-scroll">
+          <button
+            type="button"
+            class="filter-chip"
+            *ngFor="let filtro of filtros"
+            [class.active]="vm.filtro === filtro.valor"
+            (click)="cambiarFiltro(filtro.valor)"
+          >
+            {{ filtro.texto }}
+          </button>
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="section-header">
+          <div>
+            <h2>Detalle de empleados</h2>
+            <p>{{ vm.totalFiltrados }} registro(s) encontrados.</p>
+          </div>
+
+          <button
+            type="button"
+            class="outline-button"
+            (click)="abrirModuloEmpleados()"
+          >
+            Ver empleados
+          </button>
+        </div>
+
+        <div
+          class="empleados-list"
+          *ngIf="vm.empleadosFiltrados.length > 0; else sinEmpleados"
+        >
+          <article
+            class="empleado-card"
+            *ngFor="let empleado of vm.empleadosFiltrados; trackBy: trackByEmpleado"
+          >
+            <div class="empleado-top">
+              <div>
+                <span class="codigo">{{ empleado.codigo }}</span>
+                <h3>{{ empleado.nombre }}</h3>
+                <p>{{ empleado.cargo }}</p>
+              </div>
+
+              <span
+                class="estado-badge"
+                [class.success]="empleado.estadoClase === 'success'"
+                [class.danger]="empleado.estadoClase === 'danger'"
+              >
+                {{ empleado.estadoTexto }}
+              </span>
+            </div>
+
+            <div class="empleado-info">
+              <div>
+                <strong>{{ empleado.totalTrabajos }}</strong>
+                <span>Trabajos</span>
+              </div>
+
+              <div>
+                <strong>{{ empleado.pendientes }}</strong>
+                <span>Pendientes</span>
+              </div>
+
+              <div>
+                <strong>{{ empleado.enCamino + empleado.enProceso }}</strong>
+                <span>Proceso</span>
+              </div>
+
+              <div>
+                <strong>{{ empleado.finalizados }}</strong>
+                <span>Finalizados</span>
+              </div>
+            </div>
+
+            <div class="progress-box">
+              <div class="progress-top">
+                <span>Finalización</span>
+                <strong>{{ empleado.porcentajeFinalizacion }}%</strong>
+              </div>
+
+              <div class="progress-bar">
+                <div
+                  class="progress-fill"
+                  [style.width.%]="empleado.porcentajeFinalizacion"
+                ></div>
+              </div>
+            </div>
+
+            <div class="empleado-footer">
+  <span>Número: {{ empleado.telefono }}</span>
+  <span>Último trabajo: {{ empleado.ultimoTrabajoTexto }}</span>
+</div>
+          </article>
+        </div>
+
+        <ng-template #sinEmpleados>
+          <app-admin-empty-state
+            icono="people-outline"
+            titulo="Sin empleados"
+            descripcion="No hay empleados para los filtros seleccionados."
+          ></app-admin-empty-state>
+        </ng-template>
+      </section>
+
+    </main>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="reportes"></app-admin-bottom-nav>
+
+</ion-content>

@@ -1,0 +1,74 @@
+<!-- src/app/shared/componentes/trabajo-card/trabajo-card.component.html -->
+
+<article class="trabajo-card">
+
+  <div class="trabajo-main">
+
+    <div class="trabajo-icon">
+      <ion-icon name="briefcase-outline"></ion-icon>
+    </div>
+
+    <div class="trabajo-info">
+
+      <div class="trabajo-title-row">
+        <h3>{{ trabajo.clienteNombre }}</h3>
+      </div>
+
+      <p class="trabajo-tipo">
+        {{ trabajo.tipoTrabajo }}
+      </p>
+
+      <div class="trabajo-meta">
+
+        <span>
+          <ion-icon name="location-outline"></ion-icon>
+          {{ trabajo.direccion || 'Sin dirección' }}
+        </span>
+
+        <span>
+          <ion-icon name="calendar-outline"></ion-icon>
+          {{ trabajo.fechaHoraTexto }}
+        </span>
+
+        <span>
+          <ion-icon name="people-outline"></ion-icon>
+          {{ trabajo.empleadosTexto }}
+        </span>
+
+      </div>
+
+      <div class="trabajo-footer-info">
+        <span class="subtotal">
+          {{ trabajo.subtotalTexto }}
+        </span>
+
+        <span class="materiales">
+          {{ trabajo.materialesAsignados.length || 0 }} material(es)
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="trabajo-side">
+
+    <span
+      class="estado-badge"
+      [ngClass]="trabajo.estadoClase"
+    >
+      {{ trabajo.estadoTexto }}
+    </span>
+
+    <button
+      type="button"
+      class="btn-more"
+      aria-label="Acciones del trabajo"
+      (click)="abrirAcciones()"
+    >
+      <span class="dots-text">⋮</span>
+    </button>
+
+  </div>
+
+</article>

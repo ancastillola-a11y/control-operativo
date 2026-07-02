@@ -1,0 +1,123 @@
+<!-- src/app/paginas/trabajos/asignacion-trabajos/asignacion-trabajos.page.html -->
+<ion-content [fullscreen]="true" class="trabajos-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <div class="trabajos-container">
+
+      <app-admin-module-hero
+        titulo="Asignación de trabajos"
+        descripcion="Programa trabajos, asigna empleados y descuenta materiales."
+        icono="briefcase-outline"
+        botonTexto="Nuevo"
+        botonIcono="add-outline"
+        (botonClick)="nuevoTrabajo()"
+      ></app-admin-module-hero>
+
+      <section class="summary-grid">
+
+        <app-admin-summary-card
+          titulo="Total"
+          [valor]="vm.totalTrabajos"
+          icono="briefcase-outline"
+          tipo="total"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="Pendientes"
+          [valor]="vm.totalPendientes"
+          icono="time-outline"
+          tipo="warning"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="En proceso"
+          [valor]="vm.totalEnProceso"
+          icono="refresh-outline"
+          tipo="primary"
+        ></app-admin-summary-card>
+
+        <app-admin-summary-card
+          titulo="Finalizados"
+          [valor]="vm.totalFinalizados"
+          icono="checkmark-circle-outline"
+          tipo="success"
+        ></app-admin-summary-card>
+
+      </section>
+
+      <app-admin-search-filter
+        placeholder="Buscar cliente, dirección, empleado..."
+        [filtroActual]="vm.filtro"
+        (buscar)="buscarTrabajo($event)"
+        (filtrar)="abrirFiltro()"
+      ></app-admin-search-filter>
+
+      <section class="list-title-row">
+        <div>
+          <h3>Lista de trabajos</h3>
+          <p>{{ vm.trabajosFiltrados.length }} registro(s) encontrado(s)</p>
+        </div>
+
+        <span class="page-indicator">
+          Pág. {{ vm.paginaActual }} / {{ vm.totalPaginas }}
+        </span>
+      </section>
+
+      <section class="list-section">
+
+        <div
+          class="trabajos-list"
+          *ngIf="vm.trabajosPagina.length > 0; else sinResultados"
+        >
+
+          <app-trabajo-card
+            *ngFor="let trabajo of vm.trabajosPagina; trackBy: trackByTrabajo"
+            [trabajo]="trabajo"
+            (acciones)="abrirAcciones($event)"
+          ></app-trabajo-card>
+
+        </div>
+
+        <ng-template #sinResultados>
+          <app-admin-empty-state
+            icono="briefcase-outline"
+            titulo="No hay trabajos para mostrar"
+            descripcion="No se encontraron trabajos con el criterio actual."
+            botonTexto="Registrar trabajo"
+            botonIcono="add-outline"
+            (botonClick)="nuevoTrabajo()"
+          ></app-admin-empty-state>
+        </ng-template>
+
+      </section>
+
+      <app-admin-pagination
+        *ngIf="vm.totalPaginas > 1"
+        [paginaActual]="vm.paginaActual"
+        [totalPaginas]="vm.totalPaginas"
+        [paginas]="vm.paginas"
+        (anterior)="paginaAnterior()"
+        (siguiente)="paginaSiguiente(vm.totalPaginas)"
+        (irPagina)="irPagina($event)"
+      ></app-admin-pagination>
+
+    </div>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="trabajos"></app-admin-bottom-nav>
+
+</ion-content>

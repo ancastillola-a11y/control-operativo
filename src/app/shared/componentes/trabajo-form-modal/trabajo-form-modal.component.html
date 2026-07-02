@@ -1,0 +1,393 @@
+<!-- src/app/shared/componentes/trabajo-form-modal/trabajo-form-modal.component.html -->
+
+<ion-header class="modal-header">
+  <ion-toolbar>
+
+    <div class="modal-title-box">
+      <div class="modal-avatar">
+        <ion-icon name="briefcase-outline"></ion-icon>
+      </div>
+
+      <div>
+        <h2>{{ titulo }}</h2>
+        <p>Paso {{ pasoActual }} de {{ totalPasos }} · {{ tituloPaso }}</p>
+      </div>
+    </div>
+
+    <button type="button" class="btn-close" slot="end" (click)="cancelar()">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="modal-content">
+
+  <form [formGroup]="formulario" class="form-wrapper">
+
+    <section class="step-card">
+
+      <div class="step-header">
+        <h3>{{ tituloPaso }}</h3>
+        <p>{{ subtitulo }}</p>
+      </div>
+
+      <div class="steps-line">
+
+        <button
+          type="button"
+          class="step-item"
+          [class.active]="pasoActual === 1"
+          [class.done]="pasoActual > 1"
+          (click)="irPaso(1)"
+        >
+          <span>1</span>
+          <small>Información</small>
+        </button>
+
+        <div class="step-divider"></div>
+
+        <button
+          type="button"
+          class="step-item"
+          [class.active]="pasoActual === 2"
+          [class.done]="pasoActual > 2"
+          (click)="irPaso(2)"
+        >
+          <span>2</span>
+          <small>Empleados</small>
+        </button>
+
+        <div class="step-divider"></div>
+
+        <button
+          type="button"
+          class="step-item"
+          [class.active]="pasoActual === 3"
+          [class.done]="pasoActual > 3"
+          (click)="irPaso(3)"
+        >
+          <span>3</span>
+          <small>Materiales</small>
+        </button>
+
+        <div class="step-divider"></div>
+
+        <button
+          type="button"
+          class="step-item"
+          [class.active]="pasoActual === 4"
+          (click)="irPaso(4)"
+        >
+          <span>4</span>
+          <small>Confirmación</small>
+        </button>
+
+      </div>
+
+    </section>
+
+    <!-- PASO 1 -->
+    <section class="form-card" *ngIf="pasoActual === 1">
+
+      <div class="form-section-title">
+        <ion-icon name="person-outline"></ion-icon>
+        <span>Información del trabajo</span>
+      </div>
+
+      <div class="field-group">
+        <label>Cliente</label>
+        <ion-item lines="none" class="input-card">
+          <ion-input
+            formControlName="clienteNombre"
+            placeholder="Nombre del cliente"
+          ></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="field-group">
+        <label>Número de contacto</label>
+        <ion-item lines="none" class="input-card">
+          <ion-input
+            formControlName="clienteTelefono"
+            type="tel"
+            inputmode="tel"
+            placeholder="987 654 321"
+          ></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="field-group">
+        <label>Dirección, coordenadas o enlace</label>
+        <ion-item lines="none" class="input-card">
+          <ion-input
+            formControlName="direccion"
+            placeholder="Dirección, coordenadas o enlace de Google Maps"
+          ></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="map-action-row">
+        <button
+          type="button"
+          class="btn-open-map"
+          (click)="alternarMapa()"
+        >
+          <ion-icon name="map-outline"></ion-icon>
+          <span>{{ mostrarMapa ? 'Ocultar mapa' : 'Verificar en mapa' }}</span>
+        </button>
+      </div>
+
+      <app-osm-map-picker
+        *ngIf="mostrarMapa"
+        [textoInicial]="formulario.value.direccion || ''"
+        [latitudInicial]="latitudSeleccionada"
+        [longitudInicial]="longitudSeleccionada"
+        (ubicacionSeleccionada)="actualizarUbicacionMapa($event)"
+      ></app-osm-map-picker>
+
+      <div class="field-group">
+        <label>Referencia</label>
+        <ion-item lines="none" class="input-card">
+          <ion-input
+            formControlName="referencia"
+            placeholder="Referencia opcional"
+          ></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="form-grid">
+
+        <div class="field-group">
+          <label>Tipo de trabajo</label>
+          <ion-item lines="none" class="input-card">
+            <ion-select
+              formControlName="tipoTrabajo"
+              interface="popover"
+              placeholder="Seleccione"
+            >
+              <ion-select-option
+                *ngFor="let tipo of tiposTrabajo"
+                [value]="tipo"
+              >
+                {{ tipo }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <div class="field-group">
+          <label>Subtotal (S/)</label>
+          <ion-item lines="none" class="input-card">
+            <ion-input
+              formControlName="subtotal"
+              type="number"
+              inputmode="decimal"
+              placeholder="0.00"
+            ></ion-input>
+          </ion-item>
+        </div>
+
+      </div>
+
+      <div class="form-grid">
+
+        <div class="field-group">
+          <label>Fecha del trabajo</label>
+          <ion-item lines="none" class="input-card">
+            <ion-input
+              formControlName="fechaProgramada"
+              type="date"
+            ></ion-input>
+          </ion-item>
+        </div>
+
+        <div class="field-group">
+          <label>Hora programada</label>
+          <ion-item lines="none" class="input-card">
+            <ion-input
+              formControlName="horaProgramada"
+              type="time"
+            ></ion-input>
+          </ion-item>
+        </div>
+
+      </div>
+
+      <div class="field-group">
+        <label>Descripción opcional</label>
+        <ion-item lines="none" class="input-card textarea-card">
+          <ion-textarea
+            formControlName="descripcion"
+            placeholder="Detalle u observación del trabajo"
+            autoGrow="true"
+          ></ion-textarea>
+        </ion-item>
+      </div>
+
+    </section>
+
+    <!-- PASO 2 -->
+    <section class="form-card" *ngIf="pasoActual === 2">
+
+      <div class="form-section-title">
+        <ion-icon name="people-outline"></ion-icon>
+        <span>Asignación de empleados</span>
+      </div>
+
+      <app-trabajo-empleados-selector
+        [empleados]="empleadosDisponibles"
+        [seleccionados]="empleadosSeleccionados"
+        (seleccionadosChange)="actualizarEmpleados($event)"
+      ></app-trabajo-empleados-selector>
+
+    </section>
+
+    <!-- PASO 3 -->
+    <section class="form-card" *ngIf="pasoActual === 3">
+
+      <div class="form-section-title">
+        <ion-icon name="cube-outline"></ion-icon>
+        <span>Asignación de materiales</span>
+      </div>
+
+      <ng-container *ngIf="esCrear; else materialesBloqueados">
+        <app-trabajo-materiales-selector
+          [materiales]="materialesDisponibles"
+          [seleccionados]="materialesSeleccionados"
+          (seleccionadosChange)="actualizarMateriales($event)"
+        ></app-trabajo-materiales-selector>
+      </ng-container>
+
+      <ng-template #materialesBloqueados>
+        <div class="info-box">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <p>
+            Los materiales asignados no se modifican desde esta edición para proteger el control del stock.
+          </p>
+        </div>
+      </ng-template>
+
+    </section>
+
+    <!-- PASO 4 -->
+    <section class="form-card" *ngIf="pasoActual === 4">
+
+      <div class="form-section-title">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <span>Confirmación del trabajo</span>
+      </div>
+
+      <div class="resume-box">
+
+        <div class="resume-row">
+          <span>Cliente</span>
+          <strong>{{ formulario.value.clienteNombre || 'Sin cliente' }}</strong>
+        </div>
+
+        <div class="resume-row">
+          <span>Contacto</span>
+          <strong>{{ formulario.value.clienteTelefono || 'Sin contacto' }}</strong>
+        </div>
+
+        <div class="resume-row">
+          <span>Dirección</span>
+          <strong>{{ formulario.value.direccion || 'Sin dirección' }}</strong>
+        </div>
+
+        <div
+          class="resume-row"
+          *ngIf="latitudSeleccionada !== null && longitudSeleccionada !== null"
+        >
+          <span>Ubicación</span>
+          <strong>
+            Lat: {{ latitudSeleccionada }} · Lng: {{ longitudSeleccionada }}
+          </strong>
+        </div>
+
+        <div class="resume-row">
+          <span>Tipo de trabajo</span>
+          <strong>{{ formulario.value.tipoTrabajo || 'Sin tipo' }}</strong>
+        </div>
+
+        <div class="resume-row">
+          <span>Fecha y hora</span>
+          <strong>
+            {{ formulario.value.fechaProgramada || 'Sin fecha' }}
+            ·
+            {{ formulario.value.horaProgramada || 'Sin hora' }}
+          </strong>
+        </div>
+
+        <div class="resume-row">
+          <span>Empleados</span>
+          <strong>{{ resumenEmpleados }}</strong>
+        </div>
+
+        <div class="resume-row">
+          <span>Materiales</span>
+          <strong>{{ esCrear ? resumenMateriales : 'Sin modificación de materiales' }}</strong>
+        </div>
+
+        <div class="resume-row total">
+          <span>Subtotal</span>
+          <strong>S/ {{ formulario.value.subtotal || 0 }}</strong>
+        </div>
+
+      </div>
+
+      <div class="warning-box" *ngIf="esCrear">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <p>
+          Al confirmar, el sistema descontará automáticamente el stock de los materiales asignados.
+        </p>
+      </div>
+
+    </section>
+
+    <div class="modal-actions">
+
+      <button
+        type="button"
+        class="btn-secondary"
+        *ngIf="pasoActual > 1"
+        (click)="anterior()"
+      >
+        <ion-icon name="chevron-back-outline"></ion-icon>
+        <span>Anterior</span>
+      </button>
+
+      <button
+        type="button"
+        class="btn-secondary"
+        *ngIf="pasoActual === 1"
+        (click)="cancelar()"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        class="btn-primary"
+        *ngIf="pasoActual < totalPasos"
+        (click)="siguiente()"
+      >
+        <span>Siguiente</span>
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
+
+      <button
+        type="button"
+        class="btn-primary"
+        *ngIf="pasoActual === totalPasos"
+        (click)="guardar()"
+      >
+        <ion-icon name="save-outline"></ion-icon>
+        <span>{{ textoBotonFinal }}</span>
+      </button>
+
+    </div>
+
+  </form>
+
+</ion-content>

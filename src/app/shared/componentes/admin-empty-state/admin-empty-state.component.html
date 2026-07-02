@@ -1,0 +1,23 @@
+<!-- src/app/shared/componentes/admin-empty-state/admin-empty-state.component.html -->
+
+<div class="empty-state">
+
+  <div class="empty-icon">
+    <ion-icon [name]="icono"></ion-icon>
+  </div>
+
+  <h3>{{ titulo }}</h3>
+
+  <p>{{ descripcion }}</p>
+
+  <button
+    *ngIf="mostrarBoton"
+    type="button"
+    class="btn-empty"
+    (click)="emitirClick()"
+  >
+    <ion-icon [name]="botonIcono"></ion-icon>
+    <span>{{ botonTexto }}</span>
+  </button>
+
+</div>

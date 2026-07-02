@@ -1,0 +1,159 @@
+<!-- src/app/paginas/trabajos/codigos-seguridad/codigos-seguridad.page.html -->
+
+<ion-content [fullscreen]="true" class="codigos-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <div class="codigos-container">
+
+      <button
+        type="button"
+        class="back-row"
+        (click)="irAtras()"
+      >
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        <span>Volver</span>
+      </button>
+
+      <section class="module-title-card">
+        <div class="module-icon">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+        </div>
+
+        <div>
+        
+          <h2>Códigos de seguridad</h2>
+          <p>Gestiona los códigos del cliente y devolución de materiales.</p>
+        </div>
+      </section>
+
+      <ng-container *ngIf="vm.trabajos.length > 0; else sinTrabajos">
+
+        <section class="selector-card">
+
+          <label>Trabajo seleccionado</label>
+
+          <ion-item lines="none" class="select-card">
+            <ion-select
+              interface="popover"
+              [value]="vm.trabajoSeleccionado?.uid"
+              placeholder="Seleccione un trabajo"
+              (ionChange)="cambiarTrabajo($event)"
+            >
+              <ion-select-option
+                *ngFor="let trabajo of vm.trabajos"
+                [value]="trabajo.uid"
+              >
+                 {{ trabajo.tipoTrabajo }} - {{ trabajo.clienteNombre }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <div
+            class="trabajo-resumen"
+            *ngIf="vm.trabajoSeleccionado as trabajo"
+          >
+            <div>
+              <h3>{{ trabajo.clienteNombre }}</h3>
+              <p>{{ trabajo.tipoTrabajo }} · {{ trabajo.fechaHoraTexto }}</p>
+              <span>{{ trabajo.empleadosTexto }}</span>
+            </div>
+
+            <strong [ngClass]="trabajo.estadoClase">
+              {{ trabajo.estadoTexto }}
+            </strong>
+          </div>
+
+        </section>
+
+        <section class="tabs-card">
+
+          <button
+            type="button"
+            [class.active]="vm.tabActivo === 'cliente'"
+            (click)="cambiarTab('cliente')"
+          >
+            Cliente
+          </button>
+
+          <button
+            type="button"
+            [class.active]="vm.tabActivo === 'devolucion'"
+            (click)="cambiarTab('devolucion')"
+          >
+            Devolución
+          </button>
+
+        </section>
+
+        <section
+          class="codigo-section"
+          *ngIf="vm.trabajoSeleccionado as trabajo"
+        >
+
+          <app-codigo-seguridad-card
+            *ngIf="vm.tabActivo === 'cliente'"
+            tipo="cliente"
+            titulo="Código de verificación para cliente"
+            descripcion="El empleado muestra este código para validar que pertenece a la empresa."
+            [codigo]="trabajo.codigoCliente"
+            icono="shield-checkmark-outline"
+            color="primary"
+            (copiar)="copiarCodigo(trabajo.codigoCliente)"
+            (generarNuevo)="confirmarRegenerar('cliente', trabajo)"
+          ></app-codigo-seguridad-card>
+
+          <app-codigo-seguridad-card
+            *ngIf="vm.tabActivo === 'devolucion'"
+            tipo="devolucion"
+            titulo="Código para devolución de materiales"
+            descripcion="Se utiliza para validar la devolución de materiales sobrantes al almacén."
+            [codigo]="trabajo.codigoDevolucion"
+            icono="lock-closed-outline"
+            color="warning"
+            (copiar)="copiarCodigo(trabajo.codigoDevolucion)"
+            (generarNuevo)="confirmarRegenerar('devolucion', trabajo)"
+          ></app-codigo-seguridad-card>
+
+        </section>
+
+        <section class="info-card">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <p>
+            Los códigos pertenecen al trabajo seleccionado. Si genera uno nuevo, el código anterior dejará de ser válido.
+          </p>
+        </section>
+
+      </ng-container>
+
+      <ng-template #sinTrabajos>
+        <section class="empty-card">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          <h3>No hay trabajos disponibles</h3>
+          <p>Registre un trabajo para generar códigos de seguridad.</p>
+
+          <button type="button" (click)="irTrabajos()">
+            Ir a trabajos
+          </button>
+        </section>
+      </ng-template>
+
+    </div>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="mas"></app-admin-bottom-nav>
+
+</ion-content>

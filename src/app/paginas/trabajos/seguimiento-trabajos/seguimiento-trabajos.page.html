@@ -1,0 +1,158 @@
+<!-- src/app/paginas/trabajos/seguimiento-trabajos/seguimiento-trabajos.page.html -->
+
+<ion-content [fullscreen]="true" class="seguimiento-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <div class="seguimiento-container">
+
+      <button
+        type="button"
+        class="back-row"
+        (click)="irAtras()"
+      >
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        <span>Seguimiento de trabajos</span>
+      </button>
+
+      <section class="tabs-row">
+
+        <button
+          type="button"
+          [class.active]="vm.filtroActivo === 'todos'"
+          (click)="cambiarFiltro('todos')"
+        >
+          Todos
+        </button>
+
+        <button
+          type="button"
+          [class.active]="vm.filtroActivo === 'pendientes'"
+          (click)="cambiarFiltro('pendientes')"
+        >
+          Pendientes
+        </button>
+
+        <button
+          type="button"
+          [class.active]="vm.filtroActivo === 'en_camino'"
+          (click)="cambiarFiltro('en_camino')"
+        >
+          En camino
+        </button>
+
+        <button
+          type="button"
+          [class.active]="vm.filtroActivo === 'en_proceso'"
+          (click)="cambiarFiltro('en_proceso')"
+        >
+          En proceso
+        </button>
+
+        <button
+          type="button"
+          [class.active]="vm.filtroActivo === 'finalizados'"
+          (click)="cambiarFiltro('finalizados')"
+        >
+          Finalizados
+        </button>
+
+      </section>
+
+      <section
+        class="trabajos-list"
+        *ngIf="vm.trabajosFiltrados.length > 0; else sinTrabajos"
+      >
+
+        <article
+          class="seguimiento-card"
+          *ngFor="let trabajo of vm.trabajosFiltrados; trackBy: trackByTrabajo"
+          (click)="abrirDetalleTrabajo(trabajo)"
+        >
+
+          <div class="card-main-row">
+
+            <div class="trabajo-main-info">
+              <div class="trabajo-title-row">
+                <h3>{{ obtenerCodigoTrabajo(trabajo) }}</h3>
+                <strong>{{ trabajo.tipoTrabajo }}</strong>
+              </div>
+
+              <div class="info-row">
+                <span>Cliente:</span>
+                <p>{{ trabajo.clienteNombre }}</p>
+              </div>
+
+              <div class="info-row">
+                <span>Empleado:</span>
+                <p>{{ trabajo.empleadosTexto }}</p>
+              </div>
+
+              <div class="estado-row">
+                <span>Estado:</span>
+
+                <strong
+                  class="estado-badge"
+                  [ngClass]="obtenerClaseEstado(trabajo)"
+                >
+                  {{ obtenerEstadoTexto(trabajo) }}
+                </strong>
+
+                <small>{{ obtenerFechaHoraSeguimiento(trabajo) }}</small>
+              </div>
+            </div>
+
+            <ion-icon
+              class="card-arrow"
+              name="chevron-forward-outline"
+            ></ion-icon>
+
+          </div>
+
+        </article>
+
+      </section>
+
+      <ng-template #sinTrabajos>
+        <section class="empty-card">
+          <ion-icon name="clipboard-outline"></ion-icon>
+          <h3>No hay trabajos para mostrar</h3>
+          <p>No se encontraron trabajos con el estado seleccionado.</p>
+
+          <button
+            type="button"
+            (click)="verTodos()"
+          >
+            Ver todos los trabajos
+          </button>
+        </section>
+      </ng-template>
+
+      <button
+        type="button"
+        class="btn-ver-todos"
+        (click)="verTodos()"
+      >
+        <ion-icon name="clipboard-outline"></ion-icon>
+        <span>Ver todos los trabajos</span>
+      </button>
+
+    </div>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="mas"></app-admin-bottom-nav>
+
+</ion-content>

@@ -1,0 +1,416 @@
+<!-- src/app/shared/componentes/finanza-form-modal/finanza-form-modal.component.html -->
+
+<ion-header class="modal-header">
+  <ion-toolbar>
+
+    <div class="modal-toolbar-content">
+
+      <div class="modal-title-box">
+        <div class="modal-avatar">
+          <ion-icon name="wallet-outline"></ion-icon>
+        </div>
+
+        <div class="modal-title-text">
+          <h2>{{ titulo }}</h2>
+          <p>Paso {{ pasoActual }} de 2 · {{ tituloPaso }}</p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="btn-close"
+        (click)="cancelar()"
+      >
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+
+    </div>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="modal-content">
+
+  <form
+    class="form-wrapper"
+    [formGroup]="formulario"
+    (ngSubmit)="guardar()"
+  >
+
+    <section class="step-card">
+
+      <div class="step-header">
+        <h3>{{ tituloPaso }}</h3>
+        <p>{{ subtitulo }}</p>
+      </div>
+
+      <div class="steps-line">
+
+        <button
+          type="button"
+          class="step-item"
+          [class.active]="pasoActual === 1"
+          [class.done]="pasoActual > 1"
+          (click)="cambiarTrabajo()"
+        >
+          <span>1</span>
+          <small>Trabajo</small>
+        </button>
+
+        <div class="step-divider"></div>
+
+        <button
+          type="button"
+          class="step-item"
+          [class.active]="pasoActual === 2"
+          [disabled]="!trabajoSeleccionado"
+        >
+          <span>2</span>
+          <small>Finanzas</small>
+        </button>
+
+      </div>
+
+    </section>
+
+    <!-- PASO 1 -->
+    <section
+      class="form-card"
+      *ngIf="pasoActual === 1"
+    >
+
+      <div class="form-section-title">
+        <ion-icon name="search-outline"></ion-icon>
+        <span>Buscar trabajo</span>
+      </div>
+
+      <ion-item lines="none" class="input-card">
+        <ion-icon name="search-outline" slot="start"></ion-icon>
+
+        <ion-input
+          placeholder="Buscar por T-00000, cliente, dirección o empleado"
+          (ionInput)="buscarTrabajo($event)"
+        ></ion-input>
+      </ion-item>
+
+      <div
+        class="loading-box"
+        *ngIf="cargandoTrabajos"
+      >
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando trabajos...</p>
+      </div>
+
+      <div
+        class="trabajos-resultados"
+        *ngIf="!cargandoTrabajos && trabajosFiltrados.length > 0"
+      >
+
+        <button
+          type="button"
+          class="trabajo-option"
+          *ngFor="let trabajo of trabajosFiltrados"
+          (click)="seleccionarTrabajo(trabajo)"
+        >
+
+          <div class="trabajo-option-icon">
+            <ion-icon name="briefcase-outline"></ion-icon>
+          </div>
+
+          <div class="trabajo-option-info">
+            <div class="trabajo-option-top">
+              <h3>{{ trabajo.codigoSeguimiento }}</h3>
+              <span>{{ trabajo.estadoTexto }}</span>
+            </div>
+
+            <p class="cliente">{{ trabajo.clienteNombre }}</p>
+
+            <div class="trabajo-meta">
+              <small>
+                <ion-icon name="location-outline"></ion-icon>
+                {{ trabajo.direccion || 'Sin dirección' }}
+              </small>
+
+              <small>
+                <ion-icon name="cash-outline"></ion-icon>
+                {{ trabajo.subtotalTexto }}
+              </small>
+            </div>
+
+            <p class="empleados">
+              {{ trabajo.empleadosTexto }}
+            </p>
+          </div>
+
+        </button>
+
+      </div>
+
+      <div
+        class="empty-box"
+        *ngIf="!cargandoTrabajos && trabajosFiltrados.length === 0"
+      >
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <h3>No hay trabajos encontrados</h3>
+        <p>Verifique el código de seguimiento, cliente o dirección.</p>
+      </div>
+
+    </section>
+
+    <!-- PASO 2 -->
+    <ng-container *ngIf="pasoActual === 2 && trabajoSeleccionado">
+
+      <section class="form-card resumen-trabajo-card">
+
+        <div class="form-section-title">
+          <ion-icon name="briefcase-outline"></ion-icon>
+          <span>Trabajo seleccionado</span>
+        </div>
+
+        <div class="resumen-trabajo">
+
+          <div>
+            <small>Código de seguimiento</small>
+            <strong>{{ trabajoSeleccionado.codigoSeguimiento }}</strong>
+          </div>
+
+          <div>
+            <small>Cliente</small>
+            <strong>{{ trabajoSeleccionado.clienteNombre }}</strong>
+          </div>
+
+          <div>
+            <small>Tipo de trabajo</small>
+            <strong>{{ trabajoSeleccionado.tipoTrabajo }}</strong>
+          </div>
+
+          <div>
+            <small>Monto del trabajo</small>
+            <strong>{{ trabajoSeleccionado.subtotalTexto }}</strong>
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="btn-cambiar"
+          (click)="cambiarTrabajo()"
+        >
+          Cambiar trabajo
+        </button>
+
+      </section>
+
+      <section class="form-card">
+
+        <div class="form-section-title">
+          <ion-icon name="wallet-outline"></ion-icon>
+          <span>Tipo de movimiento</span>
+        </div>
+
+        <div class="tipo-grid">
+
+          <button
+            type="button"
+            class="tipo-option"
+            [class.active]="tipoActual === 'cobro_cliente'"
+            (click)="seleccionarTipo('cobro_cliente')"
+          >
+            <div class="tipo-icon">
+              <ion-icon name="receipt-outline"></ion-icon>
+            </div>
+
+            <div>
+              <h3>Cobro a cliente</h3>
+              <p>Ingreso económico del trabajo.</p>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            class="tipo-option pago"
+            [class.active]="tipoActual === 'pago_empleado'"
+            (click)="seleccionarTipo('pago_empleado')"
+          >
+            <div class="tipo-icon">
+              <ion-icon name="people-outline"></ion-icon>
+            </div>
+
+            <div>
+              <h3>Pago a empleado</h3>
+              <p>Egreso por mano de obra.</p>
+            </div>
+          </button>
+
+        </div>
+
+      </section>
+
+      <section class="form-card">
+
+        <div class="form-section-title">
+          <ion-icon name="document-text-outline"></ion-icon>
+          <span>Datos financieros</span>
+        </div>
+
+        <div
+          class="field-group"
+          *ngIf="!esCobro"
+        >
+          <label>Empleado asignado</label>
+
+          <ion-item lines="none" class="input-card">
+            <ion-select
+              formControlName="empleadoUid"
+              placeholder="Seleccione empleado"
+              interface="popover"
+            >
+              <ion-select-option
+                *ngFor="let empleado of empleadosDisponibles"
+                [value]="empleado.uid"
+              >
+                {{ empleado.nombreCompleto }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <small *ngIf="empleadosDisponibles.length === 0">
+            Este trabajo no tiene empleados asignados.
+          </small>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="field-group">
+            <label>Monto</label>
+
+            <ion-item lines="none" class="input-card">
+              <ion-input
+                formControlName="montoTotal"
+                type="number"
+                inputmode="decimal"
+                placeholder="S/ 0.00"
+              ></ion-input>
+            </ion-item>
+          </div>
+<div
+  class="sync-monto-box"
+  *ngIf="montoDiferenteTrabajo"
+>
+  <div class="sync-info">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+
+    <div>
+      <h4>El monto no coincide con el trabajo</h4>
+      <p>
+        El trabajo figura con {{ textoMontoTrabajoActual }},
+        pero estás registrando {{ textoMontoIngresado }}.
+      </p>
+    </div>
+  </div>
+
+  <ion-item lines="none" class="sync-toggle">
+    <ion-label>
+      Actualizar monto del trabajo
+    </ion-label>
+
+    <ion-toggle
+      slot="end"
+      formControlName="actualizarMontoTrabajo"
+    ></ion-toggle>
+  </ion-item>
+</div>
+          <div class="field-group">
+            <label>Estado inicial</label>
+
+            <ion-item lines="none" class="input-card">
+              <ion-select
+                formControlName="estadoInicial"
+                interface="popover"
+              >
+                <ion-select-option value="pendiente">
+                  Pendiente
+                </ion-select-option>
+
+                <ion-select-option value="cerrado">
+                  {{ esCobro ? 'Cobrado' : 'Pagado' }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </div>
+
+        </div>
+
+        <div class="field-group">
+          <label>Método de pago</label>
+
+          <ion-item lines="none" class="input-card">
+            <ion-select
+              formControlName="metodoPago"
+              interface="popover"
+              placeholder="Seleccione método"
+            >
+              <ion-select-option
+                *ngFor="let metodo of metodosPago"
+                [value]="metodo.valor"
+              >
+                {{ metodo.texto }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <div
+          class="field-group"
+          *ngIf="metodoPagoActual === 'otro'"
+        >
+          <label>Especificar método</label>
+
+          <ion-item lines="none" class="input-card">
+            <ion-input
+              formControlName="metodoPagoOtro"
+              placeholder="Ejemplo: POS, cheque, aplicativo..."
+            ></ion-input>
+          </ion-item>
+        </div>
+
+        <div class="field-group">
+          <label>Observación</label>
+
+          <ion-item lines="none" class="input-card textarea-card">
+            <ion-textarea
+              formControlName="observacion"
+              placeholder="Detalle adicional, opcional"
+              rows="3"
+            ></ion-textarea>
+          </ion-item>
+        </div>
+
+      </section>
+
+    </ng-container>
+
+    <div class="modal-actions">
+
+      <button
+        type="button"
+        class="btn-cancelar"
+        (click)="cancelar()"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        class="btn-guardar"
+        [disabled]="!trabajoSeleccionado"
+      >
+        <ion-icon name="save-outline"></ion-icon>
+        <span>Guardar</span>
+      </button>
+
+    </div>
+
+  </form>
+
+</ion-content>

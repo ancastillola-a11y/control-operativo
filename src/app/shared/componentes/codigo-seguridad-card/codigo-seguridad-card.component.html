@@ -1,0 +1,49 @@
+<!-- src/app/shared/componentes/codigo-seguridad-card/codigo-seguridad-card.component.html -->
+
+<section
+  class="codigo-card"
+  [ngClass]="color"
+>
+
+  <div class="codigo-header">
+
+    <div class="codigo-icon">
+      <ion-icon [name]="icono"></ion-icon>
+    </div>
+
+    <div class="codigo-info">
+      <h3>{{ titulo }}</h3>
+      <p>{{ descripcion }}</p>
+    </div>
+
+  </div>
+
+  <div class="codigo-digits">
+    <span *ngFor="let digito of codigoSeparado">
+      {{ digito }}
+    </span>
+  </div>
+
+  <div class="codigo-actions">
+
+    <button
+      type="button"
+      class="btn-copy"
+      (click)="copiarCodigo()"
+    >
+      <ion-icon name="copy-outline"></ion-icon>
+      <span>Copiar código</span>
+    </button>
+
+    <button
+      type="button"
+      class="btn-generate"
+      (click)="generar()"
+    >
+      <ion-icon name="refresh-outline"></ion-icon>
+      <span>Generar nuevo código</span>
+    </button>
+
+  </div>
+
+</section>

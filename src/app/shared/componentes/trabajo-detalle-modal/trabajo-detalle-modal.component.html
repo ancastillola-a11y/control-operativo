@@ -1,0 +1,173 @@
+<!-- src/app/shared/componentes/trabajo-detalle-modal/trabajo-detalle-modal.component.html -->
+
+<ion-header class="detalle-header">
+  <ion-toolbar>
+
+    <div class="detalle-title-box">
+      <div class="detalle-avatar">
+        <ion-icon name="briefcase-outline"></ion-icon>
+      </div>
+
+      <div>
+        <h2>Detalle del trabajo</h2>
+        <p>{{ trabajo.clienteNombre }}</p>
+      </div>
+    </div>
+
+    <button type="button" class="btn-close" slot="end" (click)="cerrar()">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="detalle-content">
+
+  <div class="detalle-wrapper">
+
+    <section class="detalle-card estado-card">
+
+      <div>
+        <span class="label">Estado actual</span>
+        <h3>{{ trabajo.estadoTexto }}</h3>
+      </div>
+
+      <span class="estado-badge" [ngClass]="trabajo.estadoClase">
+        {{ trabajo.estadoTexto }}
+      </span>
+
+    </section>
+
+    <section class="detalle-card">
+
+      <div class="section-title">
+        <ion-icon name="person-outline"></ion-icon>
+        <span>Datos del cliente</span>
+      </div>
+
+      <div class="info-list">
+        <div>
+          <span>Cliente</span>
+          <strong>{{ trabajo.clienteNombre }}</strong>
+        </div>
+
+        <div>
+          <span>Teléfono</span>
+          <strong>{{ trabajo.clienteTelefono || 'Sin teléfono' }}</strong>
+        </div>
+
+        <div>
+          <span>Dirección</span>
+          <strong>{{ trabajo.direccion }}</strong>
+        </div>
+
+        <div *ngIf="trabajo.referencia">
+          <span>Referencia</span>
+          <strong>{{ trabajo.referencia }}</strong>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="detalle-card">
+
+      <div class="section-title">
+        <ion-icon name="clipboard-outline"></ion-icon>
+        <span>Datos del trabajo</span>
+      </div>
+
+      <div class="info-list">
+        <div>
+          <span>Tipo de trabajo</span>
+          <strong>{{ trabajo.tipoTrabajo }}</strong>
+        </div>
+
+        <div>
+          <span>Fecha y hora</span>
+          <strong>{{ trabajo.fechaHoraTexto }}</strong>
+        </div>
+
+        <div>
+          <span>Subtotal</span>
+          <strong>{{ trabajo.subtotalTexto }}</strong>
+        </div>
+
+        <div *ngIf="trabajo.descripcion">
+          <span>Descripción</span>
+          <strong>{{ trabajo.descripcion }}</strong>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="detalle-card">
+
+      <div class="section-title">
+        <ion-icon name="people-outline"></ion-icon>
+        <span>Empleados asignados</span>
+      </div>
+
+      <div class="chip-list">
+        <span
+          class="chip"
+          *ngFor="let empleado of trabajo.empleadosAsignados"
+        >
+          {{ empleado.nombreCompleto }}
+        </span>
+      </div>
+
+    </section>
+
+    <section class="detalle-card">
+
+      <div class="section-title">
+        <ion-icon name="cube-outline"></ion-icon>
+        <span>Materiales asignados</span>
+      </div>
+
+      <div class="material-list">
+        <div
+          class="material-row"
+          *ngFor="let material of trabajo.materialesAsignados"
+        >
+          <div>
+            <strong>{{ material.nombre }}</strong>
+            <span>{{ material.categoria }}</span>
+          </div>
+
+          <p>
+            {{ material.cantidadAsignada }} {{ material.unidad }}
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+ <section class="detalle-card codigos-card">
+
+  <div class="section-title">
+    <ion-icon name="shield-checkmark-outline"></ion-icon>
+    <span>Códigos de seguridad</span>
+  </div>
+
+  <div class="info-list">
+    <div>
+      <span>Gestión de códigos</span>
+      <strong>Los códigos de cliente y devolución se administran desde</strong>
+    </div>
+  </div>
+
+  <button
+    type="button"
+    class="btn-ver-codigos"
+    (click)="verCodigosSeguridad()"
+  >
+    <ion-icon name="shield-checkmark-outline"></ion-icon>
+    <span>Ver códigos de seguridad</span>
+  </button>
+
+</section>
+
+  </div>
+
+</ion-content>

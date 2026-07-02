@@ -1,0 +1,64 @@
+/* src/app/shared/componentes/admin-empty-state/admin-empty-state.component.css */
+
+:host {
+  display: block;
+}
+
+.empty-state {
+  min-height: 310px;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 18px;
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  text-align: center;
+  color: #64748b;
+}
+
+.empty-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  background: #eef4ff;
+  color: #1759e8;
+  display: grid;
+  place-items: center;
+}
+
+.empty-icon ion-icon {
+  font-size: 30px;
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  max-width: 260px;
+  line-height: 1.35;
+}
+
+.btn-empty {
+  height: 38px;
+  padding: 0 13px;
+  border: none;
+  border-radius: 12px;
+  background: #1759e8;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}

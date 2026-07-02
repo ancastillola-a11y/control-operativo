@@ -1,0 +1,82 @@
+<!-- src/app/shared/componentes/material-acciones-modal/material-acciones-modal.component.html -->
+
+<div class="acciones-panel">
+
+  <div class="modal-bar"></div>
+
+  <header class="acciones-header">
+
+    <div class="material-avatar">
+      <img
+        *ngIf="material.imagenUrl; else avatarIniciales"
+        [src]="material.imagenUrl"
+        alt="Material"
+      />
+
+      <ng-template #avatarIniciales>
+        <span>{{ material.iniciales }}</span>
+      </ng-template>
+    </div>
+
+    <div class="material-info">
+      <h2>{{ material.nombre }}</h2>
+      <p>{{ material.categoria }}</p>
+
+      <span
+        [class.disponible]="material.estadoStock === 'disponible'"
+        [class.bajo]="material.estadoStock === 'bajo'"
+      >
+        {{ material.estadoTexto }}
+      </span>
+    </div>
+
+    <button type="button" class="btn-close" (click)="cancelar()">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+
+  </header>
+
+  <section class="acciones-lista">
+
+    <button type="button" class="accion-item" (click)="seleccionar('editar')">
+      <div class="accion-icon editar">
+        <ion-icon name="create-outline"></ion-icon>
+      </div>
+
+      <div class="accion-text">
+        <h3>Editar material</h3>
+        <p>Actualizar datos generales e imagen.</p>
+      </div>
+
+      <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+    </button>
+
+    <button type="button" class="accion-item" (click)="seleccionar('movimientos')">
+      <div class="accion-icon movimientos">
+        <ion-icon name="document-text-outline"></ion-icon>
+      </div>
+
+      <div class="accion-text">
+        <h3>Ver movimientos</h3>
+        <p>Consultar entradas, salidas y devoluciones.</p>
+      </div>
+
+      <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+    </button>
+
+    <button type="button" class="accion-item danger" (click)="seleccionar('eliminar')">
+      <div class="accion-icon eliminar">
+        <ion-icon name="trash-outline"></ion-icon>
+      </div>
+
+      <div class="accion-text">
+        <h3>Eliminar material</h3>
+        <p>Ocultar material del almacén.</p>
+      </div>
+
+      <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+    </button>
+
+  </section>
+
+</div>

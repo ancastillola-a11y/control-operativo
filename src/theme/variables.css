@@ -1,0 +1,41 @@
+/* src/theme/variables.css */
+
+:root {
+  --app-width: 430px;
+
+  --color-primary: #1A3E8C;
+  --color-primary-hover: #15337A;
+  --color-primary-soft: #EEF4FF;
+
+  --color-border: #D0D5DD;
+  --color-background: #F5F7FA;
+  --color-page-outside: #E5E7EB;
+  --color-card: #FFFFFF;
+
+  --color-text: #101828;
+  --color-text-muted: #667085;
+
+  --color-error: #D92D20;
+  --color-success: #1F9D57;
+  --color-success-bg: #DAF5E4;
+  --color-error-bg: #FDE2E2;
+  --color-warning: #C88600;
+  --color-warning-bg: #FFF7DF;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  --shadow-card: 0 1px 3px rgba(16, 24, 40, 0.08), 0 4px 16px rgba(16, 24, 40, 0.06);
+  --shadow-button: 0 6px 14px rgba(26, 62, 140, 0.22);
+
+  --font-main: Arial, Helvetica, sans-serif;
+
+  --ion-font-family: var(--font-main);
+  --ion-color-primary: #1A3E8C;
+  --ion-color-primary-rgb: 26, 62, 140;
+  --ion-color-primary-contrast: #FFFFFF;
+  --ion-background-color: #F5F7FA;
+  --ion-text-color: #101828;
+}

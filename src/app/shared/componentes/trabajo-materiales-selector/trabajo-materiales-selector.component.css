@@ -1,0 +1,194 @@
+/* src/app/shared/componentes/trabajo-materiales-selector/trabajo-materiales-selector.component.css */
+
+:host {
+  display: block;
+  font-family: var(--font-main);
+}
+
+.selector-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.selector-header h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.selector-header p {
+  margin: 3px 0 0;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.selector-header span {
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.selector-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.material-option {
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.material-option.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.material-main {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 44px 1fr 26px;
+  gap: 9px;
+  align-items: center;
+  text-align: left;
+}
+
+.material-image {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.material-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info {
+  min-width: 0;
+}
+
+.info h4 {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info p {
+  margin: 3px 0 0;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.info small {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  color: var(--color-primary);
+}
+
+.check ion-icon {
+  font-size: 22px;
+}
+
+.cantidad-box {
+  border-top: 1px solid #dbe8ff;
+  padding: 9px 10px;
+  display: grid;
+  grid-template-columns: 1fr 90px auto;
+  gap: 8px;
+  align-items: center;
+  background: #ffffff;
+}
+
+.cantidad-box label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.cantidad-box ion-input {
+  height: 34px;
+  min-height: 34px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  --padding-start: 8px;
+  --padding-end: 8px;
+}
+
+.cantidad-box span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.empty-mini {
+  border: 1px dashed var(--color-border);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.empty-mini ion-icon {
+  font-size: 26px;
+  color: var(--color-primary);
+}
+
+.empty-mini p {
+  margin: 6px 0 0;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+@media (max-width: 360px) {
+  .cantidad-box {
+    grid-template-columns: 1fr;
+  }
+}

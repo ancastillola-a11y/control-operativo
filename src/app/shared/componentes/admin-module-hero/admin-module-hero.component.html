@@ -1,0 +1,29 @@
+<!-- src/app/shared/componentes/admin-module-hero/admin-module-hero.component.html -->
+
+<section class="module-hero">
+
+  <div class="hero-left">
+
+    <div class="hero-icon">
+      <ion-icon [name]="icono"></ion-icon>
+    </div>
+
+    <div class="hero-text">
+      <span *ngIf="codigo">{{ codigo }}</span>
+      <h2>{{ titulo }}</h2>
+      <p>{{ descripcion }}</p>
+    </div>
+
+  </div>
+
+  <button
+    *ngIf="mostrarBoton"
+    type="button"
+    class="btn-hero"
+    (click)="emitirClick()"
+  >
+    <span class="btn-plus">+</span>
+    <span>{{ botonTexto }}</span>
+  </button>
+
+</section>

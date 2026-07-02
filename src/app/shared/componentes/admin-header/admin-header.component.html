@@ -1,0 +1,53 @@
+<!-- src/app/shared/componentes/admin-header/admin-header.component.html -->
+
+<header class="top-header">
+
+  <button
+    type="button"
+    class="header-btn"
+    (click)="abrirMenu($event)"
+    aria-label="Abrir menú"
+  >
+    <ion-icon name="menu-outline"></ion-icon>
+  </button>
+
+  <div class="welcome-box">
+    <h1>¡Bienvenido, {{ nombre }}!</h1>
+    <p>{{ rol }}</p>
+  </div>
+
+  <button
+    type="button"
+    class="header-btn notification-btn"
+    (click)="abrirNotificaciones($event)"
+    aria-label="Abrir notificaciones"
+  >
+    <ion-icon name="notifications-outline"></ion-icon>
+
+    <span
+      class="notification-badge"
+      *ngIf="notificaciones > 0"
+      aria-hidden="true"
+    >
+      {{ notificaciones > 99 ? '99+' : notificaciones }}
+    </span>
+  </button>
+
+  <button
+    type="button"
+    class="profile-btn"
+    (click)="abrirPerfil($event)"
+    aria-label="Abrir perfil"
+  >
+    <img
+      *ngIf="fotoUrl; else perfilIcono"
+      [src]="fotoUrl"
+      alt="Perfil"
+    />
+
+    <ng-template #perfilIcono>
+      <ion-icon name="person-circle-outline"></ion-icon>
+    </ng-template>
+  </button>
+
+</header>

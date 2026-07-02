@@ -1,0 +1,351 @@
+<!-- src/app/paginas/administrador/reporte-materiales/reporte-materiales.page.html -->
+<ion-content [fullscreen]="true" class="reporte-materiales-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas || 0"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <main class="reporte-container">
+
+      <div class="page-back-row">
+        <button
+          type="button"
+          class="back-button"
+          (click)="volverReportes()"
+        >
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+
+        <span>Volver a reportes</span>
+      </div>
+
+      <section class="hero-card">
+        <div class="hero-content">
+          <div class="hero-icon">
+            <ion-icon name="archive-outline"></ion-icon>
+          </div>
+
+          <div>
+            <h1>Reporte de materiales</h1>
+            <p>
+              Analiza stock, materiales usados, materiales devueltos y alertas del almacén.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="report-tools-card">
+        <div class="tools-header">
+          <div>
+            <h2>Periodo del reporte</h2>
+            <p>
+              Filtra los materiales usados o devueltos según la fecha de trabajos y devoluciones.
+            </p>
+          </div>
+        </div>
+
+        <div class="date-grid">
+          <label class="date-field">
+            <span>Desde</span>
+
+            <div class="date-input-wrap">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <input
+                type="date"
+                [value]="vm.fechaInicio"
+                (change)="cambiarFechaInicio($any($event.target).value)"
+              />
+            </div>
+          </label>
+
+          <label class="date-field">
+            <span>Hasta</span>
+
+            <div class="date-input-wrap">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <input
+                type="date"
+                [value]="vm.fechaFin"
+                (change)="cambiarFechaFin($any($event.target).value)"
+              />
+            </div>
+          </label>
+        </div>
+
+        <div class="tools-actions">
+          <button
+            type="button"
+            class="tool-button secondary"
+            (click)="limpiarFechas()"
+          >
+            <ion-icon name="trash-outline"></ion-icon>
+            Limpiar
+          </button>
+
+          <button
+            type="button"
+            class="tool-button success"
+            (click)="exportarExcel(vm.materialesFiltrados, vm.fechaInicio, vm.fechaFin)"
+          >
+            <ion-icon name="download-outline"></ion-icon>
+            Excel
+          </button>
+
+          <button
+            type="button"
+            class="tool-button danger"
+            (click)="exportarPDF(vm.materialesFiltrados, vm.fechaInicio, vm.fechaFin)"
+          >
+            <ion-icon name="document-text-outline"></ion-icon>
+            PDF
+          </button>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+
+        <article class="summary-card total">
+          <div>
+            <span>Total</span>
+            <h2>{{ vm.resumen.totalMateriales }}</h2>
+          </div>
+          <ion-icon name="archive-outline"></ion-icon>
+        </article>
+
+        <article class="summary-card warning">
+          <div>
+            <span>Stock bajo</span>
+            <h2>{{ vm.resumen.stockBajo }}</h2>
+          </div>
+          <ion-icon name="warning-outline"></ion-icon>
+        </article>
+
+        <article class="summary-card danger">
+          <div>
+            <span>Sin stock</span>
+            <h2>{{ vm.resumen.sinStock }}</h2>
+          </div>
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </article>
+
+        <article class="summary-card process">
+          <div>
+            <span>Usados</span>
+            <h2>{{ vm.resumen.materialesUsados }}</h2>
+          </div>
+          <ion-icon name="bar-chart-outline"></ion-icon>
+        </article>
+
+        <article class="summary-card success">
+          <div>
+            <span>Devueltos</span>
+            <h2>{{ vm.resumen.materialesDevueltos }}</h2>
+          </div>
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </article>
+
+        <article class="summary-card primary">
+          <div>
+            <span>No usados</span>
+            <h2>{{ vm.resumen.materialesNoUsados }}</h2>
+          </div>
+          <ion-icon name="refresh-outline"></ion-icon>
+        </article>
+
+      </section>
+
+      <section class="analysis-grid">
+
+        <article class="analysis-card process">
+          <span>Cantidad usada</span>
+          <h3>{{ vm.resumen.cantidadUsadaTotal }}</h3>
+          <p>Total acumulado de materiales asignados o usados en trabajos.</p>
+        </article>
+
+        <article class="analysis-card success">
+          <span>Cantidad devuelta</span>
+          <h3>{{ vm.resumen.cantidadDevueltaTotal }}</h3>
+          <p>Total acumulado de materiales devueltos al almacén.</p>
+        </article>
+
+      </section>
+
+      <section class="section-card">
+        <div class="section-header">
+          <div>
+            <h2>Materiales más usados</h2>
+            <p>Ranking de materiales con mayor consumo en trabajos.</p>
+          </div>
+        </div>
+
+        <div
+          class="ranking-list"
+          *ngIf="vm.rankingUsados.length > 0; else sinRankingUsados"
+        >
+          <article
+            class="ranking-row"
+            *ngFor="let item of vm.rankingUsados"
+          >
+            <div>
+              <span>{{ item.nombre }}</span>
+              <small>{{ item.porcentaje }}% del total usado</small>
+            </div>
+
+            <strong>{{ item.total }} {{ item.unidad }}</strong>
+          </article>
+        </div>
+
+        <ng-template #sinRankingUsados>
+          <app-admin-empty-state
+            icono="archive-outline"
+            titulo="Sin materiales usados"
+            descripcion="No hay materiales usados en el periodo seleccionado."
+          ></app-admin-empty-state>
+        </ng-template>
+      </section>
+
+      <section class="section-card">
+        <div class="section-header">
+          <div>
+            <h2>Materiales devueltos</h2>
+            <p>Ranking de materiales retornados al almacén.</p>
+          </div>
+        </div>
+
+        <div
+          class="ranking-list"
+          *ngIf="vm.rankingDevueltos.length > 0; else sinRankingDevueltos"
+        >
+          <article
+            class="ranking-row"
+            *ngFor="let item of vm.rankingDevueltos"
+          >
+            <div>
+              <span>{{ item.nombre }}</span>
+              <small>{{ item.porcentaje }}% del total devuelto</small>
+            </div>
+
+            <strong>{{ item.total }} {{ item.unidad }}</strong>
+          </article>
+        </div>
+
+        <ng-template #sinRankingDevueltos>
+          <app-admin-empty-state
+            icono="checkmark-circle-outline"
+            titulo="Sin devoluciones"
+            descripcion="No hay materiales devueltos en el periodo seleccionado."
+          ></app-admin-empty-state>
+        </ng-template>
+      </section>
+
+      <section class="filter-card">
+        <h2>Filtrar materiales</h2>
+
+        <div class="filter-scroll">
+          <button
+            type="button"
+            class="filter-chip"
+            *ngFor="let filtro of filtros"
+            [class.active]="vm.filtro === filtro.valor"
+            (click)="cambiarFiltro(filtro.valor)"
+          >
+            {{ filtro.texto }}
+          </button>
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="section-header">
+          <div>
+            <h2>Detalle de materiales</h2>
+            <p>{{ vm.totalFiltrados }} registro(s) encontrados.</p>
+          </div>
+
+          <button
+            type="button"
+            class="outline-button"
+            (click)="abrirModuloMateriales()"
+          >
+            Ver almacén
+          </button>
+        </div>
+
+        <div
+          class="materiales-list"
+          *ngIf="vm.materialesFiltrados.length > 0; else sinMateriales"
+        >
+          <article
+            class="material-card"
+            *ngFor="let material of vm.materialesFiltrados; trackBy: trackByMaterial"
+          >
+            <div class="material-top">
+              <div>
+<span class="codigo">{{ material.codigo }}</span>
+                <h3>{{ material.nombre }}</h3>
+                <p>{{ material.categoria }} · {{ material.unidad }}</p>
+              </div>
+
+              <span
+                class="estado-badge"
+                [class.success]="material.estadoStockClase === 'success'"
+                [class.warning]="material.estadoStockClase === 'warning'"
+                [class.danger]="material.estadoStockClase === 'danger'"
+              >
+                {{ material.estadoStockTexto }}
+              </span>
+            </div>
+
+            <div class="material-info">
+              <div>
+                <strong>{{ material.stockActual }}</strong>
+                <span>Stock actual</span>
+              </div>
+
+              <div>
+                <strong>{{ material.stockMinimo }}</strong>
+                <span>Stock mínimo</span>
+              </div>
+
+              <div>
+                <strong>{{ material.cantidadUsadaTotal }}</strong>
+                <span>Usado</span>
+              </div>
+
+              <div>
+                <strong>{{ material.cantidadDevueltaTotal }}</strong>
+                <span>Devuelto</span>
+              </div>
+            </div>
+
+            <div class="material-footer">
+              <span>{{ material.trabajosAsociados }} trabajo(s) asociado(s)</span>
+            </div>
+          </article>
+        </div>
+
+        <ng-template #sinMateriales>
+          <app-admin-empty-state
+            icono="archive-outline"
+            titulo="Sin materiales"
+            descripcion="No hay materiales para los filtros seleccionados."
+          ></app-admin-empty-state>
+        </ng-template>
+      </section>
+
+    </main>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="reportes"></app-admin-bottom-nav>
+
+</ion-content>

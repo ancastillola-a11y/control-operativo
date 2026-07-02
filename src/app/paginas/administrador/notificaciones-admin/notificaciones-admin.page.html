@@ -1,0 +1,198 @@
+<!-- src/app/paginas/administrador/notificaciones-admin/notificaciones-admin.page.html -->
+
+<ion-content [fullscreen]="true" class="notificaciones-root">
+
+  <ng-container *ngIf="adminVm$ | async as adminVm">
+    <app-admin-header
+      [nombre]="
+        adminVm.administrador.nombres ||
+        adminVm.administrador.usuario ||
+        adminVm.administrador.correo ||
+        'Administrador'
+      "
+      [rol]="'Administrador'"
+      [fotoUrl]="adminVm.administrador.fotoUrl || ''"
+      [notificaciones]="adminVm.resumen.notificacionesNoLeidas || 0"
+      (menuClick)="abrirMenu()"
+      (notificacionesClick)="abrirNotificaciones()"
+      (perfilClick)="abrirPerfil()"
+    ></app-admin-header>
+  </ng-container>
+
+  <ng-container *ngIf="vm$ | async as vm">
+
+    <main class="notificaciones-container">
+
+      <section class="page-title-row">
+
+        <div class="title-left">
+          <button
+            type="button"
+            class="btn-back"
+            (click)="volver()"
+            aria-label="Volver"
+          >
+            <ion-icon name="arrow-back-outline"></ion-icon>
+          </button>
+
+          <div>
+            <h2>Notificaciones del administrador</h2>
+            <p>{{ vm.noLeidas }} sin leer · {{ vm.total }} en total</p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="btn-read-all"
+          (click)="marcarTodas(vm.notificaciones)"
+          [disabled]="vm.noLeidas === 0"
+        >
+          Marcar todas como leídas
+        </button>
+
+      </section>
+
+      <section class="filters-scroll">
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="vm.filtro === 'todas'"
+          (click)="cambiarFiltro('todas')"
+        >
+          Todas
+          <span>{{ vm.total }}</span>
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="vm.filtro === 'cambios_estado'"
+          (click)="cambiarFiltro('cambios_estado')"
+        >
+          Cambios de estado
+          <span>{{ vm.totalCambiosEstado }}</span>
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="vm.filtro === 'stock'"
+          (click)="cambiarFiltro('stock')"
+        >
+          Stock
+          <span>{{ vm.totalStock }}</span>
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="vm.filtro === 'rutas'"
+          (click)="cambiarFiltro('rutas')"
+        >
+          Rutas
+          <span>{{ vm.totalRutas }}</span>
+        </button>
+
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="vm.filtro === 'devoluciones'"
+          (click)="cambiarFiltro('devoluciones')"
+        >
+          Devoluciones
+          <span>{{ vm.totalDevoluciones }}</span>
+        </button>
+
+      </section>
+
+      <section
+        class="notificaciones-list"
+        *ngIf="vm.notificacionesFiltradas.length > 0; else sinNotificaciones"
+      >
+
+        <article
+          class="notificacion-card"
+          *ngFor="let item of vm.notificacionesFiltradas; trackBy: trackByNotificacion"
+          [class.unread]="!item.leida"
+          (click)="abrirNotificacion(item)"
+        >
+
+          <div
+            class="notification-icon"
+            [class.azul]="obtenerClaseIconoSeguro(item) === 'azul'"
+            [class.azul-claro]="obtenerClaseIconoSeguro(item) === 'azul-claro'"
+            [class.warning]="obtenerClaseIconoSeguro(item) === 'warning'"
+            [class.success]="obtenerClaseIconoSeguro(item) === 'success'"
+            [class.morado]="obtenerClaseIconoSeguro(item) === 'morado'"
+            [class.gris]="obtenerClaseIconoSeguro(item) === 'gris'"
+          >
+            <ion-icon [name]="obtenerIconoSeguro(item)"></ion-icon>
+          </div>
+
+          <div class="notification-content">
+
+            <div class="notification-top">
+              <h3>{{ item.titulo }}</h3>
+              <span>{{ item.fechaTexto }}</span>
+            </div>
+
+            <p>{{ item.mensaje }}</p>
+
+          </div>
+
+          <span
+            class="unread-dot"
+            *ngIf="!item.leida"
+          ></span>
+
+          <div class="notification-actions">
+
+            <button
+              type="button"
+              class="btn-action"
+              (click)="cambiarEstadoLectura(item); $event.stopPropagation()"
+              [attr.aria-label]="item.leida ? 'Marcar como no leída' : 'Marcar como vista'"
+            >
+              <ion-icon
+                [name]="item.leida ? 'radio-button-off-outline' : 'checkmark-done-outline'"
+              ></ion-icon>
+            </button>
+
+            <button
+              type="button"
+              class="btn-action danger"
+              (click)="confirmarEliminar(item); $event.stopPropagation()"
+              aria-label="Eliminar notificación"
+            >
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+
+          </div>
+
+        </article>
+
+      </section>
+
+      <ng-template #sinNotificaciones>
+        <app-admin-empty-state
+          icono="notifications-outline"
+          titulo="Sin notificaciones"
+          descripcion="No hay notificaciones para este filtro."
+        ></app-admin-empty-state>
+      </ng-template>
+
+      <section
+        class="end-message"
+        *ngIf="vm.notificacionesFiltradas.length > 0"
+      >
+        <p>No hay más notificaciones</p>
+      </section>
+
+    </main>
+
+  </ng-container>
+
+  <app-admin-bottom-nav activo="inicio"></app-admin-bottom-nav>
+
+</ion-content>
