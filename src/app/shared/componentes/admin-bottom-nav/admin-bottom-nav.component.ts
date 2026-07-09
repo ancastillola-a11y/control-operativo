@@ -29,37 +29,86 @@ export class AdminBottomNavComponent {
   private toastCtrl = inject(ToastController);
 
   @Input() activo: AdminNavItem = 'inicio';
+  @Input() modo: 'admin' | 'empleado' = 'admin';
 
   irInicio() {
-    this.navCtrl.navigateRoot('/dashboard-admin', {
+    
+    if (this.modo === 'empleado') {
+      this.navCtrl.navigateRoot('/dashboard-empleado', {
+        animated: false,
+        replaceUrl: true
+      });
+      return;
+    }
+
+this.navCtrl.navigateRoot('/dashboard-admin', {
       animated: false,
       replaceUrl: true
     });
   }
 
   irAlmacen() {
-    this.navCtrl.navigateRoot('/materiales', {
+    
+    if (this.modo === 'empleado') {
+      this.mostrarToast('El GPS está dentro de tu panel operativo.');
+      this.navCtrl.navigateRoot('/dashboard-empleado', {
+        animated: false,
+        replaceUrl: true
+      });
+      return;
+    }
+
+this.navCtrl.navigateRoot('/materiales', {
       animated: false,
       replaceUrl: true
     });
   }
 
   irTrabajos() {
-    this.navCtrl.navigateRoot('/asignacion-trabajos', {
+    
+    if (this.modo === 'empleado') {
+      this.navCtrl.navigateRoot('/dashboard-empleado', {
+        animated: false,
+        replaceUrl: true
+      });
+      return;
+    }
+
+this.navCtrl.navigateRoot('/asignacion-trabajos', {
       animated: false,
       replaceUrl: true
     });
   }
 
   irReportes() {
-  this.navCtrl.navigateRoot('/reportes', {
+  
+    if (this.modo === 'empleado') {
+      this.mostrarToast('La ruta está disponible dentro del trabajo actual.');
+      this.navCtrl.navigateRoot('/dashboard-empleado', {
+        animated: false,
+        replaceUrl: true
+      });
+      return;
+    }
+
+this.navCtrl.navigateRoot('/reportes', {
     animated: false,
     replaceUrl: true
   });
 }
 
   irMas() {
-    this.navCtrl.navigateRoot('/mas-admin', {
+    
+    if (this.modo === 'empleado') {
+      this.mostrarToast('Tu cuenta se gestiona desde el panel operativo.');
+      this.navCtrl.navigateRoot('/dashboard-empleado', {
+        animated: false,
+        replaceUrl: true
+      });
+      return;
+    }
+
+this.navCtrl.navigateRoot('/mas-admin', {
       animated: false,
       replaceUrl: true
     });

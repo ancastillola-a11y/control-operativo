@@ -3,6 +3,7 @@ import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonicModule,
+  AlertController,
   ModalController,
   NavController,
   ToastController
@@ -62,12 +63,14 @@ export class SeguimientoTrabajosPage {
   private navCtrl = inject(NavController);
   private modalCtrl = inject(ModalController);
   private toastCtrl = inject(ToastController);
+  private alertCtrl = inject(AlertController);
   private cdr = inject(ChangeDetectorRef);
 
   adminVm$ = this.dashboardAdminService.obtenerPanelAdmin$();
 
   private filtroSubject = new BehaviorSubject<FiltroSeguimiento>('todos');
   private navegando = false;
+  accionAdminUid = '';
 
   vm$: Observable<SeguimientoVM> = combineLatest([
     this.trabajoService.vm$,
@@ -181,6 +184,103 @@ export class SeguimientoTrabajosPage {
 
     return `T-${numero.toString().padStart(5, '0')}`;
   }
+
+
+  puedeRetrocederEstado(trabajo: TrabajoVista): boolean {
+    const estado = this.normalizarEstado(trabajo.estado);
+
+    return [
+      'en_camino',
+      'en_proceso',
+      'finalizado'
+    ].includes(estado);
+  }
+
+  estaProcesandoAdmin(trabajo: TrabajoVista): boolean {
+    const uid = String(trabajo.uid || trabajo.id || '').trim();
+    return !!uid && this.accionAdminUid === uid;
+  }
+
+  obtenerEstadoAnteriorTexto(trabajo: TrabajoVista): string {
+    const estado = this.normalizarEstado(trabajo.estado);
+
+    const mapa: Record<string, string> = {
+      en_camino: 'Pendiente',
+      en_proceso: 'En camino',
+      finalizado: 'En proceso'
+    };
+
+    return mapa[estado] || '';
+  }
+
+  async retrocederEstado(trabajo: TrabajoVista): Promise<void> {
+    const uid = String(trabajo.uid || trabajo.id || '').trim();
+
+    if (!uid || this.accionAdminUid === uid) {
+      return;
+    }
+
+    if (!this.puedeRetrocederEstado(trabajo)) {
+      await this.mostrarToast('Este estado no se puede retroceder desde seguimiento.', 'primary');
+      return;
+    }
+
+    let motivo = '';
+
+    const alert = await this.alertCtrl.create({
+      header: 'Retroceder estado',
+      subHeader: this.obtenerCodigoTrabajo(trabajo) || trabajo.clienteNombre,
+      message: 'El estado volverá a: ' + this.obtenerEstadoAnteriorTexto(trabajo) + '. Esto no modifica stock ni elimina el trabajo.',
+      inputs: [
+        {
+          name: 'motivo',
+          type: 'text',
+          placeholder: 'Motivo de la corrección'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Retroceder',
+          role: 'confirm',
+          handler: (data: any) => {
+            motivo = String(data?.motivo || 'Corrección administrativa').trim();
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+
+    if (role !== 'confirm') {
+      return;
+    }
+
+    this.accionAdminUid = uid;
+
+    try {
+      await this.trabajoService.retrocederEstadoTrabajo(
+        trabajo,
+        motivo || 'Corrección administrativa'
+      );
+
+      await this.trabajoService.cargarTrabajos();
+
+      await this.mostrarToast('Estado retrocedido correctamente.', 'success');
+    } catch (error) {
+      console.error('[SeguimientoTrabajosPage] Error retrocediendo estado:', error);
+      await this.mostrarToast('No se pudo retroceder el estado.', 'danger');
+    } finally {
+      this.accionAdminUid = '';
+    }
+  }
+
 
   obtenerEstadoTexto(trabajo: TrabajoVista): string {
     const estado = this.normalizarEstado(trabajo.estado);

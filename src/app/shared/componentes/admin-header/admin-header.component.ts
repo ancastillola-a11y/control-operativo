@@ -52,10 +52,7 @@ export class AdminHeaderComponent {
     event?.preventDefault();
     event?.stopPropagation();
 
-    this.navCtrl.navigateRoot('/notificaciones-admin', {
-      animated: false,
-      replaceUrl: true
-    });
+    this.notificacionesClick.emit();
   }
 
   abrirPerfil(event?: Event) {

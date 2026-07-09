@@ -1,0 +1,169 @@
+/*src/app/shared/componentes/empleado-header/empleado-header.component.css*/
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* HEADER PRINCIPAL EMPLEADO */
+.empleado-header {
+  width: 100%;
+  min-height: 68px;
+  border-radius: 0 0 22px 22px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 34%),
+    linear-gradient(135deg, #06451f 0%, #075f2a 55%, #087b2d 100%);
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 38px 40px;
+  gap: 9px;
+  align-items: center;
+  box-shadow: 0 10px 24px rgba(5, 61, 27, 0.28);
+  overflow: visible;
+  position: relative;
+}
+
+/* BOTONES DEL HEADER */
+.menu-btn,
+.bell-btn,
+.avatar-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  outline: none;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.menu-btn,
+.bell-btn {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.menu-btn:active,
+.bell-btn:active,
+.avatar-btn:active {
+  transform: scale(0.94);
+}
+
+.menu-btn ion-icon,
+.bell-btn ion-icon {
+  font-size: 22px;
+}
+
+/* TEXTO CENTRAL */
+.header-info {
+  min-width: 0;
+  padding-left: 1px;
+}
+
+.header-info h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 15.8px;
+  line-height: 1.1;
+  font-weight: 1000;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-info p {
+  margin: 4px 0 0;
+  color: #d8ffe4;
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 850;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* CAMPANA */
+.bell-btn {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 1000;
+  display: grid;
+  place-items: center;
+  border: 2px solid #06451f;
+  box-shadow: 0 3px 8px rgba(220, 38, 38, 0.35);
+}
+
+/* AVATAR */
+.avatar-btn {
+  background: #ffffff;
+  color: #087b2d;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 1000;
+  box-shadow:
+    0 5px 14px rgba(16, 24, 40, 0.16),
+    inset 0 0 0 1px rgba(8, 123, 45, 0.08);
+}
+
+.avatar-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-btn span {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: #eaf8ef;
+  color: #087b2d;
+}
+
+/* AJUSTE PARA CELULARES PEQUEÑOS */
+@media (max-width: 360px) {
+  .empleado-header {
+    grid-template-columns: 36px minmax(0, 1fr) 36px 36px;
+    gap: 7px;
+    padding: 11px;
+  }
+
+  .menu-btn,
+  .bell-btn,
+  .avatar-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+  }
+
+  .header-info h1 {
+    font-size: 14.5px;
+  }
+
+  .header-info p {
+    font-size: 10.2px;
+  }
+
+  .menu-btn ion-icon,
+  .bell-btn ion-icon {
+    font-size: 20px;
+  }
+}

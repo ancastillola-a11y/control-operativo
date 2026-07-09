@@ -114,6 +114,56 @@ export class DashboardEmpleadoService {
     );
   }
 
+  async registrarDevolucion(
+    trabajo: DashboardTrabajoEmpleado,
+    empleado: DashboardEmpleadoUsuario,
+    materialesDevueltos: Array<{
+      materialUid: string;
+      nombre: string;
+      unidad: string;
+      cantidadAsignada: number;
+      cantidadUsada: number;
+      cantidadDevuelta: number;
+    }>
+  ): Promise<void> {
+    this.validarEmpleado(empleado);
+
+    const estado = String(trabajo.estado || '').trim();
+
+    if (
+      estado !== 'finalizado' &&
+      estado !== 'devolucion_pendiente'
+    ) {
+      throw new Error('trabajo-no-finalizado');
+    }
+
+    const materialesValidos = (materialesDevueltos || [])
+      .map((item) => ({
+        materialUid: String(item.materialUid || '').trim(),
+        nombre: String(item.nombre || 'Material').trim(),
+        unidad: String(item.unidad || 'und').trim(),
+        cantidadAsignada: Number(item.cantidadAsignada || 0),
+        cantidadUsada: Number(item.cantidadUsada || 0),
+        cantidadDevuelta: Number(item.cantidadDevuelta || 0)
+      }))
+      .filter((item) =>
+        item.materialUid &&
+        item.cantidadAsignada >= 0 &&
+        item.cantidadUsada >= 0 &&
+        item.cantidadDevuelta > 0
+      );
+
+    if (materialesValidos.length === 0) {
+      throw new Error('sin-materiales-devolver');
+    }
+
+    await this.dao.registrarDevolucionEmpleado(
+      trabajo,
+      empleado,
+      materialesValidos
+    );
+  }
+
   private construirViewModel(
     empleado: DashboardEmpleadoUsuario,
     trabajosBase: DashboardTrabajoEmpleado[]

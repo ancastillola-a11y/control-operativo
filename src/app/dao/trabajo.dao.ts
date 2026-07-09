@@ -22,7 +22,8 @@ import {
   Trabajo,
   TrabajoEmpleadoDisponible,
   TrabajoMaterialDisponible,
-  TrabajoMaterialAsignado
+  TrabajoMaterialAsignado,
+  EstadoTrabajo
 } from '../modelos/trabajo';
 
 @Injectable({
@@ -447,6 +448,37 @@ export class TrabajoDAO {
       });
     });
   }
+
+
+  async cambiarEstadoAdmin(
+    trabajoUid: string,
+    nuevoEstado: EstadoTrabajo,
+    motivo = ''
+  ): Promise<void> {
+    const uid = String(trabajoUid || '').trim();
+
+    if (!uid) {
+      throw new Error('trabajo-uid-vacio');
+    }
+
+    const adminUid = this.auth.currentUser?.uid || '';
+    const trabajoRef = doc(this.firestore, 'trabajos', uid);
+
+    await updateDoc(trabajoRef, {
+      estado: nuevoEstado,
+      estadoCorregidoPorAdmin: true,
+      motivoCorreccionEstado: String(motivo || '').trim(),
+      actualizadoPorUid: adminUid,
+      updatedAt: serverTimestamp()
+    });
+
+    await this.registrarHistorial(
+      'retroceder_estado_trabajo',
+      'Se corrigió el estado del trabajo a ' + nuevoEstado + '. Motivo: ' + String(motivo || 'Corrección administrativa'),
+      uid
+    );
+  }
+
 
   async registrarHistorial(
     accion: string,

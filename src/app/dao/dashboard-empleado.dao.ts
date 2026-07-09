@@ -156,6 +156,107 @@ export class DashboardEmpleadoDAO {
     });
   }
 
+   async registrarDevolucionEmpleado(
+    trabajo: DashboardTrabajoEmpleado,
+    empleado: DashboardEmpleadoUsuario,
+    materialesDevueltos: Array<{
+      materialUid: string;
+      nombre: string;
+      unidad: string;
+      cantidadAsignada: number;
+      cantidadUsada: number;
+      cantidadDevuelta: number;
+    }>
+  ): Promise<void> {
+    const trabajoUid = String(trabajo.uid || trabajo.id || '').trim();
+
+    if (!trabajoUid) {
+      throw new Error('trabajo-sin-uid');
+    }
+
+    const materialesOriginales = Array.isArray((trabajo as any).materialesAsignados)
+      ? (trabajo as any).materialesAsignados
+      : [];
+
+    const materialesActualizados = materialesOriginales.map((material: any) => {
+      const materialUid = String(
+        material.materialUid ||
+        material.uid ||
+        material.id ||
+        material.materialId ||
+        ''
+      ).trim();
+
+      const devuelto = materialesDevueltos.find((item) =>
+        item.materialUid === materialUid
+      );
+
+      if (!devuelto) {
+        return {
+          ...material,
+          cantidadUsada: Number(
+            material.cantidadUsada ??
+            material.cantidadAsignada ??
+            material.cantidad ??
+            0
+          ),
+          cantidadDevuelta: Number(material.cantidadDevuelta ?? 0)
+        };
+      }
+
+      return {
+        ...material,
+        materialUid,
+        nombre: material.nombre || material.materialNombre || devuelto.nombre,
+        unidad: material.unidad || devuelto.unidad || 'und',
+        cantidadAsignada: Number(
+          material.cantidadAsignada ??
+          material.cantidad ??
+          devuelto.cantidadAsignada ??
+          0
+        ),
+        cantidadUsada: Number(devuelto.cantidadUsada || 0),
+        cantidadDevuelta: Number(devuelto.cantidadDevuelta || 0)
+      };
+    });
+
+    const trabajoRef = doc(this.firestore, 'trabajos', trabajoUid);
+
+    await updateDoc(trabajoRef, {
+      estado: 'devolucion_pendiente',
+      materialesAsignados: materialesActualizados,
+      devolucionRegistrada: true,
+      devolucionValidada: false,
+      empleadoDevolucionUid: empleado.uid,
+      empleadoDevolucionNombre: empleado.nombreCompleto || empleado.usuario || 'Empleado',
+      fechaDevolucionRegistrada: serverTimestamp(),
+      actualizadoEn: serverTimestamp()
+    });
+
+    await addDoc(collection(this.firestore, 'historial_actividades'), {
+      tipo: 'devolucion_registrada',
+      modulo: 'empleado',
+      trabajoUid,
+      codigoTrabajo: trabajo.codigoTrabajo || trabajoUid,
+      empleadoUid: empleado.uid,
+      empleadoNombre: empleado.nombreCompleto || empleado.usuario || 'Empleado',
+      descripcion: 'El empleado registró materiales sobrantes para devolución.',
+      materialesDevueltos,
+      creadoEn: serverTimestamp()
+    });
+
+    await addDoc(collection(this.firestore, 'notificaciones_admin'), {
+      tipo: 'devolucion_materiales',
+      titulo: 'Devolución pendiente',
+      mensaje: `${empleado.nombreCompleto || empleado.usuario || 'Empleado'} registró materiales sobrantes para devolución.`,
+      trabajoUid,
+      codigoTrabajo: trabajo.codigoTrabajo || trabajoUid,
+      leido: false,
+      creadoEn: serverTimestamp(),
+      ruta: '/devoluciones'
+    });
+  }
+
   private trabajoPerteneceAlEmpleado(
     trabajo: any,
     empleadoUid: string

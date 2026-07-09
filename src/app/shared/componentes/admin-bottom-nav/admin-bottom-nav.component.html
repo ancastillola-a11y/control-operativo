@@ -17,7 +17,7 @@
     (click)="irAlmacen()"
   >
     <ion-icon name="cube-outline"></ion-icon>
-    <span>Almacén</span>
+    <span>{{ modo === 'empleado' ? 'GPS' : 'Almacén' }}</span>
   </button>
 
   <button
@@ -37,7 +37,7 @@
     (click)="irReportes()"
   >
     <ion-icon name="bar-chart-outline"></ion-icon>
-    <span>Reportes</span>
+    <span>{{ modo === 'empleado' ? 'Ruta' : 'Reportes' }}</span>
   </button>
 
   <button
@@ -47,7 +47,7 @@
     (click)="irMas()"
   >
     <ion-icon name="ellipsis-horizontal"></ion-icon>
-    <span>Más</span>
+    <span>{{ modo === 'empleado' ? 'Cuenta' : 'Más' }}</span>
   </button>
 
 </nav>

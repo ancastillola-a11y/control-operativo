@@ -285,6 +285,41 @@ tipoTrabajo: String(data.tipoTrabajo || '').trim(),
     await this.cargarTrabajos();
   }
 
+
+  async retrocederEstadoTrabajo(
+    trabajo: TrabajoVista,
+    motivo = ''
+  ): Promise<void> {
+    const uid = String(trabajo.uid || trabajo.id || '').trim();
+
+    if (!uid) {
+      throw new Error('trabajo-uid-vacio');
+    }
+
+    const estadoActual = trabajo.estado;
+
+    const mapaRetroceso: Partial<Record<EstadoTrabajo, EstadoTrabajo>> = {
+      en_camino: 'pendiente',
+      en_proceso: 'en_camino',
+      finalizado: 'en_proceso'
+    };
+
+    const estadoAnterior = mapaRetroceso[estadoActual];
+
+    if (!estadoAnterior) {
+      throw new Error('estado-no-retrocedible');
+    }
+
+    await this.dao.cambiarEstadoAdmin(
+      uid,
+      estadoAnterior,
+      motivo
+    );
+
+    await this.cargarTrabajos();
+  }
+
+
   private aplicarFiltros(
     trabajos: TrabajoVista[],
     busqueda: string,

@@ -1,12 +1,12 @@
 // src/app/paginas/empleado/dashboard-empleado/dashboard-empleado.page.ts
-import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 
 import {
+  AlertController,
   IonicModule,
   NavController,
-  ToastController,
-  AlertController
+  ToastController
 } from '@ionic/angular';
 
 import {
@@ -18,26 +18,30 @@ import { addIcons } from 'ionicons';
 
 import {
   alertCircleOutline,
+  arrowBackOutline,
   briefcaseOutline,
   calendarOutline,
   callOutline,
+  cameraOutline,
   cashOutline,
   checkmarkCircleOutline,
   checkmarkDoneOutline,
+  chevronForwardOutline,
   clipboardOutline,
   constructOutline,
+  copyOutline,
   cubeOutline,
-  documentTextOutline,
-  locateOutline,
+  homeOutline,
+  informationCircleOutline,
   locationOutline,
-  logOutOutline,
   mapOutline,
   navigateOutline,
+  personCircleOutline,
+  personOutline,
   pinOutline,
   playCircleOutline,
-  radioOutline,
   refreshOutline,
-  stopCircleOutline,
+  shieldCheckmarkOutline,
   timeOutline
 } from 'ionicons/icons';
 
@@ -46,12 +50,65 @@ import { GpsEmpleadoService } from '../../../procesos/gps-empleado.service';
 
 import {
   DashboardEmpleadoUsuario,
+  DashboardEmpleadoViewModel,
   DashboardTrabajoEmpleado
 } from '../../../modelos/dashboard-empleado';
 
-import { AdminModuleHeroComponent } from '../../../shared/componentes/admin-module-hero/admin-module-hero.component';
-import { AdminSummaryCardComponent } from '../../../shared/componentes/admin-summary-card/admin-summary-card.component';
-import { AdminEmptyStateComponent } from '../../../shared/componentes/admin-empty-state/admin-empty-state.component';
+import { EmpleadoHeaderComponent } from '../../../shared/componentes/empleado-header/empleado-header.component';
+import { EmpleadoBottomNavComponent } from '../../../shared/componentes/empleado-bottom-nav/empleado-bottom-nav.component';
+
+import { InicioEmpleadoComponent } from './modulos/inicio-empleado/inicio-empleado.component';
+import { TrabajosEmpleadoComponent } from './modulos/trabajos-empleado/trabajos-empleado.component';
+import { DetalleTrabajoEmpleadoComponent } from './modulos/detalle-trabajo-empleado/detalle-trabajo-empleado.component';
+import { CodigoVerificacionEmpleadoComponent } from './modulos/codigo-verificacion-empleado/codigo-verificacion-empleado.component';
+import { CambioEstadoEmpleadoComponent } from './modulos/cambio-estado-empleado/cambio-estado-empleado.component';
+import { FinalizarTrabajoEmpleadoComponent } from './modulos/finalizar-trabajo-empleado/finalizar-trabajo-empleado.component';
+import { MaterialesPosesionEmpleadoComponent } from './modulos/materiales-posesion-empleado/materiales-posesion-empleado.component';
+import { DevolucionesEmpleadoComponent } from './modulos/devoluciones-empleado/devoluciones-empleado.component';
+
+export type ModuloEmpleado =
+  | 'inicio'
+  | 'trabajos'
+  | 'detalle'
+  | 'codigo'
+  | 'cambioEstado'
+  | 'finalizar'
+  | 'materialesPosesion'
+  | 'devoluciones';
+
+export type FiltroTrabajosEmpleado =
+  | 'pendientes'
+  | 'proceso'
+  | 'finalizadas'
+  | 'todos';
+
+export type EstadoDestinoEmpleado =
+  | 'en_camino'
+  | 'en_proceso';
+
+interface MaterialDevueltoEmpleado {
+  materialUid: string;
+  nombre: string;
+  unidad: string;
+  cantidadAsignada: number;
+  cantidadUsada: number;
+  cantidadDevuelta: number;
+}
+
+interface FinalizarTrabajoEmpleadoEvento {
+  trabajo: DashboardTrabajoEmpleado;
+  empleado: DashboardEmpleadoUsuario;
+  materialesUsados: number[];
+  pagoConfirmado?: boolean;
+  metodoPago?: string;
+  observacion?: string;
+}
+
+interface RegistrarDevolucionEmpleadoEvento {
+  trabajo: DashboardTrabajoEmpleado;
+  empleado: DashboardEmpleadoUsuario;
+  materialesDevueltos: MaterialDevueltoEmpleado[];
+}
 
 @Component({
   selector: 'app-dashboard-empleado',
@@ -61,9 +118,18 @@ import { AdminEmptyStateComponent } from '../../../shared/componentes/admin-empt
   imports: [
     CommonModule,
     IonicModule,
-    AdminModuleHeroComponent,
-    AdminSummaryCardComponent,
-    AdminEmptyStateComponent
+
+    EmpleadoHeaderComponent,
+    EmpleadoBottomNavComponent,
+
+    InicioEmpleadoComponent,
+    TrabajosEmpleadoComponent,
+    DetalleTrabajoEmpleadoComponent,
+    CodigoVerificacionEmpleadoComponent,
+    CambioEstadoEmpleadoComponent,
+    FinalizarTrabajoEmpleadoComponent,
+    MaterialesPosesionEmpleadoComponent,
+    DevolucionesEmpleadoComponent
   ]
 })
 export class DashboardEmpleadoPage {
@@ -80,78 +146,414 @@ export class DashboardEmpleadoPage {
   gpsActivo$ = this.gpsEmpleadoService.activo$;
   gpsEstadoTexto$ = this.gpsEmpleadoService.estadoTexto$;
 
+  moduloActual: ModuloEmpleado = 'inicio';
+
+  filtroTrabajos: FiltroTrabajosEmpleado = 'pendientes';
+
+  trabajoSeleccionado: DashboardTrabajoEmpleado | null = null;
+  trabajoSeleccionadoUid = '';
+
+  estadoDestino: EstadoDestinoEmpleado = 'en_camino';
+
+  materialesUsadosFinalizacion: number[] = [];
+
+  accionEnProcesoUid = '';
+
   constructor() {
     addIcons({
       'alert-circle-outline': alertCircleOutline,
+      'arrow-back-outline': arrowBackOutline,
       'briefcase-outline': briefcaseOutline,
       'calendar-outline': calendarOutline,
       'call-outline': callOutline,
+      'camera-outline': cameraOutline,
       'cash-outline': cashOutline,
       'checkmark-circle-outline': checkmarkCircleOutline,
       'checkmark-done-outline': checkmarkDoneOutline,
+      'chevron-forward-outline': chevronForwardOutline,
       'clipboard-outline': clipboardOutline,
       'construct-outline': constructOutline,
+      'copy-outline': copyOutline,
       'cube-outline': cubeOutline,
-      'document-text-outline': documentTextOutline,
-      'locate-outline': locateOutline,
+      'home-outline': homeOutline,
+      'information-circle-outline': informationCircleOutline,
       'location-outline': locationOutline,
-      'log-out-outline': logOutOutline,
       'map-outline': mapOutline,
       'navigate-outline': navigateOutline,
+      'person-circle-outline': personCircleOutline,
+      'person-outline': personOutline,
       'pin-outline': pinOutline,
       'play-circle-outline': playCircleOutline,
-      'radio-outline': radioOutline,
       'refresh-outline': refreshOutline,
-      'stop-circle-outline': stopCircleOutline,
+      'shield-checkmark-outline': shieldCheckmarkOutline,
       'time-outline': timeOutline
     });
   }
 
-  puedeMarcarEnCamino(trabajo: DashboardTrabajoEmpleado): boolean {
-    return trabajo.puedeMarcarEnCamino === true;
+  irInicio() {
+    this.moduloActual = 'inicio';
+    this.subirPantalla();
   }
 
-  puedeIniciar(trabajo: DashboardTrabajoEmpleado): boolean {
-    return trabajo.puedeIniciar === true;
+  irTrabajos() {
+    this.moduloActual = 'trabajos';
+    this.subirPantalla();
   }
 
-  puedeFinalizar(trabajo: DashboardTrabajoEmpleado): boolean {
-    return trabajo.puedeFinalizar === true;
+  irDevoluciones() {
+    this.moduloActual = 'devoluciones';
+    this.subirPantalla();
   }
 
- async activarGps(
-  empleado: DashboardEmpleadoUsuario,
-  trabajo: DashboardTrabajoEmpleado | null
-) {
-  try {
-    const confirmado = await this.confirmarActivacionGps();
+  irHistorial() {
+    void this.mostrarToast(
+      'El historial operativo se integrará después.',
+      'primary'
+    );
+  }
+
+  abrirDetalleTrabajo(trabajo: DashboardTrabajoEmpleado) {
+    this.trabajoSeleccionado = trabajo;
+    this.trabajoSeleccionadoUid = this.obtenerTrabajoUid(trabajo);
+    this.moduloActual = 'detalle';
+    this.subirPantalla();
+  }
+
+  irCodigo(trabajo: DashboardTrabajoEmpleado) {
+    this.trabajoSeleccionado = trabajo;
+    this.trabajoSeleccionadoUid = this.obtenerTrabajoUid(trabajo);
+    this.moduloActual = 'codigo';
+    this.subirPantalla();
+  }
+
+  irCambioEstado(
+    trabajo: DashboardTrabajoEmpleado,
+    estado: EstadoDestinoEmpleado
+  ) {
+    this.trabajoSeleccionado = trabajo;
+    this.trabajoSeleccionadoUid = this.obtenerTrabajoUid(trabajo);
+    this.estadoDestino = estado;
+    this.moduloActual = 'cambioEstado';
+    this.subirPantalla();
+  }
+
+  irFinalizar(trabajo: DashboardTrabajoEmpleado) {
+    this.trabajoSeleccionado = trabajo;
+    this.trabajoSeleccionadoUid = this.obtenerTrabajoUid(trabajo);
+
+    this.materialesUsadosFinalizacion = this.obtenerMaterialesTrabajo(trabajo)
+      .map((material) => this.obtenerCantidadAsignada(material));
+
+    this.moduloActual = 'finalizar';
+    this.subirPantalla();
+  }
+
+  trabajoActual(
+    vm: DashboardEmpleadoViewModel
+  ): DashboardTrabajoEmpleado | null {
+    const uidSeleccionado = String(
+      this.trabajoSeleccionadoUid ||
+      this.trabajoSeleccionado?.uid ||
+      this.trabajoSeleccionado?.id ||
+      ''
+    ).trim();
+
+    if (!uidSeleccionado) {
+      return this.trabajoSeleccionado;
+    }
+
+    const trabajoRemoto = (vm.trabajos || []).find((trabajo) =>
+      this.obtenerTrabajoUid(trabajo) === uidSeleccionado
+    );
+
+    if (!trabajoRemoto) {
+      return this.trabajoSeleccionado;
+    }
+
+    if (!this.trabajoSeleccionado) {
+      return trabajoRemoto;
+    }
+
+    const estadoLocal = this.ordenEstadoFlujo(this.trabajoSeleccionado.estado);
+    const estadoRemoto = this.ordenEstadoFlujo(trabajoRemoto.estado);
+
+    if (estadoLocal > estadoRemoto) {
+      return {
+        ...(trabajoRemoto as any),
+        ...(this.trabajoSeleccionado as any),
+        codigoCliente:
+          (trabajoRemoto as any).codigoCliente ||
+          (this.trabajoSeleccionado as any).codigoCliente
+      } as DashboardTrabajoEmpleado;
+    }
+
+    return trabajoRemoto;
+  }
+
+  sm41TotalAvisos(vm: DashboardEmpleadoViewModel): number {
+    const trabajos = vm.trabajos || [];
+
+    const pendientes = trabajos.filter((trabajo) =>
+      trabajo.estado === 'pendiente'
+    ).length;
+
+    const devoluciones = trabajos.filter((trabajo) =>
+      trabajo.estado === 'devolucion_pendiente'
+    ).length;
+
+    const trabajoActivo = trabajos.some((trabajo) =>
+      [
+        'pendiente',
+        'en_camino',
+        'en_proceso'
+      ].includes(String(trabajo.estado || '').trim())
+    );
+
+    return pendientes + devoluciones + (trabajoActivo ? 1 : 0);
+  }
+
+  sm41VerTodas() {
+    void this.mostrarToast(
+      'Las notificaciones completas se integrarán después.',
+      'primary'
+    );
+  }
+
+  async confirmarCambioEstado(
+    evento: DashboardTrabajoEmpleado | {
+      trabajo: DashboardTrabajoEmpleado;
+      estadoDestino?: EstadoDestinoEmpleado;
+      empleado?: DashboardEmpleadoUsuario;
+    },
+    empleadoParametro?: DashboardEmpleadoUsuario
+  ) {
+    const trabajo = this.extraerTrabajoEvento(evento);
+    const empleado = empleadoParametro || (evento as any)?.empleado || null;
+    const estadoDestino = (evento as any)?.estadoDestino || this.estadoDestino;
+
+    if (!trabajo || !empleado) {
+      await this.mostrarToast(
+        'No se pudo identificar el trabajo o el empleado.',
+        'danger'
+      );
+      return;
+    }
+
+    if (!this.bloquearAccionTrabajo(trabajo)) {
+      return;
+    }
+
+    try {
+      if (estadoDestino === 'en_camino') {
+        await this.dashboardEmpleadoService.marcarEnCamino(
+          trabajo,
+          empleado
+        );
+
+        this.trabajoSeleccionado = this.crearTrabajoLocalConEstado(
+          trabajo,
+          'en_camino'
+        );
+
+        await this.mostrarToast(
+          'Trabajo marcado como en camino.',
+          'success'
+        );
+      }
+
+      if (estadoDestino === 'en_proceso') {
+        await this.dashboardEmpleadoService.iniciarTrabajo(
+          trabajo,
+          empleado
+        );
+
+        this.trabajoSeleccionado = this.crearTrabajoLocalConEstado(
+          trabajo,
+          'en_proceso'
+        );
+
+        await this.mostrarToast(
+          'Trabajo iniciado correctamente.',
+          'success'
+        );
+      }
+
+      this.trabajoSeleccionadoUid = this.obtenerTrabajoUid(trabajo);
+      this.moduloActual = 'detalle';
+      this.subirPantalla();
+    } catch (error) {
+      console.error('[DashboardEmpleadoPage] Error cambiando estado:', error);
+      await this.mostrarToast(this.obtenerMensajeError(error), 'danger');
+    } finally {
+      this.liberarAccionTrabajo(trabajo);
+    }
+  }
+
+  async finalizarDesdeModulo(
+    evento: FinalizarTrabajoEmpleadoEvento
+  ) {
+    const trabajo = evento?.trabajo;
+    const empleado = evento?.empleado;
+
+    if (!trabajo || !empleado) {
+      await this.mostrarToast(
+        'No se pudo identificar el trabajo o el empleado.',
+        'danger'
+      );
+      return;
+    }
+
+    if (!this.bloquearAccionTrabajo(trabajo)) {
+      return;
+    }
+
+    try {
+      this.materialesUsadosFinalizacion =
+        Array.isArray(evento.materialesUsados)
+          ? evento.materialesUsados
+          : this.obtenerMaterialesTrabajo(trabajo).map((material) =>
+              this.obtenerCantidadAsignada(material)
+            );
+
+      await this.dashboardEmpleadoService.finalizarTrabajo(
+        trabajo,
+        empleado
+      );
+
+      this.trabajoSeleccionado = this.crearTrabajoLocalFinalizado(
+        trabajo,
+        this.materialesUsadosFinalizacion
+      );
+
+      this.trabajoSeleccionadoUid = this.obtenerTrabajoUid(trabajo);
+      this.moduloActual = 'materialesPosesion';
+
+      await this.mostrarToast(
+        'Trabajo finalizado correctamente.',
+        'success'
+      );
+
+      this.subirPantalla();
+    } catch (error) {
+      console.error('[DashboardEmpleadoPage] Error finalizando trabajo:', error);
+      await this.mostrarToast(this.obtenerMensajeError(error), 'danger');
+    } finally {
+      this.liberarAccionTrabajo(trabajo);
+    }
+  }
+
+  async registrarDevolucionDesdeModulo(
+    evento: RegistrarDevolucionEmpleadoEvento
+  ) {
+    const trabajo = evento?.trabajo;
+    const empleado = evento?.empleado;
+    const materialesDevueltos = this.normalizarMaterialesDevueltos(
+      evento?.materialesDevueltos || []
+    );
+
+    if (!trabajo || !empleado) {
+      await this.mostrarToast(
+        'No se pudo identificar el trabajo o el empleado.',
+        'danger'
+      );
+      return;
+    }
+
+    if (materialesDevueltos.length === 0) {
+      await this.mostrarToast(
+        'No hay materiales sobrantes para devolver.',
+        'primary'
+      );
+      return;
+    }
+
+    const confirmado = await this.confirmarAccionEstado(
+      'Registrar devolución',
+      'Se registrarán los materiales sobrantes para que el administrador los valide y recién ahí vuelvan al stock.'
+    );
 
     if (!confirmado) {
       return;
     }
 
-    await this.gpsEmpleadoService.activarSeguimiento(
-      empleado,
-      trabajo
-    );
+    if (!this.bloquearAccionTrabajo(trabajo)) {
+      return;
+    }
+
+    try {
+      await this.dashboardEmpleadoService.registrarDevolucion(
+        trabajo,
+        empleado,
+        materialesDevueltos
+      );
+
+      this.trabajoSeleccionado = this.crearTrabajoLocalConDevolucion(
+        trabajo,
+        materialesDevueltos
+      );
+
+      this.trabajoSeleccionadoUid = this.obtenerTrabajoUid(trabajo);
+      this.moduloActual = 'devoluciones';
+
+      await this.mostrarToast(
+        'Devolución registrada. El administrador debe validarla.',
+        'success'
+      );
+
+      this.subirPantalla();
+    } catch (error) {
+      console.error('[DashboardEmpleadoPage] Error registrando devolución:', error);
+      await this.mostrarToast(this.obtenerMensajeError(error), 'danger');
+    } finally {
+      this.liberarAccionTrabajo(trabajo);
+    }
+  }
+
+  async copiarCodigoCliente(
+    valor: DashboardTrabajoEmpleado | string
+  ) {
+    const codigo = typeof valor === 'string'
+      ? valor
+      : this.obtenerCodigoCliente(valor);
+
+    if (!codigo || codigo === '----') {
+      await this.mostrarToast(
+        'Este trabajo todavía no tiene código generado.',
+        'primary'
+      );
+      return;
+    }
+
+    const copiado = await this.copiarTexto(codigo);
 
     await this.mostrarToast(
-      'GPS activado. El administrador ya puede ver tu ubicación.',
+      copiado
+        ? `Código copiado: ${codigo}`
+        : `Código vigente: ${codigo}`,
       'success'
     );
-  } catch (error) {
-    console.error('[DashboardEmpleadoPage] Error activando GPS:', error);
-    await this.mostrarToast(this.obtenerMensajeErrorGps(error), 'danger');
   }
-}
-  async desactivarGps() {
-    this.gpsEmpleadoService.desactivarSeguimiento();
-    await this.mostrarToast('GPS desactivado.', 'primary');
+
+  llamarCliente(trabajo: DashboardTrabajoEmpleado) {
+    const telefono = String((trabajo as any).clienteTelefono || '').trim();
+
+    if (!telefono) {
+      void this.mostrarToast(
+        'Este trabajo no tiene teléfono registrado.',
+        'primary'
+      );
+      return;
+    }
+
+    window.open(`tel:${telefono}`, '_self');
   }
 
   abrirRutaTrabajo(trabajo: DashboardTrabajoEmpleado | null) {
     if (!trabajo) {
-      this.mostrarToast('No tienes un trabajo seleccionado.', 'primary');
+      void this.mostrarToast(
+        'No tienes un trabajo seleccionado.',
+        'primary'
+      );
       return;
     }
 
@@ -159,99 +561,58 @@ export class DashboardEmpleadoPage {
     window.open(url, '_blank');
   }
 
-  async marcarEnCamino(
-    trabajo: DashboardTrabajoEmpleado,
-    empleado: DashboardEmpleadoUsuario
+  async activarGps(
+    empleado: DashboardEmpleadoUsuario,
+    trabajo: DashboardTrabajoEmpleado | null
   ) {
     try {
-      await this.dashboardEmpleadoService.marcarEnCamino(
-        trabajo,
-        empleado
+      await this.gpsEmpleadoService.activarSeguimiento(
+        empleado,
+        trabajo
       );
 
-      await this.mostrarToast('Trabajo marcado como en camino.', 'success');
-    } catch (error) {
-      console.error('[DashboardEmpleadoPage] Error marcando en camino:', error);
-      await this.mostrarToast(this.obtenerMensajeError(error), 'danger');
-    }
-  }
-
-  async iniciarTrabajo(
-    trabajo: DashboardTrabajoEmpleado,
-    empleado: DashboardEmpleadoUsuario
-  ) {
-    try {
-      await this.dashboardEmpleadoService.iniciarTrabajo(
-        trabajo,
-        empleado
+      await this.mostrarToast(
+        'GPS activado. El administrador ya puede ver tu ubicación.',
+        'success'
       );
-
-      await this.mostrarToast('Trabajo iniciado correctamente.', 'success');
     } catch (error) {
-      console.error('[DashboardEmpleadoPage] Error iniciando trabajo:', error);
-      await this.mostrarToast(this.obtenerMensajeError(error), 'danger');
+      console.error('[DashboardEmpleadoPage] Error activando GPS:', error);
+      await this.mostrarToast(this.obtenerMensajeErrorGps(error), 'danger');
     }
   }
 
-  async finalizarTrabajo(
-    trabajo: DashboardTrabajoEmpleado,
-    empleado: DashboardEmpleadoUsuario
-  ) {
-    try {
-      await this.dashboardEmpleadoService.finalizarTrabajo(
-        trabajo,
-        empleado
-      );
+  async desactivarGps() {
+    this.gpsEmpleadoService.desactivarSeguimiento();
 
-      await this.mostrarToast('Trabajo finalizado correctamente.', 'success');
-    } catch (error) {
-      console.error('[DashboardEmpleadoPage] Error finalizando trabajo:', error);
-      await this.mostrarToast(this.obtenerMensajeError(error), 'danger');
-    }
+    await this.mostrarToast(
+      'GPS desactivado.',
+      'primary'
+    );
   }
 
-  llamarCliente(trabajo: DashboardTrabajoEmpleado) {
-    const telefono = String(trabajo.clienteTelefono || '').trim();
+  async abrirPerfil() {
+    const alert = await this.alertCtrl.create({
+      header: 'Perfil del empleado',
+      message: '¿Deseas cerrar sesión?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Cerrar sesión',
+          role: 'confirm'
+        }
+      ]
+    });
 
-    if (!telefono) {
-      this.mostrarToast('Este trabajo no tiene teléfono registrado.', 'primary');
-      return;
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+
+    if (role === 'confirm') {
+      await this.cerrarSesion();
     }
-
-    window.open(`tel:${telefono}`, '_self');
-  }
-
-  abrirMapa(trabajo: DashboardTrabajoEmpleado) {
-    const latitud = Number(trabajo.latitud || 0);
-    const longitud = Number(trabajo.longitud || 0);
-
-    if (latitud && longitud) {
-      const url = `https://www.google.com/maps/search/?api=1&query=${latitud},${longitud}`;
-      window.open(url, '_blank');
-      return;
-    }
-
-    const direccion = String(
-      trabajo.direccionMapa ||
-        trabajo.direccion ||
-        trabajo.ubicacionTextoOriginal ||
-        ''
-    ).trim();
-
-    if (!direccion) {
-      this.mostrarToast('Este trabajo no tiene ubicación registrada.', 'primary');
-      return;
-    }
-
-    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
-
-    window.open(url, '_blank');
-  }
-
-  async refrescar(event: any) {
-    setTimeout(() => {
-      event?.target?.complete?.();
-    }, 500);
   }
 
   async cerrarSesion() {
@@ -264,11 +625,27 @@ export class DashboardEmpleadoPage {
         animated: false,
         replaceUrl: true
       });
-
     } catch (error) {
       console.error('[DashboardEmpleadoPage] Error al cerrar sesión:', error);
-      await this.mostrarToast('No se pudo cerrar sesión.', 'danger');
+
+      await this.mostrarToast(
+        'No se pudo cerrar sesión.',
+        'danger'
+      );
     }
+  }
+
+  async refrescar(event: any) {
+    setTimeout(() => {
+      event?.target?.complete?.();
+    }, 500);
+  }
+
+  async refrescarManual() {
+    await this.mostrarToast(
+      'Información actualizada.',
+      'success'
+    );
   }
 
   trackByTrabajo(
@@ -277,62 +654,322 @@ export class DashboardEmpleadoPage {
   ): string {
     return trabajo.uid || trabajo.id || String(index);
   }
-private async confirmarActivacionGps(): Promise<boolean> {
-  const alert = await this.alertCtrl.create({
-    header: 'Activar ubicación',
-    message:
-      'Para que el administrador vea tu ubicación y la ruta hacia el trabajo, debes permitir el acceso al GPS del celular.',
-    buttons: [
-      {
-        text: 'Cancelar',
-        role: 'cancel'
-      },
-      {
-        text: 'Continuar',
-        role: 'confirm'
+
+  estaProcesando(trabajo: DashboardTrabajoEmpleado): boolean {
+    const uid = this.obtenerTrabajoUid(trabajo);
+
+    return !!uid && this.accionEnProcesoUid === uid;
+  }
+
+  private extraerTrabajoEvento(
+    evento: DashboardTrabajoEmpleado | {
+      trabajo: DashboardTrabajoEmpleado;
+    }
+  ): DashboardTrabajoEmpleado | null {
+    const data = evento as any;
+
+    if (data?.trabajo) {
+      return data.trabajo as DashboardTrabajoEmpleado;
+    }
+
+    if (data?.uid || data?.id) {
+      return evento as DashboardTrabajoEmpleado;
+    }
+
+    return null;
+  }
+
+  private obtenerTrabajoUid(
+    trabajo: DashboardTrabajoEmpleado
+  ): string {
+    return String(trabajo.uid || trabajo.id || '').trim();
+  }
+
+  private obtenerMaterialesTrabajo(
+    trabajo: DashboardTrabajoEmpleado
+  ): any[] {
+    return Array.isArray((trabajo as any).materialesAsignados)
+      ? (trabajo as any).materialesAsignados
+      : [];
+  }
+
+  private obtenerCantidadAsignada(material: any): number {
+    return Number(
+      material?.cantidadAsignada ??
+      material?.cantidad ??
+      material?.cantidadEntregada ??
+      0
+    ) || 0;
+  }
+
+  private obtenerCodigoCliente(
+    trabajo: DashboardTrabajoEmpleado
+  ): string {
+    const data = trabajo as any;
+
+    const codigo = String(
+      data.codigoCliente ||
+      data.codigoVerificacionCliente ||
+      data.codigoVerificacion ||
+      data.codigoSeguridadCliente ||
+      data.codigoClienteVerificacion ||
+      data.codigoValidacionCliente ||
+      data.codigoTrabajoVerificacion ||
+      ''
+    ).trim();
+
+    return codigo || '----';
+  }
+
+  private crearTrabajoLocalConEstado(
+    trabajo: DashboardTrabajoEmpleado,
+    estado: 'en_camino' | 'en_proceso' | 'finalizado'
+  ): DashboardTrabajoEmpleado {
+    return {
+      ...(trabajo as any),
+      estado,
+      estadoTexto: this.obtenerEstadoTexto(estado),
+      estadoClase: estado
+    } as DashboardTrabajoEmpleado;
+  }
+
+  private crearTrabajoLocalFinalizado(
+    trabajo: DashboardTrabajoEmpleado,
+    materialesUsados: number[]
+  ): DashboardTrabajoEmpleado {
+    const materialesAsignados = this.obtenerMaterialesTrabajo(trabajo)
+      .map((material, index) => ({
+        ...material,
+        cantidadUsada: Number(
+          materialesUsados[index] ??
+          this.obtenerCantidadAsignada(material)
+        )
+      }));
+
+    return {
+      ...(trabajo as any),
+      estado: 'finalizado',
+      estadoTexto: 'Finalizado',
+      estadoClase: 'finalizado',
+      materialesAsignados
+    } as DashboardTrabajoEmpleado;
+  }
+
+  private crearTrabajoLocalConDevolucion(
+    trabajo: DashboardTrabajoEmpleado,
+    materialesDevueltos: MaterialDevueltoEmpleado[]
+  ): DashboardTrabajoEmpleado {
+    const materialesAsignados = this.obtenerMaterialesTrabajo(trabajo)
+      .map((material) => {
+        const materialUid = String(
+          material.materialUid ||
+          material.uid ||
+          material.id ||
+          material.materialId ||
+          ''
+        ).trim();
+
+        const devuelto = materialesDevueltos.find((item) =>
+          item.materialUid === materialUid
+        );
+
+        if (!devuelto) {
+          return {
+            ...material,
+            materialUid,
+            cantidadDevuelta: Number(material.cantidadDevuelta || 0)
+          };
+        }
+
+        return {
+          ...material,
+          materialUid,
+          nombre: material.nombre || material.materialNombre || devuelto.nombre,
+          unidad: material.unidad || devuelto.unidad || 'und',
+          cantidadAsignada: Number(
+            material.cantidadAsignada ??
+            material.cantidad ??
+            devuelto.cantidadAsignada ??
+            0
+          ),
+          cantidadUsada: Number(devuelto.cantidadUsada || 0),
+          cantidadDevuelta: Number(devuelto.cantidadDevuelta || 0)
+        };
+      });
+
+    return {
+      ...(trabajo as any),
+      estado: 'devolucion_pendiente',
+      estadoTexto: 'Devolución pendiente',
+      estadoClase: 'devolucion_pendiente',
+      devolucionRegistrada: true,
+      devolucionValidada: false,
+      materialesAsignados
+    } as DashboardTrabajoEmpleado;
+  }
+
+  private normalizarMaterialesDevueltos(
+    materiales: MaterialDevueltoEmpleado[]
+  ): MaterialDevueltoEmpleado[] {
+    return (materiales || [])
+      .map((item) => ({
+        materialUid: String(item.materialUid || '').trim(),
+        nombre: String(item.nombre || 'Material').trim(),
+        unidad: String(item.unidad || 'und').trim(),
+        cantidadAsignada: Number(item.cantidadAsignada || 0),
+        cantidadUsada: Number(item.cantidadUsada || 0),
+        cantidadDevuelta: Number(item.cantidadDevuelta || 0)
+      }))
+      .filter((item) =>
+        item.materialUid &&
+        item.cantidadDevuelta > 0
+      );
+  }
+
+  private obtenerEstadoTexto(estado: string): string {
+    const mapa: Record<string, string> = {
+      pendiente: 'Pendiente',
+      en_camino: 'En camino',
+      en_proceso: 'En proceso',
+      finalizado: 'Finalizado',
+      devolucion_pendiente: 'Devolución pendiente',
+      devolucion_realizada: 'Devolución validada',
+      cancelado: 'Cancelado'
+    };
+
+    return mapa[String(estado || '').trim()] || 'Pendiente';
+  }
+
+  private ordenEstadoFlujo(estado: string): number {
+    const mapa: Record<string, number> = {
+      pendiente: 1,
+      en_camino: 2,
+      en_proceso: 3,
+      finalizado: 4,
+      devolucion_pendiente: 5,
+      devolucion_realizada: 6,
+      cancelado: 7
+    };
+
+    return mapa[String(estado || '').trim()] || 0;
+  }
+
+  private bloquearAccionTrabajo(
+    trabajo: DashboardTrabajoEmpleado
+  ): boolean {
+    const uid = this.obtenerTrabajoUid(trabajo);
+
+    if (!uid) {
+      return false;
+    }
+
+    if (this.accionEnProcesoUid === uid) {
+      return false;
+    }
+
+    this.accionEnProcesoUid = uid;
+    return true;
+  }
+
+  private liberarAccionTrabajo(
+    trabajo: DashboardTrabajoEmpleado
+  ): void {
+    const uid = this.obtenerTrabajoUid(trabajo);
+
+    if (this.accionEnProcesoUid === uid) {
+      this.accionEnProcesoUid = '';
+    }
+  }
+
+  private async confirmarAccionEstado(
+    titulo: string,
+    mensaje: string
+  ): Promise<boolean> {
+    const alert = await this.alertCtrl.create({
+      header: titulo,
+      message: mensaje,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Confirmar',
+          role: 'confirm'
+        }
+      ]
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+
+    return role === 'confirm';
+  }
+
+  private async copiarTexto(valor: string): Promise<boolean> {
+    try {
+      if (
+        typeof navigator !== 'undefined' &&
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+      ) {
+        await navigator.clipboard.writeText(valor);
+        return true;
       }
-    ]
-  });
 
-  await alert.present();
+      const input = document.createElement('textarea');
+      input.value = valor;
+      input.style.position = 'fixed';
+      input.style.left = '-9999px';
+      input.style.top = '-9999px';
 
-  const { role } = await alert.onWillDismiss();
+      document.body.appendChild(input);
+      input.focus();
+      input.select();
 
-  return role === 'confirm';
-}
- private obtenerMensajeErrorGps(error: any): string {
-  const code = String(error?.code || error?.message || error || '');
+      const resultado = document.execCommand('copy');
 
-  if (code.includes('gps-contexto-no-seguro')) {
-    return 'Abre la app con HTTPS. En http://192.168.x.x Chrome bloquea el GPS.';
+      document.body.removeChild(input);
+
+      return resultado;
+    } catch (error) {
+      console.warn('[DashboardEmpleadoPage] No se pudo copiar:', error);
+      return false;
+    }
   }
 
-  if (code.includes('empleado-sin-acceso')) {
-    return 'Tu usuario no tiene acceso operativo habilitado.';
+  private subirPantalla() {
+    setTimeout(() => {
+      document.querySelector('.sm-container')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 50);
   }
 
-  if (code.includes('gps-permiso-denegado')) {
-    return 'El navegador tiene bloqueada la ubicación. Restablece el permiso de ubicación para esta página.';
+  private obtenerMensajeErrorGps(error: any): string {
+    const code = String(error?.code || error?.message || error || '');
+
+    if (code.includes('empleado-sin-acceso')) {
+      return 'Tu usuario no tiene acceso operativo habilitado.';
+    }
+
+    if (code.includes('gps-permiso-denegado')) {
+      return 'El permiso de ubicación fue denegado.';
+    }
+
+    if (code.includes('gps-no-disponible')) {
+      return 'El celular no pudo entregar ubicación. Activa el GPS.';
+    }
+
+    if (code.includes('permission-denied')) {
+      return 'Firestore no permitió guardar la ubicación.';
+    }
+
+    return 'No se pudo activar el GPS.';
   }
 
-  if (code.includes('gps-no-disponible')) {
-    return 'El celular no pudo entregar ubicación. Activa ubicación y precisión alta.';
-  }
-
-  if (code.includes('gps-tiempo-agotado')) {
-    return 'El GPS tardó demasiado. Intenta nuevamente al aire libre.';
-  }
-
-  if (code.includes('gps-no-soportado')) {
-    return 'Este dispositivo no soporta GPS desde el navegador.';
-  }
-
-  if (code.includes('permission-denied')) {
-    return 'Firestore no permitió guardar la ubicación.';
-  }
-
-  return 'No se pudo activar el GPS.';
-}
   private obtenerMensajeError(error: any): string {
     const code = String(error?.code || error?.message || error || '');
 
@@ -356,6 +993,14 @@ private async confirmarActivacionGps(): Promise<boolean> {
       return 'Solo puedes finalizar un trabajo en proceso.';
     }
 
+    if (code.includes('trabajo-no-finalizado')) {
+      return 'Primero debes finalizar el trabajo para registrar devolución.';
+    }
+
+    if (code.includes('sin-materiales-devolver')) {
+      return 'No hay materiales sobrantes para devolver.';
+    }
+
     if (code.includes('permission-denied')) {
       return 'No tienes permisos para actualizar este trabajo.';
     }
@@ -369,7 +1014,7 @@ private async confirmarActivacionGps(): Promise<boolean> {
   ) {
     const toast = await this.toastCtrl.create({
       message,
-      duration: 2600,
+      duration: 2400,
       position: 'top',
       color
     });

@@ -113,6 +113,20 @@
                 <small>{{ obtenerFechaHoraSeguimiento(trabajo) }}</small>
               </div>
             </div>
+            <div class="seguimiento-actions">
+              <button
+                type="button"
+                class="btn-retroceder"
+                *ngIf="puedeRetrocederEstado(trabajo)"
+                [disabled]="estaProcesandoAdmin(trabajo)"
+                (click)="$event.stopPropagation(); retrocederEstado(trabajo)"
+              >
+                <ion-icon name="arrow-back-outline"></ion-icon>
+                <span>Retroceder</span>
+              </button>
+            </div>
+
+
 
             <ion-icon
               class="card-arrow"

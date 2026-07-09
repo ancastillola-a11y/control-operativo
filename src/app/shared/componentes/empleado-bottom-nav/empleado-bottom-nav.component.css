@@ -1,0 +1,44 @@
+/*src/app/shared/componentes/empleado-bottom-nav/empleado-bottom-nav.component.css*/
+:host {
+  display: block;
+}
+
+.empleado-bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  width: calc(100% - 20px);
+  max-width: 430px;
+  height: 64px;
+  background: #ffffff;
+  border: 1px solid #dfeee4;
+  border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.13);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  padding: 6px;
+  z-index: 50;
+}
+
+.empleado-bottom-nav button {
+  border: none;
+  background: transparent;
+  color: #667085;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  font-size: 9.5px;
+  font-weight: 900;
+}
+
+.empleado-bottom-nav ion-icon {
+  font-size: 20px;
+}
+
+.empleado-bottom-nav button.active {
+  background: #eaf8ef;
+  color: #087b2d;
+}

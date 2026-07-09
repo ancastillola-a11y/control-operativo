@@ -1,0 +1,15 @@
+<div class="horario-empleado">
+  <div class="horario-icon">
+    <ion-icon name="calendar-outline"></ion-icon>
+  </div>
+
+  <div class="horario-info">
+    <span>Programado</span>
+    <strong>{{ fechaTexto }}</strong>
+  </div>
+
+  <div class="hora-chip" [class.empty]="!tieneHora">
+    <ion-icon name="time-outline"></ion-icon>
+    <span>{{ horaTexto }}</span>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+:host {
+  display: block;
+}
+
+.horario-empleado {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #dfeee4;
+  border-radius: 15px;
+  background: #f3fbf6;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.horario-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: #eaf8ef;
+  color: #087b2d;
+  display: grid;
+  place-items: center;
+}
+
+.horario-icon ion-icon {
+  font-size: 18px;
+}
+
+.horario-info {
+  min-width: 0;
+}
+
+.horario-info span {
+  display: block;
+  font-size: 10px;
+  font-weight: 900;
+  color: #087b2d;
+  margin-bottom: 2px;
+}
+
+.horario-info strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 1000;
+  color: #101828;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hora-chip {
+  min-height: 30px;
+  border-radius: 999px;
+  padding: 0 9px;
+  background: #087b2d;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 1000;
+  white-space: nowrap;
+}
+
+.hora-chip.empty {
+  background: #e5e7eb;
+  color: #667085;
+}
+
+.hora-chip ion-icon {
+  font-size: 15px;
+}

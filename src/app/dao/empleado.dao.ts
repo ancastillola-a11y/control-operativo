@@ -183,7 +183,7 @@ export class EmpleadoDAO {
       updatedAt: serverTimestamp()
     });
   }
-
+ 
   async eliminarEmpleado(uid: string): Promise<void> {
     const ref = doc(this.firestore, 'usuarios', uid);
     const adminUid = this.auth.currentUser?.uid || '';

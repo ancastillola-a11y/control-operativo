@@ -1,0 +1,49 @@
+<!--src/app/shared/componentes/empleado-bottom-nav/empleado-bottom-nav.component.html-->
+<nav class="empleado-bottom-nav">
+
+  <button
+    type="button"
+    [class.active]="activo === 'inicio'"
+    (click)="inicioClick.emit()"
+  >
+    <ion-icon name="home-outline"></ion-icon>
+    <span>Inicio</span>
+  </button>
+
+  <button
+    type="button"
+    [class.active]="activo === 'trabajos'"
+    (click)="trabajosClick.emit()"
+  >
+    <ion-icon name="briefcase-outline"></ion-icon>
+    <span>Trabajos</span>
+  </button>
+
+  <button
+    type="button"
+    [class.active]="activo === 'materiales'"
+    (click)="materialesClick.emit()"
+  >
+    <ion-icon name="cube-outline"></ion-icon>
+    <span>Devoluciones</span>
+  </button>
+
+  <button
+    type="button"
+    [class.active]="activo === 'historial'"
+    (click)="historialClick.emit()"
+  >
+    <ion-icon name="time-outline"></ion-icon>
+    <span>Historial</span>
+  </button>
+
+  <button
+    type="button"
+    [class.active]="activo === 'perfil'"
+    (click)="perfilClick.emit()"
+  >
+    <ion-icon name="person-circle-outline"></ion-icon>
+    <span>Perfil</span>
+  </button>
+
+</nav>

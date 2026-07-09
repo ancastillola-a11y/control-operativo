@@ -1,5 +1,4 @@
 <!-- src/app/paginas/empleado/dashboard-empleado/dashboard-empleado.page.html -->
-
 <ion-content [fullscreen]="true" class="empleado-root">
 
   <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)">
@@ -8,45 +7,18 @@
 
   <ng-container *ngIf="vm$ | async as vm; else cargandoPanel">
 
-    <main class="empleado-container">
+    <main class="sm-container">
 
-      <section class="empleado-topbar">
-
-        <div class="empleado-avatar">
-
-          <img
-            *ngIf="vm.empleado.fotoUrl; else inicialesEmpleado"
-            [src]="vm.empleado.fotoUrl"
-            alt="Foto empleado"
-          />
-
-          <ng-template #inicialesEmpleado>
-            <span>{{ vm.empleado.iniciales }}</span>
-          </ng-template>
-
-        </div>
-
-        <div class="empleado-topbar-info">
-          <span>Bienvenido</span>
-          <h1>{{ vm.empleado.nombreCompleto }}</h1>
-          <p>{{ vm.empleado.cargoTexto }}</p>
-        </div>
-
-        <button
-          type="button"
-          class="logout-button"
-          (click)="cerrarSesion()"
-        >
-          <ion-icon name="log-out-outline"></ion-icon>
-        </button>
-
-      </section>
-
-      <app-admin-module-hero
-        titulo="Panel operativo"
-        descripcion="Controla tus trabajos asignados, ruta y ubicación GPS en tiempo real."
-        icono="briefcase-outline"
-      ></app-admin-module-hero>
+      <app-empleado-header
+        [nombre]="vm.empleado.nombreCompleto || 'Empleado'"
+        [cargo]="vm.empleado.cargoTexto || 'Personal operativo'"
+        [fotoUrl]="vm.empleado.fotoUrl || ''"
+        [iniciales]="vm.empleado.iniciales || 'EM'"
+        [notificaciones]="sm41TotalAvisos(vm)"
+        (menuClick)="irInicio()"
+        (notificacionesClick)="sm41VerTodas()"
+        (perfilClick)="abrirPerfil()"
+      ></app-empleado-header>
 
       <section
         class="alerta-acceso"
@@ -56,275 +28,152 @@
 
         <div>
           <h3>Acceso operativo no habilitado</h3>
-          <p>Tu usuario existe, pero no está habilitado para operar. Comunícate con el administrador.</p>
+          <p>Comunícate con el administrador para activar tu acceso.</p>
         </div>
       </section>
 
-      <section class="gps-card">
+      <!-- =====================================================
+           MÓDULO 1: INICIO DEL EMPLEADO
+      ====================================================== -->
 
-        <div class="gps-main">
-          <div class="gps-icon">
-            <ion-icon name="radio-outline"></ion-icon>
-          </div>
+      <app-inicio-empleado
+        *ngIf="moduloActual === 'inicio'"
+        [vm]="vm"
+        (abrirTrabajo)="abrirDetalleTrabajo($event)"
+        (irDevoluciones)="irDevoluciones()"
+      ></app-inicio-empleado>
 
-          <div>
-            <span>Ubicación en tiempo real</span>
-            <h2>{{ gpsEstadoTexto$ | async }}</h2>
-            <p>
-              El administrador verá tu ubicación y la ruta hacia el trabajo cuando el GPS esté activo.
-            </p>
-          </div>
-        </div>
+      <!-- =====================================================
+           MÓDULO 2: TRABAJOS / ACTIVIDADES ASIGNADAS
+      ====================================================== -->
 
-        <div class="gps-actions">
+      <app-trabajos-empleado
+        *ngIf="moduloActual === 'trabajos'"
+        [vm]="vm"
+        [filtro]="filtroTrabajos"
+        (cambiarFiltro)="filtroTrabajos = $event"
+        (abrirTrabajo)="abrirDetalleTrabajo($event)"
+      ></app-trabajos-empleado>
 
-          <ng-container *ngIf="gpsActivo$ | async; else gpsApagado">
-            <button
-              type="button"
-              class="gps-button danger"
-              (click)="desactivarGps()"
-            >
-              <ion-icon name="stop-circle-outline"></ion-icon>
-              <span>Desactivar GPS</span>
-            </button>
-          </ng-container>
+      <!-- =====================================================
+           MÓDULO 3: DETALLE DEL TRABAJO
+      ====================================================== -->
 
-          <ng-template #gpsApagado>
-            <button
-  type="button"
-  class="gps-button success"
-  (click)="activarGps(vm.empleado, vm.trabajoActual)"
->
-  <ion-icon name="locate-outline"></ion-icon>
-  <span>Activar GPS</span>
-</button>
-          </ng-template>
+      <app-detalle-trabajo-empleado
+        *ngIf="moduloActual === 'detalle' && trabajoActual(vm) as trabajo"
+        [trabajo]="trabajo"
+        (volver)="irTrabajos()"
+        (llamar)="llamarCliente($event)"
+        (ruta)="abrirRutaTrabajo($event)"
+        (codigo)="irCodigo($event)"
+        (enCamino)="irCambioEstado($event, 'en_camino')"
+        (enProceso)="irCambioEstado($event, 'en_proceso')"
+        (finalizar)="irFinalizar($event)"
+      ></app-detalle-trabajo-empleado>
 
-          <button
-            type="button"
-            class="gps-button secondary"
-            (click)="abrirRutaTrabajo(vm.trabajoActual)"
-          >
-            <ion-icon name="map-outline"></ion-icon>
-            <span>Ruta</span>
-          </button>
+      <!-- =====================================================
+           MÓDULO 4: CÓDIGO DE VERIFICACIÓN DEL CLIENTE
+      ====================================================== -->
 
-        </div>
+      <app-codigo-verificacion-empleado
+        *ngIf="moduloActual === 'codigo' && trabajoActual(vm) as trabajo"
+        [trabajo]="trabajo"
+        (volver)="abrirDetalleTrabajo($event)"
+        (copiarCodigo)="copiarCodigoCliente($event)"
+      ></app-codigo-verificacion-empleado>
 
-      </section>
+      <!-- =====================================================
+           MÓDULO 5: CAMBIO DE ESTADO
+           pendiente -> en_camino
+           en_camino -> en_proceso
+      ====================================================== -->
 
-      <section class="summary-grid">
+      <app-cambio-estado-empleado
+        *ngIf="moduloActual === 'cambioEstado' && trabajoActual(vm) as trabajo"
+        [trabajo]="trabajo"
+        [empleado]="vm.empleado"
+        [estadoDestino]="estadoDestino"
+        [procesando]="estaProcesando(trabajo)"
+        (volver)="abrirDetalleTrabajo($event)"
+        (confirmar)="confirmarCambioEstado($event, vm.empleado)"
+        (abrirMapa)="abrirRutaTrabajo($event)"
+      ></app-cambio-estado-empleado>
 
-        <app-admin-summary-card
-          titulo="Total"
-          [valor]="vm.totalTrabajos"
-          icono="clipboard-outline"
-          tipo="total"
-        ></app-admin-summary-card>
+      <!-- =====================================================
+           MÓDULO 6: FINALIZAR TRABAJO
+           El empleado registra materiales usados.
+           Todavía NO se suma stock aquí.
+      ====================================================== -->
 
-        <app-admin-summary-card
-          titulo="Pendientes"
-          [valor]="vm.totalPendientes"
-          icono="time-outline"
-          tipo="warning"
-        ></app-admin-summary-card>
+      <app-finalizar-trabajo-empleado
+        *ngIf="moduloActual === 'finalizar' && trabajoActual(vm) as trabajo"
+        [trabajo]="trabajo"
+        [empleado]="vm.empleado"
+        [procesando]="estaProcesando(trabajo)"
+        (volver)="abrirDetalleTrabajo($event)"
+        (finalizar)="finalizarDesdeModulo($event)"
+      ></app-finalizar-trabajo-empleado>
 
-        <app-admin-summary-card
-          titulo="En camino"
-          [valor]="vm.totalEnCamino"
-          icono="navigate-outline"
-          tipo="primary"
-        ></app-admin-summary-card>
+      <!-- =====================================================
+           MÓDULO 7: MATERIALES EN POSESIÓN
+           El empleado declara sobrantes.
+           El trabajo pasa a devolucion_pendiente.
+      ====================================================== -->
 
-        <app-admin-summary-card
-          titulo="En proceso"
-          [valor]="vm.totalEnProceso"
-          icono="construct-outline"
-          tipo="success"
-        ></app-admin-summary-card>
+      <app-materiales-posesion-empleado
+        *ngIf="moduloActual === 'materialesPosesion' && trabajoActual(vm) as trabajo"
+        [trabajo]="trabajo"
+        [empleado]="vm.empleado"
+        [materialesUsados]="materialesUsadosFinalizacion"
+        [procesando]="estaProcesando(trabajo)"
+        (volver)="abrirDetalleTrabajo($event)"
+        (registrarDevolucion)="registrarDevolucionDesdeModulo($event)"
+      ></app-materiales-posesion-empleado>
 
-      </section>
+      <!-- =====================================================
+           MÓDULO 8: DEVOLUCIONES DEL EMPLEADO
+           Aquí el empleado ve lo que registró.
+           El administrador valida y recién ahí vuelve al stock.
+      ====================================================== -->
 
-      <section class="trabajo-actual-card">
+      <app-devoluciones-empleado
+        *ngIf="moduloActual === 'devoluciones'"
+        [vm]="vm"
+        [trabajoLocal]="trabajoSeleccionado"
+        (volver)="irTrabajos()"
+        (abrirTrabajo)="abrirDetalleTrabajo($event)"
+      ></app-devoluciones-empleado>
 
-        <div class="trabajo-actual-icon">
-          <ion-icon name="briefcase-outline"></ion-icon>
-        </div>
+      <!-- =====================================================
+           BARRA INFERIOR DEL EMPLEADO
+      ====================================================== -->
 
-        <div class="trabajo-actual-info">
-          <span>Trabajo actual</span>
-
-          <h2 *ngIf="vm.trabajoActual; else sinTrabajoActual">
-            {{ vm.trabajoActual.codigoTrabajo }}
-          </h2>
-
-          <ng-template #sinTrabajoActual>
-            <h2>Sin trabajo activo</h2>
-          </ng-template>
-
-          <p *ngIf="vm.trabajoActual">
-            {{ vm.trabajoActual.clienteNombre }} · {{ vm.trabajoActual.estadoTexto }}
-          </p>
-
-          <p *ngIf="!vm.trabajoActual">
-            Cuando tengas un trabajo asignado aparecerá aquí.
-          </p>
-        </div>
-
-      </section>
-
-      <section class="list-title-row">
-        <div>
-          <h3>Mis trabajos asignados</h3>
-          <p>{{ vm.trabajos.length }} trabajo(s) encontrado(s)</p>
-        </div>
-
-        <ion-icon name="refresh-outline"></ion-icon>
-      </section>
-
-      <section class="list-section">
-
-        <div
-          class="trabajos-list"
-          *ngIf="vm.trabajos.length > 0; else sinTrabajos"
-        >
-
-          <article
-            class="trabajo-card"
-            *ngFor="let trabajo of vm.trabajos; trackBy: trackByTrabajo"
-          >
-
-            <header class="trabajo-card-header">
-
-              <div class="trabajo-title">
-                <span class="codigo-chip">{{ trabajo.codigoTrabajo }}</span>
-                <h3>{{ trabajo.clienteNombre }}</h3>
-                <p>{{ trabajo.tipoTrabajo }}</p>
-              </div>
-
-              <span
-                class="estado-badge"
-                [ngClass]="trabajo.estadoClase"
-              >
-                {{ trabajo.estadoTexto }}
-              </span>
-
-            </header>
-
-            <div class="trabajo-info-grid">
-
-              <p>
-                <ion-icon name="calendar-outline"></ion-icon>
-                <span>{{ trabajo.fechaHoraTexto }}</span>
-              </p>
-
-              <p>
-                <ion-icon name="pin-outline"></ion-icon>
-                <span>{{ trabajo.direccionTexto }}</span>
-              </p>
-
-              <p *ngIf="trabajo.referencia">
-                <ion-icon name="location-outline"></ion-icon>
-                <span>{{ trabajo.referencia }}</span>
-              </p>
-
-              <p>
-                <ion-icon name="cash-outline"></ion-icon>
-                <span>{{ trabajo.subtotalTexto }}</span>
-              </p>
-
-            </div>
-
-            <div
-              class="trabajo-descripcion"
-              *ngIf="trabajo.descripcion"
-            >
-              <ion-icon name="document-text-outline"></ion-icon>
-              <span>{{ trabajo.descripcion }}</span>
-            </div>
-
-            <div class="materiales-box">
-              <ion-icon name="cube-outline"></ion-icon>
-              <span>{{ trabajo.materialesTexto }}</span>
-            </div>
-
-            <div class="trabajo-actions">
-
-              <button
-                type="button"
-                class="btn-action secundario"
-                (click)="llamarCliente(trabajo)"
-              >
-                <ion-icon name="call-outline"></ion-icon>
-                <span>Llamar</span>
-              </button>
-
-              <button
-                type="button"
-                class="btn-action secundario"
-                (click)="abrirMapa(trabajo)"
-              >
-                <ion-icon name="map-outline"></ion-icon>
-                <span>Mapa</span>
-              </button>
-
-              <button
-                *ngIf="puedeMarcarEnCamino(trabajo)"
-                type="button"
-                class="btn-action principal"
-                (click)="marcarEnCamino(trabajo, vm.empleado)"
-              >
-                <ion-icon name="navigate-outline"></ion-icon>
-                <span>En camino</span>
-              </button>
-
-              <button
-                *ngIf="puedeIniciar(trabajo)"
-                type="button"
-                class="btn-action principal"
-                (click)="iniciarTrabajo(trabajo, vm.empleado)"
-              >
-                <ion-icon name="play-circle-outline"></ion-icon>
-                <span>Iniciar</span>
-              </button>
-
-              <button
-                *ngIf="puedeFinalizar(trabajo)"
-                type="button"
-                class="btn-action finalizar"
-                (click)="finalizarTrabajo(trabajo, vm.empleado)"
-              >
-                <ion-icon name="checkmark-done-outline"></ion-icon>
-                <span>Finalizar</span>
-              </button>
-
-            </div>
-
-          </article>
-
-        </div>
-
-        <ng-template #sinTrabajos>
-          <app-admin-empty-state
-            icono="briefcase-outline"
-            titulo="No tienes trabajos asignados"
-            descripcion="Cuando el administrador te asigne un trabajo, aparecerá aquí."
-          ></app-admin-empty-state>
-        </ng-template>
-
-      </section>
+      <app-empleado-bottom-nav
+        [activo]="
+          moduloActual === 'inicio'
+            ? 'inicio'
+            : moduloActual === 'devoluciones'
+              ? 'materiales'
+              : 'trabajos'
+        "
+        (inicioClick)="irInicio()"
+        (trabajosClick)="irTrabajos()"
+        (materialesClick)="irDevoluciones()"
+        (historialClick)="irHistorial()"
+        (perfilClick)="abrirPerfil()"
+      ></app-empleado-bottom-nav>
 
     </main>
 
   </ng-container>
 
   <ng-template #cargandoPanel>
-    <main class="empleado-container">
-      <app-admin-empty-state
-        icono="time-outline"
-        titulo="Cargando panel empleado"
-        descripcion="Espere un momento."
-      ></app-admin-empty-state>
+    <main class="sm-container">
+      <section class="empty-sm cargando">
+        <ion-icon name="time-outline"></ion-icon>
+        <h3>Cargando panel empleado</h3>
+        <p>Espere un momento.</p>
+      </section>
     </main>
   </ng-template>
 

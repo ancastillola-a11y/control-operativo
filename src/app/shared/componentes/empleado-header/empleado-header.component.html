@@ -1,0 +1,48 @@
+<!--src/app/shared/componentes/empleado-header/empleado-header.component.html-->
+<header class="empleado-header">
+
+  <button
+    type="button"
+    class="menu-btn"
+    (click)="menuClick.emit()"
+  >
+    <ion-icon name="menu-outline"></ion-icon>
+  </button>
+
+  <div class="header-info">
+    <h1>¡Hola, {{ primerNombre }}!</h1>
+    <p>{{ cargo || 'Personal operativo' }}</p>
+  </div>
+
+  <button
+    type="button"
+    class="bell-btn"
+    (click)="notificacionesClick.emit()"
+  >
+    <ion-icon name="notifications-outline"></ion-icon>
+
+    <span
+      class="badge"
+      *ngIf="notificaciones > 0"
+    >
+      {{ notificaciones > 9 ? '9+' : notificaciones }}
+    </span>
+  </button>
+
+  <button
+    type="button"
+    class="avatar-btn"
+    (click)="perfilClick.emit()"
+  >
+    <img
+      *ngIf="fotoUrl; else inicialesEmpleado"
+      [src]="fotoUrl"
+      alt="Foto empleado"
+    />
+
+    <ng-template #inicialesEmpleado>
+      <span>{{ iniciales || 'EM' }}</span>
+    </ng-template>
+  </button>
+
+</header>
