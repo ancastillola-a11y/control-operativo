@@ -1,0 +1,117 @@
+﻿> ng.cmd run app:build:development
+[33m❯[39m Building...
+[32m✔[39m Building...
+Application bundle generation failed. [9.761 seconds] - 2026-07-10T04:25:47.345Z
+
+node.exe : X [ERROR] TS1434: Unexpected keyword or 
+identifier. [plugin angular-compiler]
+En línea: 1 Carácter: 1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (X [ERROR 
+   ] TS143...gular-compiler]:String) [], RemoteExcep  
+  tion
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+    src/app/modelos/trabajo.ts:88:0:
+      88 │ EmpleadoDisponible {
+         ╵ ~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2304: Cannot find name 
+'EmpleadoDisponible'. [plugin angular-compiler]
+
+    src/app/modelos/trabajo.ts:88:0:
+      88 │ EmpleadoDisponible {
+         ╵ ~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2693: 'string' only refers to a type, but 
+is being used as a value here. [plugin 
+angular-compiler]
+
+    src/app/modelos/trabajo.ts:89:7:
+      89 │   uid: string;
+         ╵        ~~~~~~
+
+
+X [ERROR] TS2693: 'string' only refers to a type, but 
+is being used as a value here. [plugin 
+angular-compiler]
+
+    src/app/modelos/trabajo.ts:90:18:
+      90 │   nombreCompleto: string;
+         ╵                   ~~~~~~
+
+
+X [ERROR] TS2693: 'string' only refers to a type, but 
+is being used as a value here. [plugin 
+angular-compiler]
+
+    src/app/modelos/trabajo.ts:91:11:
+      91 │   usuario: string;
+         ╵            ~~~~~~
+
+
+X [ERROR] TS2693: 'string' only refers to a type, but 
+is being used as a value here. [plugin 
+angular-compiler]
+
+    src/app/modelos/trabajo.ts:92:9:
+      92 │   cargo: string;
+         ╵          ~~~~~~
+
+
+X [ERROR] TS2693: 'string' only refers to a type, but 
+is being used as a value here. [plugin 
+angular-compiler]
+
+    src/app/modelos/trabajo.ts:93:13:
+      93 │   iniciales: string;
+         ╵              ~~~~~~
+
+
+X [ERROR] TS2339: Property 'obtenerFiltroActual' does 
+not exist on type 'TrabajoService'. [plugin 
+angular-compiler]
+
+    src/app/paginas/trabajos/asignacion-trabajos/asign
+acion-trabajos.page.ts:97:45:
+      97 │     const filtroActual = 
+this.trabajoService.obtenerFiltroActual();
+         ╵                                            
+  ~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'retrocederEstadoTrabajo' 
+does not exist on type 'TrabajoService'. [plugin 
+angular-compiler]
+
+    src/app/paginas/trabajos/seguimiento-trabajos/segu
+imiento-trabajos.page.ts:268:32:
+      268 │       await 
+this.trabajoService.retrocederEstadoTrabajo(
+          ╵                                 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS7006: Parameter 'item' implicitly has an 
+'any' type. [plugin angular-compiler]
+
+    src/app/procesos/devolucion.service.ts:201:15:
+      201 │       .filter((item) =>
+          ╵                ~~~~
+
+
+[[40mERROR[49m] An error occurred while running 
+subprocess ng.
+        
+        ng.cmd run app:build:development exited with 
+exit code 1.
+        
+        Re-running this command with the --verbose 
+flag may provide more information.
+

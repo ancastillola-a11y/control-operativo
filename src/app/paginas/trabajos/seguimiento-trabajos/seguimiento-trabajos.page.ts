@@ -191,8 +191,7 @@ export class SeguimientoTrabajosPage {
 
     return [
       'en_camino',
-      'en_proceso',
-      'finalizado'
+      'en_proceso'
     ].includes(estado);
   }
 
@@ -207,7 +206,6 @@ export class SeguimientoTrabajosPage {
     const mapa: Record<string, string> = {
       en_camino: 'Pendiente',
       en_proceso: 'En camino',
-      finalizado: 'En proceso'
     };
 
     return mapa[estado] || '';
@@ -569,4 +567,6 @@ export class SeguimientoTrabajosPage {
     await toast.present();
   }
 }
+
+
 

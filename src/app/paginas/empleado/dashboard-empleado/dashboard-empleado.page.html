@@ -1,17 +1,51 @@
-<!-- src/app/paginas/empleado/dashboard-empleado/dashboard-empleado.page.html -->
-<ion-content [fullscreen]="true" class="empleado-root">
+<!--
+  src/app/paginas/empleado/dashboard-empleado/
+  dashboard-empleado.page.html
+-->
 
-  <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)">
-    <ion-refresher-content></ion-refresher-content>
+<ion-content
+  [fullscreen]="true"
+  class="empleado-root"
+>
+  <!-- =====================================================
+       ACTUALIZACIÓN MANUAL DEL PANEL
+  ====================================================== -->
+
+  <ion-refresher
+    slot="fixed"
+    (ionRefresh)="refrescar($event)"
+  >
+    <ion-refresher-content
+      pullingText="Desliza para actualizar"
+      refreshingSpinner="crescent"
+      refreshingText="Actualizando trabajos..."
+    ></ion-refresher-content>
   </ion-refresher>
 
-  <ng-container *ngIf="vm$ | async as vm; else cargandoPanel">
+  <!-- =====================================================
+       VIEW MODEL DEL EMPLEADO
+  ====================================================== -->
 
+  <ng-container
+    *ngIf="vm$ | async as vm; else cargandoPanel"
+  >
     <main class="sm-container">
 
+      <!-- =================================================
+           CABECERA DEL EMPLEADO
+      ================================================== -->
+
       <app-empleado-header
-        [nombre]="vm.empleado.nombreCompleto || 'Empleado'"
-        [cargo]="vm.empleado.cargoTexto || 'Personal operativo'"
+        [nombre]="
+          vm.empleado.nombreCompleto ||
+          vm.empleado.usuario ||
+          'Empleado'
+        "
+        [cargo]="
+          vm.empleado.cargoTexto ||
+          vm.empleado.cargo ||
+          'Personal operativo'
+        "
         [fotoUrl]="vm.empleado.fotoUrl || ''"
         [iniciales]="vm.empleado.iniciales || 'EM'"
         [notificaciones]="sm41TotalAvisos(vm)"
@@ -20,141 +54,216 @@
         (perfilClick)="abrirPerfil()"
       ></app-empleado-header>
 
+      <!-- =================================================
+           EMPLEADO DESHABILITADO O SIN ACCESO
+      ================================================== -->
+
       <section
         class="alerta-acceso"
         *ngIf="!vm.empleado.accesoValido"
       >
-        <ion-icon name="alert-circle-outline"></ion-icon>
+        <ion-icon
+          name="alert-circle-outline"
+          aria-hidden="true"
+        ></ion-icon>
 
         <div>
           <h3>Acceso operativo no habilitado</h3>
-          <p>Comunícate con el administrador para activar tu acceso.</p>
+
+          <p>
+            Tu cuenta está deshabilitada o no tiene acceso
+            como empleado. Comunícate con el administrador.
+          </p>
         </div>
       </section>
 
-      <!-- =====================================================
-           MÓDULO 1: INICIO DEL EMPLEADO
-      ====================================================== -->
+      <!-- =================================================
+           CONTENIDO OPERATIVO DEL EMPLEADO
+      ================================================== -->
 
-      <app-inicio-empleado
-        *ngIf="moduloActual === 'inicio'"
-        [vm]="vm"
-        (abrirTrabajo)="abrirDetalleTrabajo($event)"
-        (irDevoluciones)="irDevoluciones()"
-      ></app-inicio-empleado>
+      <ng-container *ngIf="vm.empleado.accesoValido">
 
-      <!-- =====================================================
-           MÓDULO 2: TRABAJOS / ACTIVIDADES ASIGNADAS
-      ====================================================== -->
+        <!-- ===============================================
+             MÓDULO 1: INICIO DEL EMPLEADO
+        ================================================ -->
 
-      <app-trabajos-empleado
-        *ngIf="moduloActual === 'trabajos'"
-        [vm]="vm"
-        [filtro]="filtroTrabajos"
-        (cambiarFiltro)="filtroTrabajos = $event"
-        (abrirTrabajo)="abrirDetalleTrabajo($event)"
-      ></app-trabajos-empleado>
+        <app-inicio-empleado
+          *ngIf="moduloActual === 'inicio'"
+          [vm]="vm"
+          (abrirTrabajo)="abrirDetalleTrabajo($event)"
+          (irDevoluciones)="irDevoluciones()"
+        ></app-inicio-empleado>
 
-      <!-- =====================================================
-           MÓDULO 3: DETALLE DEL TRABAJO
-      ====================================================== -->
+        <!-- ===============================================
+             MÓDULO 2: TRABAJOS ASIGNADOS
 
-      <app-detalle-trabajo-empleado
-        *ngIf="moduloActual === 'detalle' && trabajoActual(vm) as trabajo"
-        [trabajo]="trabajo"
-        (volver)="irTrabajos()"
-        (llamar)="llamarCliente($event)"
-        (ruta)="abrirRutaTrabajo($event)"
-        (codigo)="irCodigo($event)"
-        (enCamino)="irCambioEstado($event, 'en_camino')"
-        (enProceso)="irCambioEstado($event, 'en_proceso')"
-        (finalizar)="irFinalizar($event)"
-      ></app-detalle-trabajo-empleado>
+             El empleado solamente recibe los trabajos
+             donde su UID aparece en empleadosAsignados.
+        ================================================ -->
 
-      <!-- =====================================================
-           MÓDULO 4: CÓDIGO DE VERIFICACIÓN DEL CLIENTE
-      ====================================================== -->
+        <app-trabajos-empleado
+          *ngIf="moduloActual === 'trabajos'"
+          [vm]="vm"
+          [filtro]="filtroTrabajos"
+          (cambiarFiltro)="filtroTrabajos = $event"
+          (abrirTrabajo)="abrirDetalleTrabajo($event)"
+        ></app-trabajos-empleado>
 
-      <app-codigo-verificacion-empleado
-        *ngIf="moduloActual === 'codigo' && trabajoActual(vm) as trabajo"
-        [trabajo]="trabajo"
-        (volver)="abrirDetalleTrabajo($event)"
-        (copiarCodigo)="copiarCodigoCliente($event)"
-      ></app-codigo-verificacion-empleado>
+        <!-- ===============================================
+             MÓDULO 3: DETALLE DEL TRABAJO
+        ================================================ -->
 
-      <!-- =====================================================
-           MÓDULO 5: CAMBIO DE ESTADO
-           pendiente -> en_camino
-           en_camino -> en_proceso
-      ====================================================== -->
+        <app-detalle-trabajo-empleado
+          *ngIf="
+            moduloActual === 'detalle' &&
+            trabajoActual(vm) as trabajo
+          "
+          [trabajo]="trabajo"
+          (volver)="irTrabajos()"
+          (llamar)="llamarCliente($event)"
+          (ruta)="abrirRutaTrabajo($event)"
+          (codigo)="irCodigo($event)"
+          (enCamino)="
+            irCambioEstado(
+              $event,
+              'en_camino'
+            )
+          "
+          (enProceso)="
+            irCambioEstado(
+              $event,
+              'en_proceso'
+            )
+          "
+          (finalizar)="irFinalizar($event)"
+        ></app-detalle-trabajo-empleado>
 
-      <app-cambio-estado-empleado
-        *ngIf="moduloActual === 'cambioEstado' && trabajoActual(vm) as trabajo"
-        [trabajo]="trabajo"
-        [empleado]="vm.empleado"
-        [estadoDestino]="estadoDestino"
-        [procesando]="estaProcesando(trabajo)"
-        (volver)="abrirDetalleTrabajo($event)"
-        (confirmar)="confirmarCambioEstado($event, vm.empleado)"
-        (abrirMapa)="abrirRutaTrabajo($event)"
-      ></app-cambio-estado-empleado>
+        <!-- ===============================================
+             MÓDULO 4: CÓDIGO DE VERIFICACIÓN DEL CLIENTE
 
-      <!-- =====================================================
-           MÓDULO 6: FINALIZAR TRABAJO
-           El empleado registra materiales usados.
-           Todavía NO se suma stock aquí.
-      ====================================================== -->
+             Este código sirve para que el cliente valide
+             que el empleado pertenece al servicio.
+        ================================================ -->
 
-      <app-finalizar-trabajo-empleado
-        *ngIf="moduloActual === 'finalizar' && trabajoActual(vm) as trabajo"
-        [trabajo]="trabajo"
-        [empleado]="vm.empleado"
-        [procesando]="estaProcesando(trabajo)"
-        (volver)="abrirDetalleTrabajo($event)"
-        (finalizar)="finalizarDesdeModulo($event)"
-      ></app-finalizar-trabajo-empleado>
+        <app-codigo-verificacion-empleado
+          *ngIf="
+            moduloActual === 'codigo' &&
+            trabajoActual(vm) as trabajo
+          "
+          [trabajo]="trabajo"
+          (volver)="abrirDetalleTrabajo($event)"
+          (copiarCodigo)="copiarCodigoCliente($event)"
+        ></app-codigo-verificacion-empleado>
 
-      <!-- =====================================================
-           MÓDULO 7: MATERIALES EN POSESIÓN
-           El empleado declara sobrantes.
-           El trabajo pasa a devolucion_pendiente.
-      ====================================================== -->
+        <!-- ===============================================
+             MÓDULO 5: CAMBIO DE ESTADO
 
-      <app-materiales-posesion-empleado
-        *ngIf="moduloActual === 'materialesPosesion' && trabajoActual(vm) as trabajo"
-        [trabajo]="trabajo"
-        [empleado]="vm.empleado"
-        [materialesUsados]="materialesUsadosFinalizacion"
-        [procesando]="estaProcesando(trabajo)"
-        (volver)="abrirDetalleTrabajo($event)"
-        (registrarDevolucion)="registrarDevolucionDesdeModulo($event)"
-      ></app-materiales-posesion-empleado>
+             Flujo permitido:
 
-      <!-- =====================================================
-           MÓDULO 8: DEVOLUCIONES DEL EMPLEADO
-           Aquí el empleado ve lo que registró.
-           El administrador valida y recién ahí vuelve al stock.
-      ====================================================== -->
+             pendiente → en_camino
+             en_camino → en_proceso
+        ================================================ -->
 
-      <app-devoluciones-empleado
-        *ngIf="moduloActual === 'devoluciones'"
-        [vm]="vm"
-        [trabajoLocal]="trabajoSeleccionado"
-        (volver)="irTrabajos()"
-        (abrirTrabajo)="abrirDetalleTrabajo($event)"
-      ></app-devoluciones-empleado>
+        <app-cambio-estado-empleado
+          *ngIf="
+            moduloActual === 'cambioEstado' &&
+            trabajoActual(vm) as trabajo
+          "
+          [trabajo]="trabajo"
+          [empleado]="vm.empleado"
+          [estadoDestino]="estadoDestino"
+          [procesando]="estaProcesando(trabajo)"
+          (volver)="abrirDetalleTrabajo($event)"
+          (confirmar)="confirmarCambioEstado($event)"
+          (abrirMapa)="abrirRutaTrabajo($event)"
+        ></app-cambio-estado-empleado>
 
-      <!-- =====================================================
+        <!-- ===============================================
+             MÓDULO 6: FINALIZAR TRABAJO
+
+             Antes de finalizar debe registrarse:
+
+             - Materiales utilizados
+             - Estado del pago
+             - Monto recibido
+             - Método de pago
+             - Observaciones
+        ================================================ -->
+
+        <app-finalizar-trabajo-empleado
+          *ngIf="
+            moduloActual === 'finalizar' &&
+            trabajoActual(vm) as trabajo
+          "
+          [trabajo]="trabajo"
+          [empleado]="vm.empleado"
+          [procesando]="estaProcesando(trabajo)"
+          (volver)="abrirDetalleTrabajo($event)"
+          (finalizar)="finalizarDesdeModulo($event)"
+        ></app-finalizar-trabajo-empleado>
+
+        <!-- ===============================================
+             MÓDULO 7: MATERIALES EN POSESIÓN
+
+             Se muestra cuando existen sobrantes.
+
+             El empleado debe ingresar el código de
+             devolución para validar el retorno.
+
+             El stock solamente debe aumentar después
+             de que el código sea validado.
+        ================================================ -->
+
+        <app-materiales-posesion-empleado
+          *ngIf="
+            moduloActual === 'materialesPosesion' &&
+            trabajoActual(vm) as trabajo
+          "
+          [trabajo]="trabajo"
+          [empleado]="vm.empleado"
+          [materialesUsados]="materialesUsadosFinalizacion"
+          [procesando]="estaProcesando(trabajo)"
+          (volver)="abrirDetalleTrabajo($event)"
+          (registrarDevolucion)="
+            registrarDevolucionDesdeModulo($event)
+          "
+        ></app-materiales-posesion-empleado>
+
+        <!-- ===============================================
+             MÓDULO 8: DEVOLUCIONES DEL EMPLEADO
+
+             Muestra trabajos con:
+
+             - devolucion_pendiente
+             - devolucion_realizada
+        ================================================ -->
+
+        <app-devoluciones-empleado
+          *ngIf="moduloActual === 'devoluciones'"
+          [vm]="vm"
+          [trabajoLocal]="trabajoSeleccionado"
+          (volver)="irTrabajos()"
+          (abrirTrabajo)="abrirDetalleTrabajo($event)"
+        ></app-devoluciones-empleado>
+
+      </ng-container>
+
+      <!-- =================================================
            BARRA INFERIOR DEL EMPLEADO
-      ====================================================== -->
+      ================================================== -->
 
       <app-empleado-bottom-nav
         [activo]="
           moduloActual === 'inicio'
             ? 'inicio'
-            : moduloActual === 'devoluciones'
+            : moduloActual === 'devoluciones' ||
+              moduloActual === 'materialesPosesion'
               ? 'materiales'
-              : 'trabajos'
+              : moduloActual === 'historial'
+                ? 'historial'
+                : moduloActual === 'perfil'
+                  ? 'perfil'
+                  : 'trabajos'
         "
         (inicioClick)="irInicio()"
         (trabajosClick)="irTrabajos()"
@@ -164,16 +273,32 @@
       ></app-empleado-bottom-nav>
 
     </main>
-
   </ng-container>
+
+  <!-- =====================================================
+       ESTADO DE CARGA
+  ====================================================== -->
 
   <ng-template #cargandoPanel>
     <main class="sm-container">
+
       <section class="empty-sm cargando">
-        <ion-icon name="time-outline"></ion-icon>
-        <h3>Cargando panel empleado</h3>
-        <p>Espere un momento.</p>
+
+        <ion-spinner name="crescent"></ion-spinner>
+
+        <ion-icon
+          name="time-outline"
+          aria-hidden="true"
+        ></ion-icon>
+
+        <h3>Cargando panel del empleado</h3>
+
+        <p>
+          Estamos consultando tus trabajos asignados.
+        </p>
+
       </section>
+
     </main>
   </ng-template>
 

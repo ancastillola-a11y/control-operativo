@@ -7,6 +7,7 @@ export type EstadoTrabajo =
   | 'finalizado'
   | 'devolucion_pendiente'
   | 'devolucion_realizada'
+  | 'cerrado'
   | 'cancelado';
 
 export type EstadoFiltroTrabajo =
@@ -14,7 +15,22 @@ export type EstadoFiltroTrabajo =
   | 'pendientes'
   | 'enProceso'
   | 'finalizados'
+  | 'devoluciones'
+  | 'cerrados'
   | 'cancelados';
+
+export type EstadoPagoTrabajo =
+  | 'pendiente'
+  | 'pagado'
+  | 'parcial';
+
+export type MetodoPagoTrabajo =
+  | 'Efectivo'
+  | 'Yape'
+  | 'Plin'
+  | 'Transferencia'
+  | 'Tarjeta'
+  | 'Otro';
 
 export interface TrabajoEmpleadoAsignado {
   uid: string;
@@ -25,14 +41,38 @@ export interface TrabajoEmpleadoAsignado {
 
 export interface TrabajoMaterialAsignado {
   materialUid: string;
+
   nombre: string;
   categoria: string;
   unidad: string;
 
   cantidadAsignada: number;
 
+  /**
+   * Se registra cuando el empleado finaliza el trabajo.
+   * No modifica stock directamente.
+   */
+  cantidadUsada?: number;
+
+  /**
+   * Se calcula como:
+   * cantidadAsignada - cantidadUsada
+   *
+   * Solo vuelve al stock cuando el empleado ingresa
+   * correctamente el código de devolución.
+   */
+  cantidadDevuelta?: number;
+
   stockAntes?: number;
   stockDespues?: number;
+
+  stockRetornoAntes?: number;
+  stockRetornoDespues?: number;
+
+  precioUnitario?: number;
+  subtotalMaterial?: number;
+
+  devolucionValidada?: boolean;
 
   imagenUrl?: string;
 }
@@ -45,6 +85,7 @@ export interface TrabajoEmpleadoDisponible {
   iniciales: string;
 }
 
+
 export interface TrabajoMaterialDisponible {
   uid: string;
   nombre: string;
@@ -52,6 +93,7 @@ export interface TrabajoMaterialDisponible {
   unidad: string;
   stockActual: number;
   stockMinimo: number;
+  precioUnitario?: number;
   imagenUrl?: string;
   iniciales: string;
 }
@@ -60,15 +102,22 @@ export interface Trabajo {
   id?: string;
   uid?: string;
 
+  /**
+   * Código visible de seguimiento del trabajo.
+   * Ejemplo: T-00025
+   */
+  codigoTrabajo?: string;
+
   clienteNombre: string;
   clienteTelefono: string;
+
   direccion: string;
-  
   referencia?: string;
+
   latitud?: number | null;
-longitud?: number | null;
-direccionMapa?: string;
-ubicacionTextoOriginal?: string;
+  longitud?: number | null;
+  direccionMapa?: string;
+  ubicacionTextoOriginal?: string;
 
   tipoTrabajo: string;
   descripcion?: string;
@@ -81,10 +130,68 @@ ubicacionTextoOriginal?: string;
   empleadosAsignados: TrabajoEmpleadoAsignado[];
   materialesAsignados: TrabajoMaterialAsignado[];
 
+  /**
+   * Código que el empleado muestra al cliente.
+   * Sirve para validar que pertenece al servicio.
+   */
   codigoCliente: string;
+
+  /**
+   * Código que el administrador/almacén entrega al empleado
+   * para validar la devolución de materiales sobrantes.
+   * El empleado no debe verlo libremente antes de devolver.
+   */
   codigoDevolucion: string;
 
   estado: EstadoTrabajo;
+
+  /**
+   * Datos de pago registrados al finalizar el trabajo.
+   */
+  pagoEstado?: EstadoPagoTrabajo;
+  pagoConfirmado?: boolean;
+  montoRecibido?: number;
+  metodoPago?: MetodoPagoTrabajo;
+  observacionPago?: string;
+
+  /**
+   * Datos de finalización del servicio.
+   */
+  observacionFinalizacion?: string;
+  finalizadoPorUid?: string;
+  finalizadoPorNombre?: string;
+  finalizadoAt?: any;
+
+  /**
+   * Datos de ruta e inicio.
+   */
+  enCaminoPorUid?: string;
+  enCaminoPorNombre?: string;
+  enCaminoAt?: any;
+
+  iniciadoPorUid?: string;
+  iniciadoPorNombre?: string;
+  iniciadoAt?: any;
+
+  /**
+   * Datos de devolución.
+   */
+  devolucionRegistrada?: boolean;
+  devolucionValidada?: boolean;
+
+  empleadoDevolucionUid?: string;
+  empleadoDevolucionNombre?: string;
+
+  fechaDevolucionRegistrada?: any;
+  fechaDevolucionValidada?: any;
+
+  /**
+   * Datos de cierre administrativo.
+   */
+  cerradoPorUid?: string;
+  cerradoPorNombre?: string;
+  cerradoAt?: any;
+  observacionCierre?: string;
 
   activo: boolean;
   eliminado: boolean;
@@ -108,17 +215,22 @@ export interface TrabajoVista extends Trabajo {
 
   empleadosTexto: string;
   materialesTexto: string;
+
+  pagoTexto?: string;
+  devolucionTexto?: string;
 }
 
 export interface CrearTrabajoData {
   clienteNombre: string;
   clienteTelefono: string;
+
   direccion: string;
   referencia?: string;
+
   latitud?: number | null;
-longitud?: number | null;
-direccionMapa?: string;
-ubicacionTextoOriginal?: string;
+  longitud?: number | null;
+  direccionMapa?: string;
+  ubicacionTextoOriginal?: string;
 
   tipoTrabajo: string;
   descripcion?: string;
@@ -137,12 +249,14 @@ export interface EditarTrabajoData {
 
   clienteNombre: string;
   clienteTelefono: string;
+
   direccion: string;
   referencia?: string;
+
   latitud?: number | null;
-longitud?: number | null;
-direccionMapa?: string;
-ubicacionTextoOriginal?: string;
+  longitud?: number | null;
+  direccionMapa?: string;
+  ubicacionTextoOriginal?: string;
 
   tipoTrabajo: string;
   descripcion?: string;
@@ -153,6 +267,49 @@ ubicacionTextoOriginal?: string;
   subtotal: number;
 
   empleadosAsignados: TrabajoEmpleadoAsignado[];
+}
+
+export interface FinalizarTrabajoData {
+  trabajoUid: string;
+
+  empleadoUid: string;
+  empleadoNombre: string;
+
+  materialesUsados: Array<{
+    materialUid: string;
+    cantidadUsada: number;
+  }>;
+
+  pagoEstado: EstadoPagoTrabajo;
+  pagoConfirmado: boolean;
+  montoRecibido: number;
+  metodoPago: MetodoPagoTrabajo;
+  observacionPago?: string;
+
+  observacionFinalizacion?: string;
+}
+
+export interface RegistrarDevolucionTrabajoData {
+  trabajoUid: string;
+
+  empleadoUid: string;
+  empleadoNombre: string;
+
+  codigoDevolucionIngresado: string;
+
+  materialesDevueltos: Array<{
+    materialUid: string;
+    nombre: string;
+    unidad: string;
+    cantidadAsignada: number;
+    cantidadUsada: number;
+    cantidadDevuelta: number;
+  }>;
+}
+
+export interface CerrarTrabajoData {
+  trabajoUid: string;
+  observacionCierre?: string;
 }
 
 export interface TrabajosViewModel {
@@ -171,6 +328,7 @@ export interface TrabajosViewModel {
   totalPendientes: number;
   totalEnProceso: number;
   totalFinalizados: number;
+  totalDevoluciones?: number;
+  totalCerrados?: number;
   totalCancelados: number;
 }
-

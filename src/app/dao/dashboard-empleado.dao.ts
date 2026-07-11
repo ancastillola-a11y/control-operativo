@@ -8,6 +8,7 @@ import {
   collectionData,
   doc,
   docData,
+  runTransaction,
   serverTimestamp,
   updateDoc
 } from '@angular/fire/firestore';
@@ -24,14 +25,15 @@ import {
   DashboardTrabajoEmpleado
 } from '../modelos/dashboard-empleado';
 
-import {
-  Empleado
-} from '../modelos/empleado';
+import { Empleado } from '../modelos/empleado';
 
 import {
   EstadoTrabajo,
+  FinalizarTrabajoData,
+  RegistrarDevolucionTrabajoData,
   Trabajo,
-  TrabajoEmpleadoAsignado
+  TrabajoEmpleadoAsignado,
+  TrabajoMaterialAsignado
 } from '../modelos/trabajo';
 
 @Injectable({
@@ -115,31 +117,25 @@ export class DashboardEmpleadoDAO {
     const payload: any = {
       estado: nuevoEstado,
       actualizadoPorUid: empleado.uid,
-      actualizadoPorNombre: empleado.nombreCompleto,
+      actualizadoPorNombre: empleado.nombreCompleto || empleado.usuario || 'Empleado',
       updatedAt: serverTimestamp()
     };
 
     if (nuevoEstado === 'en_camino') {
       payload.enCaminoPorUid = empleado.uid;
-      payload.enCaminoPorNombre = empleado.nombreCompleto;
+      payload.enCaminoPorNombre = empleado.nombreCompleto || empleado.usuario || 'Empleado';
       payload.enCaminoAt = serverTimestamp();
     }
 
     if (nuevoEstado === 'en_proceso') {
       payload.iniciadoPorUid = empleado.uid;
-      payload.iniciadoPorNombre = empleado.nombreCompleto;
+      payload.iniciadoPorNombre = empleado.nombreCompleto || empleado.usuario || 'Empleado';
       payload.iniciadoAt = serverTimestamp();
-    }
-
-    if (nuevoEstado === 'finalizado') {
-      payload.finalizadoPorUid = empleado.uid;
-      payload.finalizadoPorNombre = empleado.nombreCompleto;
-      payload.finalizadoAt = serverTimestamp();
     }
 
     await updateDoc(ref, payload);
 
-    await this.registrarHistorial(
+    await this.registrarHistorialCambioEstado(
       trabajo,
       nuevoEstado,
       empleado
@@ -147,7 +143,7 @@ export class DashboardEmpleadoDAO {
       console.warn('[DashboardEmpleadoDAO] No se pudo registrar historial:', error);
     });
 
-    await this.notificarAdministrador(
+    await this.notificarAdministradorCambioEstado(
       trabajo,
       nuevoEstado,
       empleado
@@ -156,104 +152,496 @@ export class DashboardEmpleadoDAO {
     });
   }
 
-   async registrarDevolucionEmpleado(
-    trabajo: DashboardTrabajoEmpleado,
-    empleado: DashboardEmpleadoUsuario,
-    materialesDevueltos: Array<{
-      materialUid: string;
-      nombre: string;
-      unidad: string;
-      cantidadAsignada: number;
-      cantidadUsada: number;
-      cantidadDevuelta: number;
-    }>
+  async finalizarTrabajoEmpleado(
+    data: FinalizarTrabajoData
   ): Promise<void> {
-    const trabajoUid = String(trabajo.uid || trabajo.id || '').trim();
+    const trabajoUid = String(data.trabajoUid || '').trim();
 
     if (!trabajoUid) {
-      throw new Error('trabajo-sin-uid');
+      throw new Error('trabajo-uid-vacio');
     }
-
-    const materialesOriginales = Array.isArray((trabajo as any).materialesAsignados)
-      ? (trabajo as any).materialesAsignados
-      : [];
-
-    const materialesActualizados = materialesOriginales.map((material: any) => {
-      const materialUid = String(
-        material.materialUid ||
-        material.uid ||
-        material.id ||
-        material.materialId ||
-        ''
-      ).trim();
-
-      const devuelto = materialesDevueltos.find((item) =>
-        item.materialUid === materialUid
-      );
-
-      if (!devuelto) {
-        return {
-          ...material,
-          cantidadUsada: Number(
-            material.cantidadUsada ??
-            material.cantidadAsignada ??
-            material.cantidad ??
-            0
-          ),
-          cantidadDevuelta: Number(material.cantidadDevuelta ?? 0)
-        };
-      }
-
-      return {
-        ...material,
-        materialUid,
-        nombre: material.nombre || material.materialNombre || devuelto.nombre,
-        unidad: material.unidad || devuelto.unidad || 'und',
-        cantidadAsignada: Number(
-          material.cantidadAsignada ??
-          material.cantidad ??
-          devuelto.cantidadAsignada ??
-          0
-        ),
-        cantidadUsada: Number(devuelto.cantidadUsada || 0),
-        cantidadDevuelta: Number(devuelto.cantidadDevuelta || 0)
-      };
-    });
 
     const trabajoRef = doc(this.firestore, 'trabajos', trabajoUid);
 
-    await updateDoc(trabajoRef, {
-      estado: 'devolucion_pendiente',
-      materialesAsignados: materialesActualizados,
-      devolucionRegistrada: true,
-      devolucionValidada: false,
-      empleadoDevolucionUid: empleado.uid,
-      empleadoDevolucionNombre: empleado.nombreCompleto || empleado.usuario || 'Empleado',
-      fechaDevolucionRegistrada: serverTimestamp(),
-      actualizadoEn: serverTimestamp()
-    });
+    await runTransaction(this.firestore, async (transaction) => {
+      const trabajoSnap = await transaction.get(trabajoRef);
 
-    await addDoc(collection(this.firestore, 'historial_actividades'), {
-      tipo: 'devolucion_registrada',
-      modulo: 'empleado',
-      trabajoUid,
-      codigoTrabajo: trabajo.codigoTrabajo || trabajoUid,
-      empleadoUid: empleado.uid,
-      empleadoNombre: empleado.nombreCompleto || empleado.usuario || 'Empleado',
-      descripcion: 'El empleado registró materiales sobrantes para devolución.',
-      materialesDevueltos,
-      creadoEn: serverTimestamp()
-    });
+      if (!trabajoSnap.exists()) {
+        throw new Error('trabajo-no-existe');
+      }
 
-    await addDoc(collection(this.firestore, 'notificaciones_admin'), {
-      tipo: 'devolucion_materiales',
-      titulo: 'Devolución pendiente',
-      mensaje: `${empleado.nombreCompleto || empleado.usuario || 'Empleado'} registró materiales sobrantes para devolución.`,
-      trabajoUid,
-      codigoTrabajo: trabajo.codigoTrabajo || trabajoUid,
-      leido: false,
-      creadoEn: serverTimestamp(),
-      ruta: '/devoluciones'
+      const trabajo: any = trabajoSnap.data();
+
+      if (trabajo.estado !== 'en_proceso') {
+        throw new Error('trabajo-no-en-proceso');
+      }
+
+      const materialesOriginales = Array.isArray(trabajo.materialesAsignados)
+        ? trabajo.materialesAsignados
+        : [];
+
+      if (materialesOriginales.length === 0) {
+        throw new Error('sin-materiales-asignados');
+      }
+
+      const materialesUsados = Array.isArray(data.materialesUsados)
+        ? data.materialesUsados
+        : [];
+
+      if (materialesUsados.length === 0) {
+        throw new Error('materiales-usados-vacios');
+      }
+
+      const materialesActualizados: TrabajoMaterialAsignado[] =
+        materialesOriginales.map((material: any) => {
+          const materialUid = this.obtenerMaterialUid(material);
+          const nombre = String(material.nombre || material.materialNombre || 'Material').trim();
+          const cantidadAsignada = this.obtenerCantidadAsignada(material);
+
+          const usado = materialesUsados.find((item) =>
+            String(item.materialUid || '').trim() === materialUid
+          );
+
+          if (!materialUid) {
+            throw new Error('material-sin-uid');
+          }
+
+          if (!usado) {
+            throw new Error(`material-usado-faltante:${nombre}`);
+          }
+
+          const cantidadUsada = Number(usado.cantidadUsada || 0);
+
+          if (
+            !Number.isFinite(cantidadUsada) ||
+            cantidadUsada < 0 ||
+            cantidadUsada > cantidadAsignada
+          ) {
+            throw new Error(`cantidad-usada-invalida:${nombre}`);
+          }
+
+          const cantidadDevuelta = Math.max(
+            cantidadAsignada - cantidadUsada,
+            0
+          );
+
+          return {
+            ...material,
+
+            materialUid,
+            nombre,
+            categoria: String(material.categoria || 'Sin categoría').trim(),
+            unidad: String(material.unidad || 'und').trim(),
+
+            cantidadAsignada,
+            cantidadUsada,
+            cantidadDevuelta,
+
+            devolucionValidada: false
+          };
+        });
+
+      const haySobrantes = materialesActualizados.some((material) =>
+        Number(material.cantidadDevuelta || 0) > 0
+      );
+
+      const nuevoEstado: EstadoTrabajo = haySobrantes
+        ? 'devolucion_pendiente'
+        : 'finalizado';
+
+      transaction.update(trabajoRef, {
+        estado: nuevoEstado,
+
+        materialesAsignados: materialesActualizados,
+
+        pagoEstado: data.pagoEstado,
+        pagoConfirmado: data.pagoConfirmado === true,
+        montoRecibido: Number(data.montoRecibido || 0),
+        metodoPago: data.metodoPago,
+        observacionPago: String(data.observacionPago || '').trim(),
+
+        observacionFinalizacion: String(data.observacionFinalizacion || '').trim(),
+
+        finalizadoPorUid: data.empleadoUid,
+        finalizadoPorNombre: data.empleadoNombre,
+        finalizadoAt: serverTimestamp(),
+
+        devolucionRegistrada: haySobrantes,
+        devolucionValidada: false,
+        empleadoDevolucionUid: haySobrantes ? data.empleadoUid : '',
+        empleadoDevolucionNombre: haySobrantes ? data.empleadoNombre : '',
+        fechaDevolucionRegistrada: haySobrantes ? serverTimestamp() : null,
+
+        actualizadoPorUid: data.empleadoUid,
+        actualizadoPorNombre: data.empleadoNombre,
+        updatedAt: serverTimestamp()
+      });
+
+      const historialRef = doc(
+        collection(this.firestore, 'historial_actividades')
+      );
+
+      transaction.set(historialRef, {
+        modulo: 'Panel empleado',
+        accion: 'finalizar_trabajo',
+        descripcion: haySobrantes
+          ? `El empleado ${data.empleadoNombre} finalizó el trabajo y registró materiales sobrantes.`
+          : `El empleado ${data.empleadoNombre} finalizó el trabajo sin materiales sobrantes.`,
+        trabajoUid,
+        codigoTrabajo: this.obtenerCodigoTrabajo({
+          ...trabajo,
+          uid: trabajoUid,
+          id: trabajoUid
+        }),
+        empleadoUid: data.empleadoUid,
+        empleadoNombre: data.empleadoNombre,
+        pagoEstado: data.pagoEstado,
+        montoRecibido: Number(data.montoRecibido || 0),
+        metodoPago: data.metodoPago,
+        materialesAsignados: materialesActualizados,
+        createdAt: serverTimestamp()
+      });
+
+      const notificacionTrabajoRef = doc(
+        collection(this.firestore, 'notificaciones_admin')
+      );
+
+      transaction.set(notificacionTrabajoRef, {
+        titulo: 'Trabajo finalizado',
+        mensaje: `${data.empleadoNombre} finalizó un trabajo.`,
+        detalle: haySobrantes
+          ? 'El trabajo tiene materiales sobrantes pendientes de devolución.'
+          : 'El trabajo fue finalizado sin devolución pendiente.',
+        tipo: 'trabajo_finalizado',
+        ruta: haySobrantes ? '/devoluciones' : '/seguimiento-trabajos',
+        referenciaUid: trabajoUid,
+        trabajoUid,
+        codigoTrabajo: this.obtenerCodigoTrabajo({
+          ...trabajo,
+          uid: trabajoUid,
+          id: trabajoUid
+        }),
+        empleadoUid: data.empleadoUid,
+        empleadoNombre: data.empleadoNombre,
+        leido: false,
+        leida: false,
+        eliminada: false,
+        activa: true,
+        createdAt: serverTimestamp()
+      });
+    });
+  }
+
+  async validarDevolucionEmpleado(
+    data: RegistrarDevolucionTrabajoData
+  ): Promise<void> {
+    const trabajoUid = String(data.trabajoUid || '').trim();
+
+    if (!trabajoUid) {
+      throw new Error('trabajo-uid-vacio');
+    }
+
+    const codigoIngresado = String(data.codigoDevolucionIngresado || '').trim();
+
+    if (!codigoIngresado) {
+      throw new Error('codigo-devolucion-vacio');
+    }
+
+    const materialesDevueltos = Array.isArray(data.materialesDevueltos)
+      ? data.materialesDevueltos
+      : [];
+
+    if (materialesDevueltos.length === 0) {
+      throw new Error('sin-materiales-devolver');
+    }
+
+    const trabajoRef = doc(this.firestore, 'trabajos', trabajoUid);
+
+    await runTransaction(this.firestore, async (transaction) => {
+      const trabajoSnap = await transaction.get(trabajoRef);
+
+      if (!trabajoSnap.exists()) {
+        throw new Error('trabajo-no-existe');
+      }
+
+      const trabajo: any = trabajoSnap.data();
+
+      if (
+        trabajo.estado === 'devolucion_realizada' ||
+        trabajo.devolucionValidada === true
+      ) {
+        throw new Error('devolucion-ya-validada');
+      }
+
+      if (
+        trabajo.estado !== 'devolucion_pendiente' &&
+        trabajo.estado !== 'finalizado'
+      ) {
+        throw new Error('trabajo-sin-devolucion-pendiente');
+      }
+
+      const codigoReal = String(trabajo.codigoDevolucion || '').trim();
+
+      if (!codigoReal) {
+        throw new Error('codigo-devolucion-no-configurado');
+      }
+
+      if (codigoIngresado !== codigoReal) {
+        throw new Error('codigo-devolucion-incorrecto');
+      }
+
+      const materialesOriginales = Array.isArray(trabajo.materialesAsignados)
+        ? trabajo.materialesAsignados
+        : [];
+
+      if (materialesOriginales.length === 0) {
+        throw new Error('sin-materiales-devolver');
+      }
+
+      const stockRetornoPorMaterial: Record<string, {
+        stockAntes: number;
+        stockDespues: number;
+      }> = {};
+
+      let totalDevuelto = 0;
+
+      for (const devuelto of materialesDevueltos) {
+        const materialUid = String(devuelto.materialUid || '').trim();
+        const cantidadDevuelta = Number(devuelto.cantidadDevuelta || 0);
+
+        if (!materialUid || cantidadDevuelta <= 0) {
+          continue;
+        }
+
+        const materialOriginal = materialesOriginales.find((material: any) =>
+          this.obtenerMaterialUid(material) === materialUid
+        );
+
+        if (!materialOriginal) {
+          throw new Error(`material-devolucion-no-asignado:${devuelto.nombre}`);
+        }
+
+        const nombre = String(
+          devuelto.nombre ||
+          materialOriginal.nombre ||
+          'Material'
+        ).trim();
+
+        const cantidadAsignada = Number(
+          materialOriginal.cantidadAsignada ??
+          devuelto.cantidadAsignada ??
+          0
+        );
+
+        const cantidadUsada = Number(
+          materialOriginal.cantidadUsada ??
+          devuelto.cantidadUsada ??
+          0
+        );
+
+        const sobranteMaximo = Math.max(
+          cantidadAsignada - cantidadUsada,
+          0
+        );
+
+        if (
+          !Number.isFinite(cantidadAsignada) ||
+          !Number.isFinite(cantidadUsada) ||
+          !Number.isFinite(cantidadDevuelta)
+        ) {
+          throw new Error(`cantidad-devolucion-invalida:${nombre}`);
+        }
+
+        if (cantidadDevuelta > sobranteMaximo) {
+          throw new Error(`cantidad-devuelta-mayor-sobrante:${nombre}`);
+        }
+
+        const materialRef = doc(
+          this.firestore,
+          'materiales',
+          materialUid
+        );
+
+        const materialSnap = await transaction.get(materialRef);
+
+        if (!materialSnap.exists()) {
+          throw new Error(`material-no-existe:${nombre}`);
+        }
+
+        const materialData: any = materialSnap.data();
+
+        const stockAntes = Number(materialData.stockActual || 0);
+        const stockDespues = stockAntes + cantidadDevuelta;
+        const stockMinimo = Number(materialData.stockMinimo || 0);
+
+        transaction.update(materialRef, {
+          stockActual: stockDespues,
+          stockBajo: stockMinimo > 0 && stockDespues <= stockMinimo,
+          updatedAt: serverTimestamp()
+        });
+
+        const movimientoRef = doc(
+          collection(this.firestore, 'movimientos_materiales')
+        );
+
+        transaction.set(movimientoRef, {
+          materialUid,
+          materialNombre: nombre,
+
+          tipoMovimiento: 'entrada',
+          cantidad: cantidadDevuelta,
+
+          stockAntes,
+          stockDespues,
+
+          moduloOrigen: 'devolucion_materiales',
+          trabajoUid,
+          codigoTrabajo: this.obtenerCodigoTrabajo({
+            ...trabajo,
+            uid: trabajoUid,
+            id: trabajoUid
+          }),
+
+          descripcion: `Entrada por devolución de materiales del trabajo ${this.obtenerCodigoTrabajo({
+            ...trabajo,
+            uid: trabajoUid,
+            id: trabajoUid
+          })}.`,
+
+          realizadoPorUid: data.empleadoUid,
+          realizadoPorNombre: data.empleadoNombre,
+
+          createdAt: serverTimestamp()
+        });
+
+        stockRetornoPorMaterial[materialUid] = {
+          stockAntes,
+          stockDespues
+        };
+
+        totalDevuelto += cantidadDevuelta;
+      }
+
+      if (totalDevuelto <= 0) {
+        throw new Error('sin-materiales-devolver');
+      }
+
+      const materialesActualizados: TrabajoMaterialAsignado[] =
+        materialesOriginales.map((material: any) => {
+          const materialUid = this.obtenerMaterialUid(material);
+
+          const devuelto = materialesDevueltos.find((item) =>
+            String(item.materialUid || '').trim() === materialUid
+          );
+
+          if (!devuelto) {
+            return {
+              ...material,
+              materialUid,
+              cantidadUsada: Number(material.cantidadUsada || 0),
+              cantidadDevuelta: Number(material.cantidadDevuelta || 0),
+              devolucionValidada:
+                Number(material.cantidadDevuelta || 0) > 0
+                  ? material.devolucionValidada === true
+                  : true
+            };
+          }
+
+          const stockRetorno = stockRetornoPorMaterial[materialUid];
+
+          return {
+            ...material,
+
+            materialUid,
+
+            nombre: material.nombre || devuelto.nombre || 'Material',
+            unidad: material.unidad || devuelto.unidad || 'und',
+
+            cantidadAsignada: Number(
+              material.cantidadAsignada ??
+              devuelto.cantidadAsignada ??
+              0
+            ),
+
+            cantidadUsada: Number(
+              material.cantidadUsada ??
+              devuelto.cantidadUsada ??
+              0
+            ),
+
+            cantidadDevuelta: Number(devuelto.cantidadDevuelta || 0),
+
+            stockRetornoAntes: stockRetorno?.stockAntes ?? null,
+            stockRetornoDespues: stockRetorno?.stockDespues ?? null,
+
+            devolucionValidada: true
+          };
+        });
+
+      transaction.update(trabajoRef, {
+        estado: 'devolucion_realizada',
+
+        materialesAsignados: materialesActualizados,
+
+        devolucionRegistrada: true,
+        devolucionValidada: true,
+
+        empleadoDevolucionUid: data.empleadoUid,
+        empleadoDevolucionNombre: data.empleadoNombre,
+
+        fechaDevolucionValidada: serverTimestamp(),
+
+        actualizadoPorUid: data.empleadoUid,
+        actualizadoPorNombre: data.empleadoNombre,
+        updatedAt: serverTimestamp()
+      });
+
+      const historialRef = doc(
+        collection(this.firestore, 'historial_actividades')
+      );
+
+      transaction.set(historialRef, {
+        modulo: 'Panel empleado',
+        accion: 'devolucion_realizada',
+        descripcion: `El empleado ${data.empleadoNombre} validó la devolución de materiales con código.`,
+        trabajoUid,
+        codigoTrabajo: this.obtenerCodigoTrabajo({
+          ...trabajo,
+          uid: trabajoUid,
+          id: trabajoUid
+        }),
+        empleadoUid: data.empleadoUid,
+        empleadoNombre: data.empleadoNombre,
+        materialesDevueltos,
+        totalDevuelto,
+        createdAt: serverTimestamp()
+      });
+
+      const notificacionRef = doc(
+        collection(this.firestore, 'notificaciones_admin')
+      );
+
+      transaction.set(notificacionRef, {
+        titulo: 'Devolución realizada',
+        mensaje: `${data.empleadoNombre} devolvió materiales sobrantes.`,
+        detalle: 'El stock fue actualizado mediante código de devolución.',
+        tipo: 'devolucion_realizada',
+        ruta: '/devoluciones',
+        referenciaUid: trabajoUid,
+        trabajoUid,
+        codigoTrabajo: this.obtenerCodigoTrabajo({
+          ...trabajo,
+          uid: trabajoUid,
+          id: trabajoUid
+        }),
+        empleadoUid: data.empleadoUid,
+        empleadoNombre: data.empleadoNombre,
+        leido: false,
+        leida: false,
+        eliminada: false,
+        activa: true,
+        createdAt: serverTimestamp()
+      });
     });
   }
 
@@ -373,12 +761,28 @@ export class DashboardEmpleadoDAO {
       materialesAsignados,
 
       codigoCliente: String(data.codigoCliente || '').trim(),
-      codigoDevolucion: String(data.codigoDevolucion || '').trim(),
+
+      /*
+        Importante:
+        El empleado NO debe ver libremente el código de devolución.
+        Solo debe ingresarlo cuando el administrador o almacén se lo entregue.
+      */
+      codigoDevolucion: '',
 
       estado,
 
       activo: data.activo !== false,
       eliminado: data.eliminado === true,
+
+      pagoEstado: data.pagoEstado,
+      pagoConfirmado: data.pagoConfirmado === true,
+      montoRecibido: Number(data.montoRecibido || 0),
+      metodoPago: data.metodoPago,
+      observacionPago: String(data.observacionPago || '').trim(),
+      observacionFinalizacion: String(data.observacionFinalizacion || '').trim(),
+
+      devolucionRegistrada: data.devolucionRegistrada === true,
+      devolucionValidada: data.devolucionValidada === true,
 
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
@@ -392,18 +796,30 @@ export class DashboardEmpleadoDAO {
       }),
 
       estadoTexto: this.obtenerEstadoTexto(estado),
-      estadoClase: estado,
+      estadoClase: this.obtenerEstadoClase(estado),
 
-      fechaHoraTexto: this.obtenerFechaHoraTexto(fechaProgramada, horaProgramada),
+      fechaHoraTexto: this.obtenerFechaHoraTexto(
+        fechaProgramada,
+        horaProgramada
+      ),
+
       subtotalTexto: this.formatearSoles(subtotal),
 
       direccionTexto: this.obtenerDireccionTexto(data),
 
       materialesTexto: materialesAsignados.length
         ? materialesAsignados
-            .map((material: any) =>
-              `${material.nombre || 'Material'} (${Number(material.cantidadAsignada || 0)} ${material.unidad || 'und.'})`
-            )
+            .map((material: any) => {
+              const asignada = Number(material.cantidadAsignada || 0);
+              const usada = Number(material.cantidadUsada || 0);
+              const devuelta = Number(material.cantidadDevuelta || 0);
+
+              if (usada || devuelta) {
+                return `${material.nombre || 'Material'} (${asignada} ${material.unidad || 'und.'}, usado: ${usada}, sobrante: ${devuelta})`;
+              }
+
+              return `${material.nombre || 'Material'} (${asignada} ${material.unidad || 'und.'})`;
+            })
             .join(', ')
         : 'Sin materiales registrados',
 
@@ -421,7 +837,7 @@ export class DashboardEmpleadoDAO {
     return trabajo;
   }
 
-  private async registrarHistorial(
+  private async registrarHistorialCambioEstado(
     trabajo: DashboardTrabajoEmpleado,
     nuevoEstado: EstadoTrabajo,
     empleado: DashboardEmpleadoUsuario
@@ -440,7 +856,7 @@ export class DashboardEmpleadoDAO {
     });
   }
 
-  private async notificarAdministrador(
+  private async notificarAdministradorCambioEstado(
     trabajo: DashboardTrabajoEmpleado,
     nuevoEstado: EstadoTrabajo,
     empleado: DashboardEmpleadoUsuario
@@ -458,6 +874,7 @@ export class DashboardEmpleadoDAO {
       codigoTrabajo: trabajo.codigoTrabajo,
       empleadoUid: empleado.uid,
       empleadoNombre: empleado.nombreCompleto,
+      leido: false,
       leida: false,
       eliminada: false,
       activa: true,
@@ -491,6 +908,7 @@ export class DashboardEmpleadoDAO {
       'finalizado',
       'devolucion_pendiente',
       'devolucion_realizada',
+      'cerrado',
       'cancelado'
     ];
 
@@ -507,10 +925,39 @@ export class DashboardEmpleadoDAO {
       finalizado: 'Finalizado',
       devolucion_pendiente: 'Devolución pendiente',
       devolucion_realizada: 'Devolución realizada',
+      cerrado: 'Cerrado',
       cancelado: 'Cancelado'
     };
 
     return mapa[estado] || 'Pendiente';
+  }
+
+  private obtenerEstadoClase(estado: EstadoTrabajo): string {
+    if (estado === 'pendiente') {
+      return 'pendiente';
+    }
+
+    if (estado === 'en_camino' || estado === 'en_proceso') {
+      return 'proceso';
+    }
+
+    if (
+      estado === 'finalizado' ||
+      estado === 'devolucion_realizada' ||
+      estado === 'cerrado'
+    ) {
+      return 'finalizado';
+    }
+
+    if (estado === 'devolucion_pendiente') {
+      return 'devolucion_pendiente';
+    }
+
+    if (estado === 'cancelado') {
+      return 'cancelado';
+    }
+
+    return 'pendiente';
   }
 
   private ordenEstado(estado: EstadoTrabajo): number {
@@ -521,7 +968,8 @@ export class DashboardEmpleadoDAO {
       devolucion_pendiente: 4,
       finalizado: 5,
       devolucion_realizada: 6,
-      cancelado: 7
+      cerrado: 7,
+      cancelado: 8
     };
 
     return mapa[estado] || 99;
@@ -610,6 +1058,25 @@ export class DashboardEmpleadoDAO {
     }
 
     return Math.abs(hash) % 100000;
+  }
+
+  private obtenerMaterialUid(material: any): string {
+    return String(
+      material?.materialUid ||
+      material?.uid ||
+      material?.id ||
+      material?.materialId ||
+      ''
+    ).trim();
+  }
+
+  private obtenerCantidadAsignada(material: any): number {
+    return Number(
+      material?.cantidadAsignada ??
+      material?.cantidad ??
+      material?.cantidadEntregada ??
+      0
+    ) || 0;
   }
 
   private obtenerIniciales(nombre: string): string {
