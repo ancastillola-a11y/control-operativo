@@ -1,137 +1,370 @@
-<!-- src/app/paginas/trabajos/seguimiento-trabajos/seguimiento-trabajos.page.html -->
+<!--
+  src/app/paginas/trabajos/seguimiento-trabajos/
+  seguimiento-trabajos.page.html
+-->
 
-<ion-content [fullscreen]="true" class="seguimiento-root">
+<ion-content
+  [fullscreen]="true"
+  class="seguimiento-root"
+>
+  <!-- =====================================================
+       CABECERA
+  ====================================================== -->
 
   <ng-container *ngIf="adminVm$ | async as adminVm">
     <app-admin-header
-      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [nombre]="
+        adminVm.administrador.nombres ||
+        adminVm.administrador.usuario ||
+        adminVm.administrador.correo ||
+        'Administrador'
+      "
       [rol]="'Administrador'"
       [fotoUrl]="adminVm.administrador.fotoUrl || ''"
-      [notificaciones]="adminVm.resumen.notificacionesNoLeidas"
+      [notificaciones]="
+        adminVm.resumen.notificacionesNoLeidas || 0
+      "
       (menuClick)="abrirMenu()"
       (notificacionesClick)="abrirNotificaciones()"
       (perfilClick)="abrirPerfil()"
     ></app-admin-header>
   </ng-container>
 
-  <ng-container *ngIf="vm$ | async as vm">
+  <!-- =====================================================
+       CONTENIDO
+  ====================================================== -->
 
-    <div class="seguimiento-container">
+  <ng-container
+    *ngIf="vm$ | async as vm; else cargandoSeguimiento"
+  >
+    <main class="seguimiento-container">
+
+      <!-- =================================================
+           TÍTULO
+      ================================================== -->
 
       <button
         type="button"
         class="back-row"
+        aria-label="Volver al menú administrativo"
         (click)="irAtras()"
       >
-        <ion-icon name="arrow-back-outline"></ion-icon>
+        <ion-icon
+          name="arrow-back-outline"
+          aria-hidden="true"
+        ></ion-icon>
+
         <span>Seguimiento de trabajos</span>
       </button>
 
-      <section class="tabs-row">
+      <!-- =================================================
+           BUSCADOR
+      ================================================== -->
+
+      <section class="search-tools">
+
+        <ion-searchbar
+          class="seguimiento-search"
+          placeholder="Buscar código, cliente, empleado o dirección"
+          inputmode="search"
+          enterkeyhint="search"
+          showClearButton="focus"
+          [debounce]="250"
+          [value]="vm.busqueda"
+          (ionInput)="cambiarBusqueda($event)"
+        ></ion-searchbar>
+
+      </section>
+
+      <!-- =================================================
+           FILTROS
+      ================================================== -->
+
+      <section
+        class="tabs-row"
+        aria-label="Filtros de seguimiento"
+      >
 
         <button
           type="button"
           [class.active]="vm.filtroActivo === 'todos'"
+          [attr.aria-pressed]="vm.filtroActivo === 'todos'"
           (click)="cambiarFiltro('todos')"
         >
           Todos
+          <span>{{ vm.totalTrabajos }}</span>
         </button>
 
         <button
           type="button"
           [class.active]="vm.filtroActivo === 'pendientes'"
+          [attr.aria-pressed]="vm.filtroActivo === 'pendientes'"
           (click)="cambiarFiltro('pendientes')"
         >
           Pendientes
+          <span>{{ vm.totalPendientes }}</span>
         </button>
 
         <button
           type="button"
           [class.active]="vm.filtroActivo === 'en_camino'"
+          [attr.aria-pressed]="vm.filtroActivo === 'en_camino'"
           (click)="cambiarFiltro('en_camino')"
         >
           En camino
+          <span>{{ vm.totalEnCamino }}</span>
         </button>
 
         <button
           type="button"
           [class.active]="vm.filtroActivo === 'en_proceso'"
+          [attr.aria-pressed]="vm.filtroActivo === 'en_proceso'"
           (click)="cambiarFiltro('en_proceso')"
         >
           En proceso
+          <span>{{ vm.totalEnProceso }}</span>
         </button>
 
         <button
           type="button"
           [class.active]="vm.filtroActivo === 'finalizados'"
+          [attr.aria-pressed]="vm.filtroActivo === 'finalizados'"
           (click)="cambiarFiltro('finalizados')"
         >
           Finalizados
+          <span>{{ vm.totalFinalizados }}</span>
         </button>
 
       </section>
 
+      <!-- =================================================
+           RESULTADOS
+      ================================================== -->
+
+      <div class="results-meta">
+
+        <span>
+          {{
+            vm.trabajosFiltrados.length === 1
+              ? '1 trabajo'
+              : vm.trabajosFiltrados.length + ' trabajos'
+          }}
+        </span>
+
+        <span *ngIf="vm.busqueda">
+          para “{{ vm.busqueda }}”
+        </span>
+
+      </div>
+
+      <!-- =================================================
+           LISTADO
+      ================================================== -->
+
       <section
         class="trabajos-list"
-        *ngIf="vm.trabajosFiltrados.length > 0; else sinTrabajos"
+        *ngIf="
+          vm.trabajosFiltrados.length > 0;
+          else sinTrabajos
+        "
       >
 
         <article
           class="seguimiento-card"
-          *ngFor="let trabajo of vm.trabajosFiltrados; trackBy: trackByTrabajo"
+          *ngFor="
+            let trabajo of vm.trabajosFiltrados;
+            trackBy: trackByTrabajo
+          "
+          [class.procesando]="estaProcesandoAdmin(trabajo)"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="
+            'Abrir detalle del trabajo ' +
+            obtenerCodigoTrabajo(trabajo)
+          "
           (click)="abrirDetalleTrabajo(trabajo)"
+          (keyup.enter)="abrirDetalleTrabajo(trabajo)"
         >
+
+          <!-- =============================================
+               CABECERA DE TARJETA
+          ============================================== -->
 
           <div class="card-main-row">
 
             <div class="trabajo-main-info">
-              <div class="trabajo-title-row">
-                <h3>{{ obtenerCodigoTrabajo(trabajo) }}</h3>
-                <strong>{{ trabajo.tipoTrabajo }}</strong>
-              </div>
 
-              <div class="info-row">
-                <span>Cliente:</span>
-                <p>{{ trabajo.clienteNombre }}</p>
-              </div>
+              <div class="trabajo-code-row">
 
-              <div class="info-row">
-                <span>Empleado:</span>
-                <p>{{ trabajo.empleadosTexto }}</p>
-              </div>
+                <h3>
+                  {{ obtenerCodigoTrabajo(trabajo) }}
+                </h3>
 
-              <div class="estado-row">
-                <span>Estado:</span>
-
-                <strong
+                <span
                   class="estado-badge"
                   [ngClass]="obtenerClaseEstado(trabajo)"
                 >
                   {{ obtenerEstadoTexto(trabajo) }}
-                </strong>
+                </span>
 
-                <small>{{ obtenerFechaHoraSeguimiento(trabajo) }}</small>
               </div>
-            </div>
-            <div class="seguimiento-actions">
-              <button
-                type="button"
-                class="btn-retroceder"
-                *ngIf="puedeRetrocederEstado(trabajo)"
-                [disabled]="estaProcesandoAdmin(trabajo)"
-                (click)="$event.stopPropagation(); retrocederEstado(trabajo)"
-              >
-                <ion-icon name="arrow-back-outline"></ion-icon>
-                <span>Retroceder</span>
-              </button>
-            </div>
 
+              <strong>
+                {{
+                  trabajo.tipoTrabajo ||
+                  'Trabajo operativo'
+                }}
+              </strong>
 
+            </div>
 
             <ion-icon
-              class="card-arrow"
               name="chevron-forward-outline"
+              aria-hidden="true"
             ></ion-icon>
+
+          </div>
+
+          <!-- =============================================
+               INFORMACIÓN COMPACTA
+          ============================================== -->
+
+          <div class="seguimiento-info-grid">
+
+            <div class="seguimiento-info-item">
+
+              <ion-icon
+                name="person-outline"
+                aria-hidden="true"
+              ></ion-icon>
+
+              <div>
+                <span>Cliente</span>
+
+                <strong>
+                  {{
+                    trabajo.clienteNombre ||
+                    'Sin cliente'
+                  }}
+                </strong>
+              </div>
+
+            </div>
+
+            <div class="seguimiento-info-item">
+
+              <ion-icon
+                name="construct-outline"
+                aria-hidden="true"
+              ></ion-icon>
+
+              <div>
+                <span>Empleado</span>
+
+                <strong>
+                  {{
+                    trabajo.empleadosTexto ||
+                    'Sin empleado asignado'
+                  }}
+                </strong>
+              </div>
+
+            </div>
+
+            <div class="seguimiento-info-item">
+
+              <ion-icon
+                name="time-outline"
+                aria-hidden="true"
+              ></ion-icon>
+
+              <div>
+                <span>Última actualización</span>
+
+                <strong>
+                  {{ obtenerFechaHoraSeguimiento(trabajo) }}
+                </strong>
+              </div>
+
+            </div>
+
+            <div class="seguimiento-info-item">
+
+              <ion-icon
+                name="navigate-outline"
+                aria-hidden="true"
+              ></ion-icon>
+
+              <div>
+                <span>Dirección</span>
+
+                <strong>
+                  {{
+                    trabajo.direccionMapa ||
+                    trabajo.direccion ||
+                    trabajo.ubicacionTextoOriginal ||
+                    'Sin dirección registrada'
+                  }}
+                </strong>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- =============================================
+               ACCIONES
+          ============================================== -->
+
+          <div class="card-actions">
+
+            <button
+              type="button"
+              class="btn-codigos"
+              aria-label="Ver códigos de seguridad"
+              (click)="
+                $event.stopPropagation();
+                abrirCodigosSeguridad(trabajo)
+              "
+            >
+              <ion-icon
+                name="clipboard-outline"
+                aria-hidden="true"
+              ></ion-icon>
+
+              <span>Códigos</span>
+            </button>
+
+            <button
+              type="button"
+              class="btn-retroceder"
+              *ngIf="puedeRetrocederEstado(trabajo)"
+              [disabled]="estaProcesandoAdmin(trabajo)"
+              aria-label="Retroceder estado del trabajo"
+              (click)="
+                $event.stopPropagation();
+                retrocederEstado(trabajo)
+              "
+            >
+              <ion-spinner
+                name="crescent"
+                *ngIf="estaProcesandoAdmin(trabajo)"
+              ></ion-spinner>
+
+              <ion-icon
+                name="refresh-outline"
+                *ngIf="!estaProcesandoAdmin(trabajo)"
+                aria-hidden="true"
+              ></ion-icon>
+
+              <span>
+                {{
+                  estaProcesandoAdmin(trabajo)
+                    ? 'Procesando...'
+                    : 'Retroceder estado'
+                }}
+              </span>
+            </button>
 
           </div>
 
@@ -139,34 +372,129 @@
 
       </section>
 
+      <!-- =================================================
+           SIN RESULTADOS
+      ================================================== -->
+
       <ng-template #sinTrabajos>
-        <section class="empty-card">
-          <ion-icon name="clipboard-outline"></ion-icon>
-          <h3>No hay trabajos para mostrar</h3>
-          <p>No se encontraron trabajos con el estado seleccionado.</p>
+
+        <section class="empty-state">
+
+          <ion-icon
+            name="warning-outline"
+            aria-hidden="true"
+          ></ion-icon>
+
+          <h3>Sin trabajos</h3>
+
+          <p *ngIf="vm.busqueda">
+            No se encontraron trabajos relacionados con
+            “{{ vm.busqueda }}”.
+          </p>
+
+          <p
+            *ngIf="
+              !vm.busqueda &&
+              vm.filtroActivo === 'todos'
+            "
+          >
+            Todavía no existen trabajos registrados.
+          </p>
+
+          <p
+            *ngIf="
+              !vm.busqueda &&
+              vm.filtroActivo === 'pendientes'
+            "
+          >
+            No existen trabajos pendientes.
+          </p>
+
+          <p
+            *ngIf="
+              !vm.busqueda &&
+              vm.filtroActivo === 'en_camino'
+            "
+          >
+            No existen trabajos en camino.
+          </p>
+
+          <p
+            *ngIf="
+              !vm.busqueda &&
+              vm.filtroActivo === 'en_proceso'
+            "
+          >
+            No existen trabajos en proceso.
+          </p>
+
+          <p
+            *ngIf="
+              !vm.busqueda &&
+              vm.filtroActivo === 'finalizados'
+            "
+          >
+            No existen trabajos finalizados.
+          </p>
 
           <button
             type="button"
+            class="btn-empty-action"
+            *ngIf="vm.busqueda"
+            (click)="limpiarBusqueda()"
+          >
+            Limpiar búsqueda
+          </button>
+
+          <button
+            type="button"
+            class="btn-empty-action"
+            *ngIf="
+              !vm.busqueda &&
+              vm.filtroActivo !== 'todos'
+            "
             (click)="verTodos()"
           >
             Ver todos los trabajos
           </button>
+
         </section>
+
       </ng-template>
 
-      <button
-        type="button"
-        class="btn-ver-todos"
-        (click)="verTodos()"
-      >
-        <ion-icon name="clipboard-outline"></ion-icon>
-        <span>Ver todos los trabajos</span>
-      </button>
-
-    </div>
-
+    </main>
   </ng-container>
 
-  <app-admin-bottom-nav activo="mas"></app-admin-bottom-nav>
+  <!-- =====================================================
+       CARGANDO
+  ====================================================== -->
+
+  <ng-template #cargandoSeguimiento>
+
+    <main class="seguimiento-container">
+
+      <section class="empty-state loading-state">
+
+        <ion-spinner name="crescent"></ion-spinner>
+
+        <h3>Cargando seguimiento</h3>
+
+        <p>
+          Consultando los trabajos registrados.
+        </p>
+
+      </section>
+
+    </main>
+
+  </ng-template>
+
+  <!-- =====================================================
+       BARRA INFERIOR
+  ====================================================== -->
+
+  <app-admin-bottom-nav
+    activo="trabajos"
+  ></app-admin-bottom-nav>
 
 </ion-content>

@@ -1,9 +1,17 @@
-﻿// src/app/paginas/trabajos/seguimiento-trabajos/seguimiento-trabajos.page.ts
-import { Component, ChangeDetectorRef, inject } from '@angular/core';
+﻿// src/app/paginas/trabajos/seguimiento-trabajos/
+// seguimiento-trabajos.page.ts
+
 import { CommonModule } from '@angular/common';
+
 import {
-  IonicModule,
+  ChangeDetectorRef,
+  Component,
+  inject
+} from '@angular/core';
+
+import {
   AlertController,
+  IonicModule,
   ModalController,
   NavController,
   ToastController
@@ -16,16 +24,45 @@ import {
   Observable
 } from 'rxjs';
 
-import { TrabajoService } from '../../../procesos/trabajo.service';
-import { DashboardAdminService } from '../../../procesos/dashboard-admin.service';
+import { addIcons } from 'ionicons';
 
-import { TrabajoVista } from '../../../modelos/trabajo';
+import {
+  arrowBackOutline,
+  chevronForwardOutline,
+  clipboardOutline,
+  constructOutline,
+  navigateOutline,
+  personOutline,
+  refreshOutline,
+  timeOutline,
+  warningOutline
+} from 'ionicons/icons';
 
-import { AdminHeaderComponent } from '../../../shared/componentes/admin-header/admin-header.component';
-import { AdminBottomNavComponent } from '../../../shared/componentes/admin-bottom-nav/admin-bottom-nav.component';
-import { TrabajoDetalleModalComponent } from '../../../shared/componentes/trabajo-detalle-modal/trabajo-detalle-modal.component';
+import {
+  TrabajoService
+} from '../../../procesos/trabajo.service';
 
-type FiltroSeguimiento =
+import {
+  DashboardAdminService
+} from '../../../procesos/dashboard-admin.service';
+
+import {
+  TrabajoVista
+} from '../../../modelos/trabajo';
+
+import {
+  AdminHeaderComponent
+} from '../../../shared/componentes/admin-header/admin-header.component';
+
+import {
+  AdminBottomNavComponent
+} from '../../../shared/componentes/admin-bottom-nav/admin-bottom-nav.component';
+
+import {
+  TrabajoDetalleModalComponent
+} from '../../../shared/componentes/trabajo-detalle-modal/trabajo-detalle-modal.component';
+
+export type FiltroSeguimiento =
   | 'todos'
   | 'pendientes'
   | 'en_camino'
@@ -35,7 +72,9 @@ type FiltroSeguimiento =
 interface SeguimientoVM {
   trabajos: TrabajoVista[];
   trabajosFiltrados: TrabajoVista[];
+
   filtroActivo: FiltroSeguimiento;
+  busqueda: string;
 
   totalTrabajos: number;
   totalPendientes: number;
@@ -44,11 +83,19 @@ interface SeguimientoVM {
   totalFinalizados: number;
 }
 
+type ColorToast =
+  | 'primary'
+  | 'success'
+  | 'warning'
+  | 'danger';
+
 @Component({
   selector: 'app-seguimiento-trabajos',
+  standalone: true,
+
   templateUrl: './seguimiento-trabajos.page.html',
   styleUrls: ['./seguimiento-trabajos.page.css'],
-  standalone: true,
+
   imports: [
     CommonModule,
     IonicModule,
@@ -57,299 +104,812 @@ interface SeguimientoVM {
   ]
 })
 export class SeguimientoTrabajosPage {
-  private trabajoService = inject(TrabajoService);
-  private dashboardAdminService = inject(DashboardAdminService);
+  private trabajoService =
+    inject(TrabajoService);
 
-  private navCtrl = inject(NavController);
-  private modalCtrl = inject(ModalController);
-  private toastCtrl = inject(ToastController);
-  private alertCtrl = inject(AlertController);
-  private cdr = inject(ChangeDetectorRef);
+  private dashboardAdminService =
+    inject(DashboardAdminService);
 
-  adminVm$ = this.dashboardAdminService.obtenerPanelAdmin$();
+  private navCtrl =
+    inject(NavController);
 
-  private filtroSubject = new BehaviorSubject<FiltroSeguimiento>('todos');
+  private modalCtrl =
+    inject(ModalController);
+
+  private toastCtrl =
+    inject(ToastController);
+
+  private alertCtrl =
+    inject(AlertController);
+
+  private cdr =
+    inject(ChangeDetectorRef);
+
+  adminVm$ =
+    this.dashboardAdminService.obtenerPanelAdmin$();
+
+  private filtroSubject =
+    new BehaviorSubject<FiltroSeguimiento>('todos');
+
+  private busquedaSubject =
+    new BehaviorSubject<string>('');
+
   private navegando = false;
+
   accionAdminUid = '';
 
   vm$: Observable<SeguimientoVM> = combineLatest([
     this.trabajoService.vm$,
-    this.filtroSubject.asObservable()
+    this.filtroSubject.asObservable(),
+    this.busquedaSubject.asObservable()
   ]).pipe(
-    map(([trabajoVm, filtroActivo]) => {
-      const trabajosBase = trabajoVm.trabajos || [];
-
-      const trabajos = trabajosBase.filter((trabajo) => {
-        const estado = this.normalizarEstado(trabajo.estado);
-        return estado !== 'cancelado';
-      });
-
-      const trabajosFiltrados = this.filtrarTrabajos(
-        trabajos,
-        filtroActivo
-      );
-
-      return {
-        trabajos,
-        trabajosFiltrados,
+    map(
+      ([
+        trabajoVm,
         filtroActivo,
+        busqueda
+      ]) => {
+        const trabajosBase: TrabajoVista[] =
+          Array.isArray(trabajoVm?.trabajos)
+            ? trabajoVm.trabajos
+            : [];
 
-        totalTrabajos: trabajos.length,
-        totalPendientes: trabajos.filter((item) => this.normalizarEstado(item.estado) === 'pendiente').length,
-        totalEnCamino: trabajos.filter((item) => this.normalizarEstado(item.estado) === 'en_camino').length,
-        totalEnProceso: trabajos.filter((item) => this.normalizarEstado(item.estado) === 'en_proceso').length,
-        totalFinalizados: trabajos.filter((item) => {
-          const estado = this.normalizarEstado(item.estado);
-          return estado === 'finalizado' || estado === 'devolucion_realizada';
-        }).length
-      };
-    })
+        const trabajos = trabajosBase
+          .filter(
+            (trabajo: TrabajoVista) => {
+              const estado =
+                this.normalizarEstado(
+                  trabajo?.estado
+                );
+
+              return (
+                estado !== 'cancelado' &&
+                (trabajo as any)?.eliminado !== true
+              );
+            }
+          )
+          .sort(
+            (
+              a: TrabajoVista,
+              b: TrabajoVista
+            ) =>
+              this.obtenerMarcaTiempo(b) -
+              this.obtenerMarcaTiempo(a)
+          );
+
+        const trabajosPorEstado =
+          this.filtrarTrabajos(
+            trabajos,
+            filtroActivo
+          );
+
+        const trabajosFiltrados =
+          this.aplicarBusqueda(
+            trabajosPorEstado,
+            busqueda
+          );
+
+        const totalPendientes =
+          trabajos.filter(
+            (item: TrabajoVista) =>
+              this.normalizarEstado(
+                item.estado
+              ) === 'pendiente'
+          ).length;
+
+        const totalEnCamino =
+          trabajos.filter(
+            (item: TrabajoVista) =>
+              this.normalizarEstado(
+                item.estado
+              ) === 'en_camino'
+          ).length;
+
+        const totalEnProceso =
+          trabajos.filter(
+            (item: TrabajoVista) =>
+              this.normalizarEstado(
+                item.estado
+              ) === 'en_proceso'
+          ).length;
+
+        const totalFinalizados =
+          trabajos.filter(
+            (item: TrabajoVista) =>
+              this.esEstadoFinalizado(
+                this.normalizarEstado(
+                  item.estado
+                )
+              )
+          ).length;
+
+        return {
+          trabajos,
+          trabajosFiltrados,
+
+          filtroActivo,
+          busqueda,
+
+          totalTrabajos:
+            trabajos.length,
+
+          totalPendientes,
+          totalEnCamino,
+          totalEnProceso,
+          totalFinalizados
+        };
+      }
+    )
   );
 
-  ionViewWillEnter() {
-    this.trabajoService.cargarTrabajos();
+  constructor() {
+    addIcons({
+      'arrow-back-outline':
+        arrowBackOutline,
 
-    setTimeout(() => {
-      this.cdr.detectChanges();
-    }, 100);
+      'chevron-forward-outline':
+        chevronForwardOutline,
+
+      'clipboard-outline':
+        clipboardOutline,
+
+      'construct-outline':
+        constructOutline,
+
+      'navigate-outline':
+        navigateOutline,
+
+      'person-outline':
+        personOutline,
+
+      'refresh-outline':
+        refreshOutline,
+
+      'time-outline':
+        timeOutline,
+
+      'warning-outline':
+        warningOutline
+    });
   }
 
-  trackByTrabajo(
-    index: number,
-    trabajo: TrabajoVista
-  ): string {
-    return trabajo.uid || trabajo.id || String(index);
+  async ionViewWillEnter(): Promise<void> {
+    try {
+      await this.trabajoService
+        .cargarTrabajos();
+    } catch (error: unknown) {
+      console.error(
+        '[SeguimientoTrabajosPage] Error cargando trabajos:',
+        error
+      );
+
+      await this.mostrarToast(
+        'No se pudieron actualizar los trabajos.',
+        'danger'
+      );
+    } finally {
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 100);
+    }
   }
 
-  cambiarFiltro(filtro: FiltroSeguimiento) {
+  /*
+   * ============================================================
+   * FILTROS Y BÚSQUEDA
+   * ============================================================
+   */
+
+  cambiarFiltro(
+    filtro: FiltroSeguimiento
+  ): void {
     this.filtroSubject.next(filtro);
   }
 
-  verTodos() {
+  verTodos(): void {
     this.filtroSubject.next('todos');
   }
 
-  async abrirDetalleTrabajo(trabajo: TrabajoVista) {
-    const modal = await this.modalCtrl.create({
-      component: TrabajoDetalleModalComponent,
-      cssClass: 'trabajo-detalle-modal',
-      backdropDismiss: true,
-      componentProps: {
-        trabajo
-      }
-    });
+  cambiarBusqueda(
+    event: any
+  ): void {
+    const valor = String(
+      event?.detail?.value || ''
+    ).trim();
+
+    this.busquedaSubject.next(valor);
+  }
+
+  limpiarBusqueda(): void {
+    this.busquedaSubject.next('');
+  }
+
+  /*
+   * ============================================================
+   * DETALLE Y CÓDIGOS
+   * ============================================================
+   */
+
+  async abrirDetalleTrabajo(
+    trabajo: TrabajoVista
+  ): Promise<void> {
+    if (!trabajo) {
+      await this.mostrarToast(
+        'No se encontró el trabajo seleccionado.',
+        'warning'
+      );
+
+      return;
+    }
+
+    const modal =
+      await this.modalCtrl.create({
+        component:
+          TrabajoDetalleModalComponent,
+
+        cssClass:
+          'trabajo-detalle-modal',
+
+        backdropDismiss: true,
+
+        componentProps: {
+          trabajo
+        }
+      });
 
     await modal.present();
 
-    const { data, role } = await modal.onWillDismiss();
+    const resultado =
+      await modal.onWillDismiss();
 
-    if (role === 'codigos' || data?.accion === 'codigos') {
-      this.abrirCodigosSeguridad(trabajo);
+    if (
+      resultado.role === 'codigos' ||
+      resultado.data?.accion === 'codigos'
+    ) {
+      this.abrirCodigosSeguridad(
+        trabajo
+      );
     }
   }
 
-  abrirCodigosSeguridad(trabajo: TrabajoVista) {
-    if (!trabajo.uid) {
-      this.mostrarToast('El trabajo no tiene UID vÃ¡lido.', 'danger');
+  abrirCodigosSeguridad(
+    trabajo: TrabajoVista
+  ): void {
+    const uid =
+      this.obtenerTrabajoUid(
+        trabajo
+      );
+
+    if (!uid) {
+      void this.mostrarToast(
+        'El trabajo no tiene un identificador válido.',
+        'danger'
+      );
+
       return;
     }
 
-   this.navCtrl.navigateForward(
-  `/codigos-seguridad?trabajoUid=${encodeURIComponent(trabajo.uid)}`,
-  {
-    animated: false
-  }
-);
+    void this.navCtrl.navigateForward(
+      `/codigos-seguridad?trabajoUid=${encodeURIComponent(uid)}`,
+      {
+        animated: false
+      }
+    );
   }
 
-  obtenerCodigoTrabajo(trabajo: TrabajoVista): string {
-    const codigoGuardado = String(
-      (trabajo as any).codigoTrabajo ||
-      (trabajo as any).codigo ||
-      ''
+  /*
+   * ============================================================
+   * CÓDIGO DE SEGUIMIENTO
+   * ============================================================
+   */
+
+  obtenerCodigoTrabajo(
+    trabajo: TrabajoVista
+  ): string {
+    const data =
+      trabajo as any;
+
+    const candidatos = [
+      data?.codigoSeguimiento,
+      data?.codigoTrabajo,
+      data?.codigo,
+      data?.numero,
+      trabajo?.id
+    ]
+      .map(
+        (valor: unknown) =>
+          String(valor || '').trim()
+      )
+      .filter(
+        (valor: string) =>
+          valor.length > 0
+      );
+
+    const codigoValido =
+      candidatos.find(
+        (codigo: string) =>
+          /^T-\d{5}$/i.test(
+            codigo
+          )
+      );
+
+    if (codigoValido) {
+      return codigoValido
+        .toUpperCase();
+    }
+
+    const base = String(
+      trabajo?.uid ||
+      trabajo?.id ||
+      trabajo?.clienteNombre ||
+      'TRABAJO'
     ).trim();
 
-    if (/^T-\d{5}$/i.test(codigoGuardado)) {
-      return codigoGuardado.toUpperCase();
-    }
+    const numero =
+      this.generarNumeroDesdeTexto(
+        base
+      );
 
-    const id = String(trabajo.id || '').trim();
-
-    if (/^T-\d{5}$/i.test(id)) {
-      return id.toUpperCase();
-    }
-
-    const base = String(trabajo.uid || trabajo.id || trabajo.clienteNombre || 'TRABAJO');
-    const numero = this.generarNumeroDesdeTexto(base);
-
-    return `T-${numero.toString().padStart(5, '0')}`;
+    return `T-${String(numero).padStart(
+      5,
+      '0'
+    )}`;
   }
 
+  /*
+   * ============================================================
+   * RETROCESO ADMINISTRATIVO CONTROLADO
+   * ============================================================
+   */
 
-  puedeRetrocederEstado(trabajo: TrabajoVista): boolean {
-    const estado = this.normalizarEstado(trabajo.estado);
+  puedeRetrocederEstado(
+    trabajo: TrabajoVista
+  ): boolean {
+    const estado =
+      this.normalizarEstado(
+        trabajo?.estado
+      );
 
-    return [
-      'en_camino',
-      'en_proceso'
-    ].includes(estado);
+    return (
+      estado === 'en_camino' ||
+      estado === 'en_proceso'
+    );
   }
 
-  estaProcesandoAdmin(trabajo: TrabajoVista): boolean {
-    const uid = String(trabajo.uid || trabajo.id || '').trim();
-    return !!uid && this.accionAdminUid === uid;
+  estaProcesandoAdmin(
+    trabajo: TrabajoVista
+  ): boolean {
+    const uid =
+      this.obtenerTrabajoUid(
+        trabajo
+      );
+
+    return (
+      !!uid &&
+      this.accionAdminUid === uid
+    );
   }
 
-  obtenerEstadoAnteriorTexto(trabajo: TrabajoVista): string {
-    const estado = this.normalizarEstado(trabajo.estado);
+  async retrocederEstado(
+    trabajo: TrabajoVista
+  ): Promise<void> {
+    if (!trabajo) {
+      await this.mostrarToast(
+        'No se encontró el trabajo seleccionado.',
+        'warning'
+      );
 
-    const mapa: Record<string, string> = {
-      en_camino: 'Pendiente',
-      en_proceso: 'En camino',
-    };
-
-    return mapa[estado] || '';
-  }
-
-  async retrocederEstado(trabajo: TrabajoVista): Promise<void> {
-    const uid = String(trabajo.uid || trabajo.id || '').trim();
-
-    if (!uid || this.accionAdminUid === uid) {
       return;
     }
 
-    if (!this.puedeRetrocederEstado(trabajo)) {
-      await this.mostrarToast('Este estado no se puede retroceder desde seguimiento.', 'primary');
+    const uid =
+      this.obtenerTrabajoUid(
+        trabajo
+      );
+
+    const estadoActual =
+      this.normalizarEstado(
+        trabajo.estado
+      );
+
+    if (!uid) {
+      await this.mostrarToast(
+        'El trabajo no tiene un identificador válido.',
+        'danger'
+      );
+
       return;
     }
 
-    let motivo = '';
+    if (
+      !this.puedeRetrocederEstado(
+        trabajo
+      )
+    ) {
+      await this.mostrarToast(
+        'Este estado no puede retrocederse.',
+        'warning'
+      );
 
-    const alert = await this.alertCtrl.create({
-      header: 'Retroceder estado',
-      subHeader: this.obtenerCodigoTrabajo(trabajo) || trabajo.clienteNombre,
-      message: 'El estado volverá a: ' + this.obtenerEstadoAnteriorTexto(trabajo) + '. Esto no modifica stock ni elimina el trabajo.',
-      inputs: [
-        {
-          name: 'motivo',
-          type: 'text',
-          placeholder: 'Motivo de la corrección'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Retroceder',
-          role: 'confirm',
-          handler: (data: any) => {
-            motivo = String(data?.motivo || 'Corrección administrativa').trim();
-            return true;
+      return;
+    }
+
+    if (
+      this.accionAdminUid === uid
+    ) {
+      return;
+    }
+
+    const estadoAnterior =
+      estadoActual === 'en_proceso'
+        ? 'En camino'
+        : 'Pendiente';
+
+    const alert =
+      await this.alertCtrl.create({
+        header:
+          'Retroceder estado',
+
+        subHeader:
+          this.obtenerCodigoTrabajo(
+            trabajo
+          ),
+
+        message:
+          `El trabajo volverá de “${this.obtenerEstadoTexto(trabajo)}” a “${estadoAnterior}”. Esta acción es solo para corregir un estado registrado por error.`,
+
+        inputs: [
+          {
+            name: 'motivo',
+            type: 'textarea',
+            placeholder:
+              'Escribe el motivo de la corrección',
+
+            attributes: {
+              maxlength: 250,
+              rows: 4
+            }
           }
-        }
-      ]
-    });
+        ],
+
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel'
+          },
+          {
+            text: 'Retroceder',
+            role: 'confirm'
+          }
+        ],
+
+        cssClass:
+          'seguimiento-retroceso-alert'
+      });
 
     await alert.present();
 
-    const { role } = await alert.onDidDismiss();
+    const resultado =
+      await alert.onDidDismiss();
 
-    if (role !== 'confirm') {
+    if (
+      resultado.role !== 'confirm'
+    ) {
+      return;
+    }
+
+    const motivo = String(
+      resultado.data?.values
+        ?.motivo ||
+      ''
+    ).trim();
+
+    if (motivo.length < 5) {
+      await this.mostrarToast(
+        'Escribe un motivo de al menos 5 caracteres.',
+        'warning'
+      );
+
       return;
     }
 
     this.accionAdminUid = uid;
 
     try {
-      await this.trabajoService.retrocederEstadoTrabajo(
-        trabajo,
-        motivo || 'Corrección administrativa'
+      await this.trabajoService
+        .retrocederEstadoTrabajo(
+          trabajo,
+          motivo
+        );
+
+      await this.mostrarToast(
+        `El trabajo volvió a “${estadoAnterior}”.`,
+        'success'
       );
 
-      await this.trabajoService.cargarTrabajos();
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 80);
+    } catch (error: unknown) {
+      console.error(
+        '[SeguimientoTrabajosPage] Error retrocediendo estado:',
+        error
+      );
 
-      await this.mostrarToast('Estado retrocedido correctamente.', 'success');
-    } catch (error) {
-      console.error('[SeguimientoTrabajosPage] Error retrocediendo estado:', error);
-      await this.mostrarToast('No se pudo retroceder el estado.', 'danger');
+      await this.mostrarToast(
+        this.obtenerMensajeError(
+          error
+        ),
+        'danger'
+      );
     } finally {
-      this.accionAdminUid = '';
+      if (
+        this.accionAdminUid === uid
+      ) {
+        this.accionAdminUid = '';
+      }
     }
   }
 
+  /*
+   * ============================================================
+   * PRESENTACIÓN
+   * ============================================================
+   */
 
-  obtenerEstadoTexto(trabajo: TrabajoVista): string {
-    const estado = this.normalizarEstado(trabajo.estado);
+  obtenerEstadoTexto(
+    trabajo: TrabajoVista
+  ): string {
+    const estado =
+      this.normalizarEstado(
+        trabajo?.estado
+      );
 
-    const mapa: Record<string, string> = {
-      pendiente: 'Pendiente',
-      en_camino: 'En camino',
-      en_proceso: 'En proceso',
-      finalizado: 'Finalizado',
-      devolucion_pendiente: 'Devolución pendiente',
-      devolucion_realizada: 'Devolución realizada',
-      cancelado: 'Cancelado'
-    };
+    const mapa:
+      Record<string, string> = {
+        pendiente:
+          'Pendiente',
 
-    return mapa[estado] || trabajo.estadoTexto || 'Pendiente';
+        en_camino:
+          'En camino',
+
+        en_proceso:
+          'En proceso',
+
+        finalizado:
+          'Finalizado',
+
+        devolucion_pendiente:
+          'Devolución pendiente',
+
+        devolucion_realizada:
+          'Devolución realizada',
+
+        cerrado:
+          'Cerrado',
+
+        cancelado:
+          'Cancelado'
+      };
+
+    return (
+      mapa[estado] ||
+      String(
+        trabajo?.estadoTexto ||
+        ''
+      ).trim() ||
+      'Pendiente'
+    );
   }
 
-  obtenerClaseEstado(trabajo: TrabajoVista): string {
-    return this.normalizarEstado(trabajo.estado);
+  obtenerClaseEstado(
+    trabajo: TrabajoVista
+  ): string {
+    return this.normalizarEstado(
+      trabajo?.estado
+    );
   }
 
-  obtenerFechaHoraSeguimiento(trabajo: TrabajoVista): string {
-    const fechaDesdeTimestamp = this.obtenerFechaDesdeTimestamp(trabajo);
+  obtenerFechaHoraSeguimiento(
+    trabajo: TrabajoVista
+  ): string {
+    const data =
+      trabajo as any;
 
-    if (fechaDesdeTimestamp) {
-      return this.formatearFechaRelativa(fechaDesdeTimestamp);
+    const estado =
+      this.normalizarEstado(
+        trabajo?.estado
+      );
+
+    let fecha: unknown = null;
+
+    if (estado === 'en_camino') {
+      fecha =
+        data?.enCaminoAt;
+    } else if (
+      estado === 'en_proceso'
+    ) {
+      fecha =
+        data?.iniciadoAt;
+    } else if (
+      estado === 'finalizado'
+    ) {
+      fecha =
+        data?.finalizadoAt;
+    } else if (
+      estado === 'devolucion_pendiente'
+    ) {
+      fecha =
+        data?.fechaDevolucionRegistrada ||
+        data?.finalizadoAt;
+    } else if (
+      estado === 'devolucion_realizada'
+    ) {
+      fecha =
+        data?.fechaDevolucionValidada ||
+        data?.fechaDevolucionRegistrada;
+    } else if (
+      estado === 'cerrado'
+    ) {
+      fecha =
+        data?.cerradoAt;
     }
 
-    const fecha = String(trabajo.fechaProgramada || '').trim();
-    const hora = String(trabajo.horaProgramada || '').trim();
+    fecha =
+      fecha ||
+      data?.updatedAt ||
+      data?.createdAt;
 
-    if (!fecha && !hora) {
-      return 'Sin hora';
+    const fechaFormateada =
+      this.formatearFecha(
+        fecha
+      );
+
+    if (fechaFormateada) {
+      return fechaFormateada;
     }
 
-    const horaTexto = this.formatearHoraAmPm(hora);
+    const fechaProgramada =
+      String(
+        trabajo?.fechaProgramada ||
+        ''
+      ).trim();
 
-    if (!fecha) {
-      return horaTexto || 'Sin hora';
+    const horaProgramada =
+      String(
+        trabajo?.horaProgramada ||
+        ''
+      ).trim();
+
+    if (
+      fechaProgramada &&
+      horaProgramada
+    ) {
+      return `${fechaProgramada} · ${horaProgramada}`;
     }
 
-    const fechaTexto = this.formatearFechaProgramada(fecha);
-
-    if (!horaTexto) {
-      return fechaTexto;
+    if (fechaProgramada) {
+      return fechaProgramada;
     }
 
-    return `${fechaTexto}, ${horaTexto}`;
+    return 'Sin fecha registrada';
   }
 
-  abrirMenu() {
-    this.navegarRoot('/dashboard-admin');
+  /*
+   * ============================================================
+   * NAVEGACIÓN
+   * ============================================================
+   */
+
+  abrirMenu(): void {
+    this.navegarUnaVez(
+      '/dashboard-admin'
+    );
   }
 
-  abrirNotificaciones() {
-  this.navCtrl.navigateRoot('/notificaciones-admin', {
-    animated: false,
-    replaceUrl: true
-  });
-}
-
-  abrirPerfil() {
-    this.mostrarToast('Configuración de perfil próximamente.', 'primary');
+  abrirNotificaciones(): void {
+    this.navegarUnaVez(
+      '/notificaciones-admin'
+    );
   }
 
-  irAtras() {
-    this.navegarRoot('/mas-admin');
+  abrirPerfil(): void {
+    void this.mostrarToast(
+      'Configuración de perfil próximamente.',
+      'primary'
+    );
   }
 
-  irAsignacionTrabajos() {
-    this.navegarRoot('/asignacion-trabajos');
+  irAtras(): void {
+    this.navegarUnaVez(
+      '/mas-admin'
+    );
+  }
+
+  /*
+   * ============================================================
+   * TRACK BY
+   * ============================================================
+   */
+
+  trackByTrabajo = (
+    index: number,
+    trabajo: TrabajoVista
+  ): string => {
+    const uid = String(
+      trabajo?.uid ||
+      trabajo?.id ||
+      ''
+    ).trim();
+
+    return (
+      uid ||
+      this.obtenerCodigoTrabajo(
+        trabajo
+      ) ||
+      String(index)
+    );
+  };
+
+  /*
+   * ============================================================
+   * MÉTODOS PRIVADOS
+   * ============================================================
+   */
+
+  private aplicarBusqueda(
+    trabajos: TrabajoVista[],
+    busqueda: string
+  ): TrabajoVista[] {
+    const termino =
+      this.normalizarTextoBusqueda(
+        busqueda
+      );
+
+    if (!termino) {
+      return trabajos;
+    }
+
+    return trabajos.filter(
+      (trabajo: TrabajoVista) => {
+        const texto =
+          this.normalizarTextoBusqueda(
+            [
+              this.obtenerCodigoTrabajo(
+                trabajo
+              ),
+              trabajo?.tipoTrabajo,
+              trabajo?.clienteNombre,
+              trabajo?.empleadosTexto,
+              trabajo?.direccionMapa,
+              trabajo?.direccion,
+              trabajo?.ubicacionTextoOriginal,
+              this.obtenerEstadoTexto(
+                trabajo
+              ),
+              this.obtenerFechaHoraSeguimiento(
+                trabajo
+              )
+            ].join(' ')
+          );
+
+        return texto.includes(termino);
+      }
+    );
+  }
+
+  private normalizarTextoBusqueda(
+    valor: unknown
+  ): string {
+    return String(valor || '')
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(
+        /[\u0300-\u036f]/g,
+        ''
+      )
+      .replace(/\s+/g, ' ');
   }
 
   private filtrarTrabajos(
@@ -361,212 +921,382 @@ export class SeguimientoTrabajosPage {
     }
 
     if (filtro === 'pendientes') {
-      return trabajos.filter((trabajo) => this.normalizarEstado(trabajo.estado) === 'pendiente');
+      return trabajos.filter(
+        (trabajo: TrabajoVista) =>
+          this.normalizarEstado(
+            trabajo.estado
+          ) === 'pendiente'
+      );
     }
 
     if (filtro === 'en_camino') {
-      return trabajos.filter((trabajo) => this.normalizarEstado(trabajo.estado) === 'en_camino');
+      return trabajos.filter(
+        (trabajo: TrabajoVista) =>
+          this.normalizarEstado(
+            trabajo.estado
+          ) === 'en_camino'
+      );
     }
 
     if (filtro === 'en_proceso') {
-      return trabajos.filter((trabajo) => this.normalizarEstado(trabajo.estado) === 'en_proceso');
+      return trabajos.filter(
+        (trabajo: TrabajoVista) =>
+          this.normalizarEstado(
+            trabajo.estado
+          ) === 'en_proceso'
+      );
     }
 
-    if (filtro === 'finalizados') {
-      return trabajos.filter((trabajo) => {
-        const estado = this.normalizarEstado(trabajo.estado);
-        return estado === 'finalizado' || estado === 'devolucion_realizada';
-      });
-    }
-
-    return trabajos;
+    return trabajos.filter(
+      (trabajo: TrabajoVista) =>
+        this.esEstadoFinalizado(
+          this.normalizarEstado(
+            trabajo.estado
+          )
+        )
+    );
   }
 
-  private normalizarEstado(estado: any): string {
-    const valor = String(estado || '').trim();
-
-    if (valor === 'enCamino') {
-      return 'en_camino';
-    }
-
-    if (valor === 'enProceso') {
-      return 'en_proceso';
-    }
-
-    if (valor === 'devolucionPendiente') {
-      return 'devolucion_pendiente';
-    }
-
-    if (valor === 'devolucionRealizada') {
-      return 'devolucion_realizada';
-    }
-
-    return valor || 'pendiente';
+  private esEstadoFinalizado(
+    estado: string
+  ): boolean {
+    return [
+      'finalizado',
+      'devolucion_pendiente',
+      'devolucion_realizada',
+      'cerrado'
+    ].includes(estado);
   }
 
-  private generarNumeroDesdeTexto(texto: string): number {
+  private normalizarEstado(
+    estado: unknown
+  ): string {
+    const valor =
+      String(
+        estado || ''
+      )
+        .trim()
+        .toLowerCase()
+        .replace(
+          /[\s-]+/g,
+          '_'
+        );
+
+    const mapa:
+      Record<string, string> = {
+        pendiente:
+          'pendiente',
+
+        asignado:
+          'pendiente',
+
+        en_camino:
+          'en_camino',
+
+        encamino:
+          'en_camino',
+
+        en_proceso:
+          'en_proceso',
+
+        enproceso:
+          'en_proceso',
+
+        proceso:
+          'en_proceso',
+
+        finalizado:
+          'finalizado',
+
+        finalizada:
+          'finalizado',
+
+        devolucion_pendiente:
+          'devolucion_pendiente',
+
+        devolucionpendiente:
+          'devolucion_pendiente',
+
+        devolucion_realizada:
+          'devolucion_realizada',
+
+        devolucionrealizada:
+          'devolucion_realizada',
+
+        cerrado:
+          'cerrado',
+
+        cerrada:
+          'cerrado',
+
+        cancelado:
+          'cancelado',
+
+        cancelada:
+          'cancelado'
+      };
+
+    return (
+      mapa[valor] ||
+      valor ||
+      'pendiente'
+    );
+  }
+
+  private obtenerTrabajoUid(
+    trabajo: TrabajoVista
+  ): string {
+    return String(
+      trabajo?.uid ||
+      trabajo?.id ||
+      ''
+    ).trim();
+  }
+
+  private generarNumeroDesdeTexto(
+    texto: string
+  ): number {
     let hash = 0;
 
-    for (let i = 0; i < texto.length; i++) {
-      hash = ((hash << 5) - hash) + texto.charCodeAt(i);
+    for (
+      let indice = 0;
+      indice < texto.length;
+      indice++
+    ) {
+      hash =
+        ((hash << 5) - hash) +
+        texto.charCodeAt(indice);
+
       hash |= 0;
     }
 
-    return Math.abs(hash) % 100000;
+    return (
+      Math.abs(hash) %
+      100000
+    );
   }
 
-  private obtenerFechaDesdeTimestamp(trabajo: TrabajoVista): Date | null {
-    const updatedAt = (trabajo as any).updatedAt;
-    const createdAt = (trabajo as any).createdAt;
+  private obtenerMarcaTiempo(
+    trabajo: TrabajoVista
+  ): number {
+    const data =
+      trabajo as any;
 
-    if (updatedAt?.toDate) {
-      return updatedAt.toDate();
+    const candidatos = [
+      data?.cerradoAt,
+      data?.fechaDevolucionValidada,
+      data?.fechaDevolucionRegistrada,
+      data?.finalizadoAt,
+      data?.iniciadoAt,
+      data?.enCaminoAt,
+      data?.updatedAt,
+      data?.createdAt
+    ];
+
+    for (
+      const fecha of candidatos
+    ) {
+      const marca =
+        this.convertirFechaAMilisegundos(
+          fecha
+        );
+
+      if (marca > 0) {
+        return marca;
+      }
     }
 
-    if (createdAt?.toDate) {
-      return createdAt.toDate();
-    }
-
-    return null;
+    return 0;
   }
 
-  private formatearFechaRelativa(fecha: Date): string {
-    const hoy = new Date();
-    const ayer = new Date();
-    ayer.setDate(hoy.getDate() - 1);
+  private convertirFechaAMilisegundos(
+    fecha: unknown
+  ): number {
+    if (!fecha) {
+      return 0;
+    }
 
-    const mismaFecha = (a: Date, b: Date): boolean => {
+    const valor =
+      fecha as any;
+
+    if (
+      typeof valor?.toMillis ===
+      'function'
+    ) {
       return (
-        a.getFullYear() === b.getFullYear() &&
-        a.getMonth() === b.getMonth() &&
-        a.getDate() === b.getDate()
+        Number(
+          valor.toMillis()
+        ) ||
+        0
       );
-    };
-
-    const hora = this.formatearHoraAmPmDesdeDate(fecha);
-
-    if (mismaFecha(fecha, hoy)) {
-      return `Hoy, ${hora}`;
     }
 
-    if (mismaFecha(fecha, ayer)) {
-      return `Ayer, ${hora}`;
+    if (
+      typeof valor?.toDate ===
+      'function'
+    ) {
+      return valor
+        .toDate()
+        .getTime();
     }
 
-    return `${this.dosDigitos(fecha.getDate())}/${this.dosDigitos(fecha.getMonth() + 1)}/${fecha.getFullYear()}, ${hora}`;
-  }
+    if (fecha instanceof Date) {
+      return fecha.getTime();
+    }
 
-  private formatearFechaProgramada(fecha: string): string {
-    const partes = fecha.split('-');
-
-    if (partes.length !== 3) {
+    if (
+      typeof fecha === 'number'
+    ) {
       return fecha;
     }
 
-    const anio = Number(partes[0]);
-    const mes = Number(partes[1]) - 1;
-    const dia = Number(partes[2]);
+    if (
+      typeof fecha === 'string'
+    ) {
+      const resultado =
+        new Date(
+          fecha
+        ).getTime();
 
-    const fechaObj = new Date(anio, mes, dia);
-
-    if (Number.isNaN(fechaObj.getTime())) {
-      return fecha;
+      return Number.isNaN(
+        resultado
+      )
+        ? 0
+        : resultado;
     }
 
-    const hoy = new Date();
-    const ayer = new Date();
-    ayer.setDate(hoy.getDate() - 1);
-
-    const mismaFecha = (a: Date, b: Date): boolean => {
-      return (
-        a.getFullYear() === b.getFullYear() &&
-        a.getMonth() === b.getMonth() &&
-        a.getDate() === b.getDate()
-      );
-    };
-
-    if (mismaFecha(fechaObj, hoy)) {
-      return 'Hoy';
-    }
-
-    if (mismaFecha(fechaObj, ayer)) {
-      return 'Ayer';
-    }
-
-    return `${this.dosDigitos(dia)}/${this.dosDigitos(mes + 1)}/${anio}`;
+    return 0;
   }
 
-  private formatearHoraAmPm(hora: string): string {
-    const limpio = String(hora || '').trim();
+  private formatearFecha(
+    fecha: unknown
+  ): string {
+    const milisegundos =
+      this.convertirFechaAMilisegundos(
+        fecha
+      );
 
-    if (!limpio) {
+    if (milisegundos <= 0) {
       return '';
     }
 
-    const coincidencia = limpio.match(/^(\d{1,2}):(\d{2})/);
-
-    if (!coincidencia) {
-      return limpio;
-    }
-
-    const horas24 = Number(coincidencia[1]);
-    const minutos = coincidencia[2];
-
-    if (!Number.isFinite(horas24)) {
-      return limpio;
-    }
-
-    const periodo = horas24 >= 12 ? 'p. m.' : 'a. m.';
-    const horas12 = horas24 % 12 || 12;
-
-    return `${this.dosDigitos(horas12)}:${minutos} ${periodo}`;
+    return new Date(
+      milisegundos
+    ).toLocaleString(
+      'es-PE',
+      {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }
+    );
   }
 
-  private formatearHoraAmPmDesdeDate(fecha: Date): string {
-    const horas24 = fecha.getHours();
-    const minutos = this.dosDigitos(fecha.getMinutes());
-    const periodo = horas24 >= 12 ? 'p. m.' : 'a. m.';
-    const horas12 = horas24 % 12 || 12;
-
-    return `${this.dosDigitos(horas12)}:${minutos} ${periodo}`;
-  }
-
-  private dosDigitos(valor: number): string {
-    return String(valor).padStart(2, '0');
-  }
-
-  private async navegarRoot(ruta: string) {
+  private navegarUnaVez(
+    ruta: string
+  ): void {
     if (this.navegando) {
       return;
     }
 
     this.navegando = true;
 
-    try {
-      await this.navCtrl.navigateRoot(ruta, {
-        animated: false
+    void this.navCtrl
+      .navigateRoot(
+        ruta,
+        {
+          animated: false,
+          replaceUrl: true
+        }
+      )
+      .finally(() => {
+        setTimeout(() => {
+          this.navegando = false;
+        }, 250);
       });
-    } finally {
-      setTimeout(() => {
-        this.navegando = false;
-      }, 300);
+  }
+
+  private obtenerMensajeError(
+    error: unknown
+  ): string {
+    const objeto =
+      error as {
+        code?: string;
+        message?: string;
+      };
+
+    const codigo = String(
+      objeto?.code ||
+      objeto?.message ||
+      error ||
+      ''
+    );
+
+    if (
+      codigo.includes(
+        'trabajo-uid-vacio'
+      )
+    ) {
+      return 'No se encontró el identificador del trabajo.';
     }
+
+    if (
+      codigo.includes(
+        'estado-no-retrocedible'
+      )
+    ) {
+      return 'El estado actual no permite retroceso.';
+    }
+
+    if (
+      codigo.includes(
+        'trabajo-no-existe'
+      )
+    ) {
+      return 'El trabajo ya no existe.';
+    }
+
+    if (
+      codigo.includes(
+        'permission-denied'
+      )
+    ) {
+      return 'No tienes permisos para corregir el estado.';
+    }
+
+    if (
+      codigo.includes(
+        'unauthenticated'
+      )
+    ) {
+      return 'La sesión del administrador no está activa.';
+    }
+
+    if (
+      codigo.includes(
+        'unavailable'
+      )
+    ) {
+      return 'No hay conexión. Revisa tu internet.';
+    }
+
+    return 'No se pudo completar la corrección del estado.';
   }
 
   private async mostrarToast(
     message: string,
-    color: 'success' | 'danger' | 'primary' = 'primary'
-  ) {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2300,
-      position: 'top',
-      color
-    });
+    color: ColorToast = 'primary'
+  ): Promise<void> {
+    const toast =
+      await this.toastCtrl.create({
+        message,
+        duration: 2600,
+        position: 'top',
+        color
+      });
 
     await toast.present();
   }
 }
-
-
-

@@ -3,59 +3,62 @@
   dashboard-empleado.page.html
 -->
 
-<ion-content
-  [fullscreen]="true"
-  class="empleado-root"
+<ng-container
+  *ngIf="vm$ | async as vm; else cargandoPanel"
 >
   <!-- =====================================================
-       ACTUALIZACIÓN MANUAL DEL PANEL
+       CABECERA FIJA
   ====================================================== -->
 
-  <ion-refresher
-    slot="fixed"
-    (ionRefresh)="refrescar($event)"
+  <ion-header
+    class="empleado-shell-header"
+    [translucent]="false"
   >
-    <ion-refresher-content
-      pullingText="Desliza para actualizar"
-      refreshingSpinner="crescent"
-      refreshingText="Actualizando trabajos..."
-    ></ion-refresher-content>
-  </ion-refresher>
+    <app-empleado-header
+      [nombre]="
+        vm.empleado.nombreCompleto ||
+        vm.empleado.usuario ||
+        'Empleado'
+      "
+      [cargo]="
+        vm.empleado.cargoTexto ||
+        vm.empleado.cargo ||
+        'Personal operativo'
+      "
+      [fotoUrl]="vm.empleado.fotoUrl || ''"
+      [iniciales]="vm.empleado.iniciales || 'EM'"
+      [notificaciones]="sm41TotalAvisos(vm)"
+      (menuClick)="irInicio()"
+      (notificacionesClick)="sm41VerTodas()"
+      (perfilClick)="abrirPerfil()"
+    ></app-empleado-header>
+  </ion-header>
 
   <!-- =====================================================
-       VIEW MODEL DEL EMPLEADO
+       CONTENIDO DESPLAZABLE
   ====================================================== -->
 
-  <ng-container
-    *ngIf="vm$ | async as vm; else cargandoPanel"
+  <ion-content
+    [fullscreen]="false"
+    class="empleado-root"
   >
+    <!-- ACTUALIZACIÓN MANUAL -->
+
+    <ion-refresher
+      slot="fixed"
+      (ionRefresh)="refrescar($event)"
+    >
+      <ion-refresher-content
+        pullingText="Desliza para actualizar"
+        refreshingSpinner="crescent"
+        refreshingText="Actualizando trabajos..."
+      ></ion-refresher-content>
+    </ion-refresher>
+
     <main class="sm-container">
 
       <!-- =================================================
-           CABECERA DEL EMPLEADO
-      ================================================== -->
-
-      <app-empleado-header
-        [nombre]="
-          vm.empleado.nombreCompleto ||
-          vm.empleado.usuario ||
-          'Empleado'
-        "
-        [cargo]="
-          vm.empleado.cargoTexto ||
-          vm.empleado.cargo ||
-          'Personal operativo'
-        "
-        [fotoUrl]="vm.empleado.fotoUrl || ''"
-        [iniciales]="vm.empleado.iniciales || 'EM'"
-        [notificaciones]="sm41TotalAvisos(vm)"
-        (menuClick)="irInicio()"
-        (notificacionesClick)="sm41VerTodas()"
-        (perfilClick)="abrirPerfil()"
-      ></app-empleado-header>
-
-      <!-- =================================================
-           EMPLEADO DESHABILITADO O SIN ACCESO
+           EMPLEADO SIN ACCESO
       ================================================== -->
 
       <section
@@ -78,13 +81,13 @@
       </section>
 
       <!-- =================================================
-           CONTENIDO OPERATIVO DEL EMPLEADO
+           MÓDULOS DEL EMPLEADO
       ================================================== -->
 
       <ng-container *ngIf="vm.empleado.accesoValido">
 
         <!-- ===============================================
-             MÓDULO 1: INICIO DEL EMPLEADO
+             INICIO
         ================================================ -->
 
         <app-inicio-empleado
@@ -95,10 +98,7 @@
         ></app-inicio-empleado>
 
         <!-- ===============================================
-             MÓDULO 2: TRABAJOS ASIGNADOS
-
-             El empleado solamente recibe los trabajos
-             donde su UID aparece en empleadosAsignados.
+             TRABAJOS ASIGNADOS
         ================================================ -->
 
         <app-trabajos-empleado
@@ -110,7 +110,22 @@
         ></app-trabajos-empleado>
 
         <!-- ===============================================
-             MÓDULO 3: DETALLE DEL TRABAJO
+             HISTORIAL
+
+             Reutiliza el listado de trabajos mostrando
+             únicamente los trabajos finalizados.
+        ================================================ -->
+
+        <app-trabajos-empleado
+          *ngIf="moduloActual === 'historial'"
+          [vm]="vm"
+          [filtro]="'finalizadas'"
+          (cambiarFiltro)="filtroTrabajos = $event"
+          (abrirTrabajo)="abrirDetalleTrabajo($event)"
+        ></app-trabajos-empleado>
+
+        <!-- ===============================================
+             DETALLE DEL TRABAJO
         ================================================ -->
 
         <app-detalle-trabajo-empleado
@@ -139,10 +154,7 @@
         ></app-detalle-trabajo-empleado>
 
         <!-- ===============================================
-             MÓDULO 4: CÓDIGO DE VERIFICACIÓN DEL CLIENTE
-
-             Este código sirve para que el cliente valide
-             que el empleado pertenece al servicio.
+             CÓDIGO DE VERIFICACIÓN DEL CLIENTE
         ================================================ -->
 
         <app-codigo-verificacion-empleado
@@ -156,9 +168,7 @@
         ></app-codigo-verificacion-empleado>
 
         <!-- ===============================================
-             MÓDULO 5: CAMBIO DE ESTADO
-
-             Flujo permitido:
+             CAMBIO DE ESTADO
 
              pendiente → en_camino
              en_camino → en_proceso
@@ -179,15 +189,7 @@
         ></app-cambio-estado-empleado>
 
         <!-- ===============================================
-             MÓDULO 6: FINALIZAR TRABAJO
-
-             Antes de finalizar debe registrarse:
-
-             - Materiales utilizados
-             - Estado del pago
-             - Monto recibido
-             - Método de pago
-             - Observaciones
+             FINALIZAR TRABAJO
         ================================================ -->
 
         <app-finalizar-trabajo-empleado
@@ -203,15 +205,9 @@
         ></app-finalizar-trabajo-empleado>
 
         <!-- ===============================================
-             MÓDULO 7: MATERIALES EN POSESIÓN
+             MATERIALES EN POSESIÓN
 
-             Se muestra cuando existen sobrantes.
-
-             El empleado debe ingresar el código de
-             devolución para validar el retorno.
-
-             El stock solamente debe aumentar después
-             de que el código sea validado.
+             Es una vista interna del proceso de devolución.
         ================================================ -->
 
         <app-materiales-posesion-empleado
@@ -230,12 +226,7 @@
         ></app-materiales-posesion-empleado>
 
         <!-- ===============================================
-             MÓDULO 8: DEVOLUCIONES DEL EMPLEADO
-
-             Muestra trabajos con:
-
-             - devolucion_pendiente
-             - devolucion_realizada
+             DEVOLUCIONES
         ================================================ -->
 
         <app-devoluciones-empleado
@@ -248,48 +239,52 @@
 
       </ng-container>
 
-      <!-- =================================================
-           BARRA INFERIOR DEL EMPLEADO
-      ================================================== -->
-
-      <app-empleado-bottom-nav
-        [activo]="
-          moduloActual === 'inicio'
-            ? 'inicio'
-            : moduloActual === 'devoluciones' ||
-              moduloActual === 'materialesPosesion'
-              ? 'materiales'
-              : moduloActual === 'historial'
-                ? 'historial'
-                : moduloActual === 'perfil'
-                  ? 'perfil'
-                  : 'trabajos'
-        "
-        (inicioClick)="irInicio()"
-        (trabajosClick)="irTrabajos()"
-        (materialesClick)="irDevoluciones()"
-        (historialClick)="irHistorial()"
-        (perfilClick)="abrirPerfil()"
-      ></app-empleado-bottom-nav>
-
     </main>
-  </ng-container>
+  </ion-content>
 
   <!-- =====================================================
-       ESTADO DE CARGA
+       BARRA INFERIOR FIJA
   ====================================================== -->
 
-  <ng-template #cargandoPanel>
-    <main class="sm-container">
+  <ion-footer
+    class="empleado-shell-footer"
+  >
+    <app-empleado-bottom-nav
+      [activo]="
+        moduloActual === 'inicio'
+          ? 'inicio'
+          : moduloActual === 'devoluciones' ||
+            moduloActual === 'materialesPosesion'
+            ? 'devoluciones'
+            : moduloActual === 'historial'
+              ? 'historial'
+              : 'trabajos'
+      "
+      (inicioClick)="irInicio()"
+      (trabajosClick)="irTrabajos()"
+      (devolucionesClick)="irDevoluciones()"
+      (historialClick)="irHistorial()"
+      (perfilClick)="abrirPerfil()"
+    ></app-empleado-bottom-nav>
+  </ion-footer>
+
+</ng-container>
+
+<!-- =======================================================
+     CARGA INICIAL
+======================================================== -->
+
+<ng-template #cargandoPanel>
+
+  <ion-content
+    [fullscreen]="true"
+    class="empleado-root"
+  >
+    <main class="sm-container sm-container--loading">
 
       <section class="empty-sm cargando">
 
         <ion-spinner name="crescent"></ion-spinner>
-
-        <ion-icon
-          name="time-outline"
-          aria-hidden="true"
-        ></ion-icon>
 
         <h3>Cargando panel del empleado</h3>
 
@@ -300,6 +295,6 @@
       </section>
 
     </main>
-  </ng-template>
+  </ion-content>
 
-</ion-content>
+</ng-template>

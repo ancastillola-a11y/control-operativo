@@ -2,312 +2,716 @@
 
 :host {
   display: block;
+  width: 100%;
+  min-height: 100%;
+
+  --seg-primary: #0a5fd7;
+  --seg-primary-dark: #073b84;
+  --seg-primary-soft: #eaf2ff;
+
+  --seg-success: #07825f;
+  --seg-success-soft: #e6f7f1;
+
+  --seg-warning: #b86b00;
+  --seg-warning-soft: #fff3dc;
+
+  --seg-danger: #c43232;
+  --seg-danger-soft: #ffeded;
+
+  --seg-purple: #6941c6;
+  --seg-purple-soft: #f0ebff;
+
+  --seg-page: #f5f7fa;
+  --seg-card: #ffffff;
+
+  --seg-text: #101828;
+  --seg-muted: #667085;
+  --seg-border: #dfe4ea;
+
+  --seg-shadow:
+    0 2px 7px rgba(16, 24, 40, 0.08);
+}
+
+:host * {
+  box-sizing: border-box;
 }
 
 ion-content.seguimiento-root {
-  --background: var(--color-page-outside);
+  --background: var(--seg-page);
+}
+
+app-admin-header,
+app-admin-bottom-nav {
+  display: block;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
 }
 
 .seguimiento-container {
   width: 100%;
-  max-width: var(--app-width);
-  min-height: calc(100vh - 76px);
+  max-width: 430px;
+  min-height: 100%;
   margin: 0 auto;
-  padding: 12px 14px 94px;
-  background: var(--color-background);
+
+  padding:
+    12px
+    14px
+    calc(92px + env(safe-area-inset-bottom));
+
+  background: var(--seg-page);
 }
+
+/* ==========================================================
+   TÍTULO
+========================================================== */
 
 .back-row {
   width: 100%;
+  min-height: 38px;
+
+  margin: 0 0 9px;
+  padding: 2px 0;
+
   border: none;
   background: transparent;
-  padding: 2px 0 12px;
+  color: var(--seg-text);
+
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-text);
-  font-family: var(--font-main);
+
+  text-align: left;
+  cursor: pointer;
 }
 
 .back-row ion-icon {
+  flex: 0 0 auto;
+  color: var(--seg-primary-dark);
   font-size: 20px;
-  color: var(--color-primary);
 }
 
 .back-row span {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 900;
+  line-height: 1.2;
 }
+
+/* ==========================================================
+   BUSCADOR
+========================================================== */
+
+.search-tools {
+  width: 100%;
+  margin-bottom: 9px;
+}
+
+.seguimiento-search {
+  min-height: 44px;
+  padding: 0;
+
+  --background: #ffffff;
+  --color: var(--seg-text);
+  --placeholder-color: #98a2b3;
+  --icon-color: var(--seg-primary);
+  --clear-button-color: var(--seg-muted);
+
+  --border-radius: 12px;
+  --box-shadow:
+    0 1px 5px rgba(16, 24, 40, 0.09);
+
+  font-size: 12px;
+}
+
+/* ==========================================================
+   FILTROS
+========================================================== */
 
 .tabs-row {
   width: 100%;
-  display: flex;
-  gap: 7px;
-  overflow-x: auto;
-  padding-bottom: 10px;
   margin-bottom: 8px;
-}
 
-.tabs-row::-webkit-scrollbar {
-  display: none;
+  display: grid;
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
+
+  gap: 7px;
 }
 
 .tabs-row button {
-  min-width: max-content;
-  height: 34px;
-  padding: 0 12px;
-  border: 1px solid var(--color-border);
+  min-width: 0;
+  min-height: 36px;
+
+  padding: 6px 7px;
+
+  border: 1px solid var(--seg-border);
   border-radius: 10px;
+
   background: #ffffff;
-  color: var(--color-text-muted);
-  font-family: var(--font-main);
-  font-size: 10.5px;
-  font-weight: 800;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  color: var(--seg-muted);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  font-size: 9px;
+  font-weight: 850;
+  line-height: 1.15;
+
+  box-shadow:
+    0 1px 3px rgba(16, 24, 40, 0.06);
+
+  cursor: pointer;
+}
+
+.tabs-row button:nth-child(1),
+.tabs-row button:nth-child(2),
+.tabs-row button:nth-child(3) {
+  grid-column: span 2;
+}
+
+.tabs-row button:nth-child(4),
+.tabs-row button:nth-child(5) {
+  grid-column: span 3;
+}
+
+.tabs-row button span {
+  min-width: 19px;
+  height: 19px;
+
+  padding: 0 5px;
+  border-radius: 999px;
+
+  background: #edf1f6;
+  color: #475467;
+
+  display: inline-grid;
+  place-items: center;
+
+  font-size: 8.5px;
+  font-weight: 900;
 }
 
 .tabs-row button.active {
-  background: var(--color-primary);
+  border-color: var(--seg-primary);
+  background: var(--seg-primary);
   color: #ffffff;
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-button);
+
+  box-shadow:
+    0 4px 10px rgba(10, 95, 215, 0.22);
 }
 
-.trabajos-list {
-  display: flex;
-  flex-direction: column;
-  gap: 11px;
+.tabs-row button.active span {
+  background: #ffffff;
+  color: var(--seg-primary);
 }
+
+.tabs-row button:active {
+  transform: scale(0.97);
+}
+
+/* ==========================================================
+   RESULTADOS
+========================================================== */
+
+.results-meta {
+  min-height: 21px;
+  margin: 0 2px 6px;
+
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  color: var(--seg-muted);
+
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+/* ==========================================================
+   LISTA
+========================================================== */
+
+.trabajos-list {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 1fr;
+
+  gap: 10px;
+}
+
+/* ==========================================================
+   TARJETA
+========================================================== */
 
 .seguimiento-card {
   width: 100%;
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: var(--shadow-card);
-  padding: 13px;
-  font-family: var(--font-main);
+  min-width: 0;
+
+  padding: 10px;
+
+  border: 1px solid var(--seg-border);
+  border-left: 4px solid var(--seg-primary);
+  border-radius: 14px;
+
+  outline: none;
+
+  background: var(--seg-card);
+  box-shadow: var(--seg-shadow);
+
+  cursor: pointer;
 }
 
+.seguimiento-card:active {
+  transform: scale(0.99);
+}
+
+.seguimiento-card:focus-visible {
+  outline: 2px solid var(--seg-primary);
+  outline-offset: 2px;
+}
+
+.seguimiento-card.procesando {
+  opacity: 0.68;
+  pointer-events: none;
+}
+
+/* ==========================================================
+   CABECERA DE TARJETA
+========================================================== */
+
 .card-main-row {
+  width: 100%;
+
   display: grid;
-  grid-template-columns: 1fr 22px;
-  gap: 8px;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+
   align-items: center;
+  gap: 8px;
 }
 
 .trabajo-main-info {
   min-width: 0;
 }
 
-.trabajo-title-row {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 10px;
+.trabajo-code-row {
+  width: 100%;
+
+  display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.trabajo-title-row h3 {
+.trabajo-code-row h3 {
+  min-width: 0;
   margin: 0;
-  font-size: 12px;
+
+  overflow: hidden;
+
+  color: var(--seg-primary-dark);
+
+  font-size: 14px;
   font-weight: 900;
-  color: var(--color-primary);
-  letter-spacing: 0.1px;
+  line-height: 1.2;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.trabajo-title-row strong {
+.trabajo-main-info > strong {
   display: block;
-  font-size: 11.5px;
-  font-weight: 900;
-  color: var(--color-text);
-  white-space: nowrap;
+
+  margin-top: 4px;
+
   overflow: hidden;
+
+  color: var(--seg-text);
+
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.25;
+
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.info-row,
-.estado-row {
-  display: grid;
-  grid-template-columns: 62px 1fr;
-  gap: 6px;
-  align-items: center;
-  margin-top: 5px;
+.card-main-row > ion-icon {
+  color: var(--seg-primary);
+  font-size: 20px;
 }
 
-.info-row span,
-.estado-row span {
-  font-size: 10.5px;
-  font-weight: 800;
-  color: var(--color-primary);
-}
-
-.info-row p {
-  margin: 0;
-  font-size: 10.8px;
-  font-weight: 700;
-  color: var(--color-text);
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.estado-row {
-  grid-template-columns: 62px auto 1fr;
-}
+/* ==========================================================
+   ESTADOS
+========================================================== */
 
 .estado-badge {
-  width: max-content;
-  min-height: 22px;
-  padding: 0 8px;
+  flex: 0 0 auto;
+
+  min-height: 24px;
+
+  padding: 4px 8px;
   border-radius: 999px;
-  font-size: 9.5px;
-  font-weight: 900;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
+  font-size: 8.5px;
+  font-weight: 900;
+  line-height: 1.1;
+
+  white-space: nowrap;
 }
 
 .estado-badge.pendiente {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
+  background: var(--seg-warning-soft);
+  color: var(--seg-warning);
 }
 
 .estado-badge.en_camino {
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
+  background: var(--seg-primary-soft);
+  color: var(--seg-primary);
 }
 
 .estado-badge.en_proceso {
-  background: #e8f5ff;
-  color: var(--color-primary);
+  background: var(--seg-purple-soft);
+  color: var(--seg-purple);
 }
 
 .estado-badge.finalizado,
-.estado-badge.devolucion_realizada {
-  background: var(--color-success-bg);
-  color: var(--color-success);
+.estado-badge.devolucion_realizada,
+.estado-badge.cerrado {
+  background: var(--seg-success-soft);
+  color: var(--seg-success);
 }
 
 .estado-badge.devolucion_pendiente {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
+  background: var(--seg-warning-soft);
+  color: var(--seg-warning);
 }
 
-.estado-row small {
-  justify-self: end;
-  font-size: 9.5px;
-  font-weight: 700;
-  color: var(--color-text-muted);
-  text-align: right;
-  white-space: nowrap;
+.estado-badge.cancelado {
+  background: var(--seg-danger-soft);
+  color: var(--seg-danger);
 }
 
-.card-arrow {
-  font-size: 20px;
-  color: var(--color-primary);
-}
+/* ==========================================================
+   INFORMACIÓN
 
-.btn-ver-todos {
+   El icono permanece a la izquierda.
+   El texto queda siempre a la derecha.
+========================================================== */
+
+.seguimiento-info-grid {
   width: 100%;
-  height: 42px;
-  margin-top: 14px;
-  border: 1px solid #dbe8ff;
-  border-radius: 13px;
-  background: #ffffff;
-  color: var(--color-primary);
-  font-family: var(--font-main);
-  font-size: 12px;
-  font-weight: 900;
+
+  margin-top: 9px;
+
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 7px;
+}
+
+.seguimiento-info-item {
+  min-width: 0;
+  min-height: 56px;
+
+  padding: 7px;
+
+  border: 1px solid #e5eaf0;
+  border-radius: 10px;
+
+  background: #f8fafc;
+
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 7px;
-  box-shadow: var(--shadow-card);
 }
 
-.btn-ver-todos ion-icon {
-  font-size: 18px;
+.seguimiento-info-item ion-icon {
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+
+  padding: 5px;
+  border-radius: 9px;
+
+  background: var(--seg-primary-soft);
+  color: var(--seg-primary);
+
+  font-size: 17px;
 }
 
-.empty-card {
-  padding: 26px 16px;
-  border-radius: 18px;
-  background: #ffffff;
-  border: 1px solid var(--color-border);
-  text-align: center;
-  box-shadow: var(--shadow-card);
+.seguimiento-info-item > div {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
-.empty-card ion-icon {
-  font-size: 42px;
-  color: var(--color-primary);
+.seguimiento-info-item span {
+  display: block;
+
+  margin: 0 0 2px;
+
+  color: var(--seg-muted);
+
+  font-size: 8px;
+  font-weight: 750;
+  line-height: 1.15;
 }
 
-.empty-card h3 {
-  margin: 10px 0 0;
-  font-size: 15px;
-  font-weight: 900;
-  color: var(--color-text);
+.seguimiento-info-item strong {
+  display: -webkit-box;
+  display: box;
+
+  margin: 0;
+
+  overflow: hidden;
+
+  color: var(--seg-text);
+
+  font-size: 9.5px;
+  font-weight: 850;
+  line-height: 1.3;
+
+  overflow-wrap: anywhere;
+
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+
+  -webkit-box-orient: vertical;
+  box-orient: vertical;
 }
 
-.empty-card p {
-  margin: 6px 0 14px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  line-height: 1.35;
-}
+/* ==========================================================
+   ACCIONES
+========================================================== */
 
-.empty-card button {
-  height: 39px;
-  padding: 0 15px;
-  border: none;
-  border-radius: 12px;
-  background: var(--color-primary);
-  color: #ffffff;
-  font-family: var(--font-main);
-  font-size: 12px;
-  font-weight: 800;
-}
+.card-actions {
+  width: 100%;
 
-@media (max-width: 360px) {
-  .estado-row {
-    grid-template-columns: 62px 1fr;
-  }
+  margin-top: 9px;
+  padding-top: 8px;
 
-  .estado-row small {
-    grid-column: 2 / 3;
-    justify-self: start;
-  }
-}
+  border-top: 1px solid #e9edf2;
 
-.seguimiento-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
-  margin-top: 10px;
+  flex-wrap: wrap;
+
+  gap: 7px;
+}
+
+.btn-codigos,
+.btn-retroceder {
+  min-height: 33px;
+
+  padding: 6px 10px;
+
+  border-radius: 9px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  font-size: 9.5px;
+  font-weight: 850;
+
+  cursor: pointer;
+}
+
+.btn-codigos {
+  border: 1px solid var(--seg-primary);
+  background: #ffffff;
+  color: var(--seg-primary);
 }
 
 .btn-retroceder {
-  min-height: 34px;
-  border: none;
-  border-radius: 999px;
-  padding: 0 12px;
-  background: #fff4d6;
-  color: #b77900;
-  font-size: 11px;
-  font-weight: 900;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  border: 1px solid #f0c36d;
+  background: var(--seg-warning-soft);
+  color: var(--seg-warning);
 }
 
+.btn-codigos ion-icon,
 .btn-retroceder ion-icon {
-  font-size: 16px;
+  font-size: 15px;
 }
 
+.btn-retroceder ion-spinner {
+  width: 15px;
+  height: 15px;
+}
+
+.btn-codigos:active,
+.btn-retroceder:active {
+  transform: scale(0.97);
+}
+
+.btn-codigos:disabled,
 .btn-retroceder:disabled {
   opacity: 0.55;
-  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* ==========================================================
+   ESTADO VACÍO
+========================================================== */
+
+.empty-state {
+  width: 100%;
+  min-height: 180px;
+
+  padding: 26px 18px;
+
+  border: 1px solid var(--seg-border);
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  box-shadow: var(--seg-shadow);
+}
+
+.empty-state > ion-icon {
+  width: 46px;
+  height: 46px;
+
+  padding: 10px;
+  border-radius: 50%;
+
+  background: var(--seg-primary-soft);
+  color: var(--seg-primary);
+
+  font-size: 26px;
+}
+
+.empty-state h3 {
+  margin: 10px 0 0;
+
+  color: var(--seg-text);
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.empty-state p {
+  max-width: 290px;
+
+  margin: 6px 0 0;
+
+  color: var(--seg-muted);
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.btn-empty-action {
+  min-width: 185px;
+  min-height: 38px;
+
+  margin-top: 14px;
+  padding: 7px 14px;
+
+  border: 1px solid var(--seg-primary);
+  border-radius: 10px;
+
+  background: var(--seg-primary);
+  color: #ffffff;
+
+  font-size: 10.5px;
+  font-weight: 850;
+
+  cursor: pointer;
+}
+
+/* ==========================================================
+   CARGANDO
+========================================================== */
+
+.loading-state ion-spinner {
+  width: 28px;
+  height: 28px;
+  color: var(--seg-primary);
+}
+
+.loading-state > ion-icon {
+  display: none;
+}
+
+/* ==========================================================
+   TELÉFONOS PEQUEÑOS
+========================================================== */
+
+@media (max-width: 350px) {
+  .seguimiento-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .back-row span {
+    font-size: 16px;
+  }
+
+  .tabs-row {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .tabs-row button,
+  .tabs-row button:nth-child(1),
+  .tabs-row button:nth-child(2),
+  .tabs-row button:nth-child(3),
+  .tabs-row button:nth-child(4),
+  .tabs-row button:nth-child(5) {
+    grid-column: auto;
+  }
+
+  .tabs-row button:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .seguimiento-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .btn-codigos,
+  .btn-retroceder {
+    width: 100%;
+  }
+}
+
+/* ==========================================================
+   PANTALLAS MAYORES
+========================================================== */
+
+@media (min-width: 431px) {
+  ion-content.seguimiento-root {
+    --background: #e8edf3;
+  }
+
+  .seguimiento-container {
+    min-height: 100vh;
+
+    border-left: 1px solid #e0e5ec;
+    border-right: 1px solid #e0e5ec;
+  }
 }

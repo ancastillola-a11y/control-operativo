@@ -2,276 +2,823 @@
 
 :host {
   display: block;
+  width: 100%;
+  min-height: 100%;
+
+  --dev-primary: #0a5fd7;
+  --dev-primary-dark: #073b84;
+  --dev-primary-soft: #eaf2ff;
+
+  --dev-success: #008c67;
+  --dev-success-soft: #e5f7f1;
+
+  --dev-warning: #c27800;
+  --dev-warning-soft: #fff3dc;
+
+  --dev-page: #f5f7fa;
+  --dev-card: #ffffff;
+
+  --dev-text: #101828;
+  --dev-muted: #667085;
+  --dev-border: #dfe4ea;
+
+  --dev-shadow:
+    0 2px 7px rgba(16, 24, 40, 0.08);
+}
+
+:host * {
+  box-sizing: border-box;
 }
 
 ion-content.devoluciones-root {
-  --background: var(--color-page-outside);
+  --background: var(--dev-page);
 }
+
+app-admin-header,
+app-admin-bottom-nav {
+  display: block;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+/* ==========================================================
+   CONTENEDOR
+========================================================== */
 
 .devoluciones-container {
   width: 100%;
-  max-width: var(--app-width);
-  min-height: 100dvh;
+  max-width: 430px;
+  min-height: 100%;
   margin: 0 auto;
-  padding: 10px 12px calc(96px + env(safe-area-inset-bottom));
-  background: var(--color-background);
+
+  padding:
+    12px
+    14px
+    calc(88px + env(safe-area-inset-bottom));
+
+  background: var(--dev-page);
 }
 
+/* ==========================================================
+   TÍTULO
+========================================================== */
+
 .page-title-row {
+  width: 100%;
+  margin-bottom: 10px;
+
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 9px;
 }
 
 .btn-back {
   width: 34px;
   height: 34px;
-  border: none;
-  border-radius: 12px;
+  flex: 0 0 34px;
+
+  padding: 0;
+
+  border: 1px solid var(--dev-border);
+  border-radius: 50%;
+
   background: #ffffff;
-  color: var(--color-primary);
+  color: var(--dev-primary-dark);
+
   display: grid;
   place-items: center;
-  box-shadow: var(--shadow-card);
-  flex-shrink: 0;
+
+  box-shadow:
+    0 1px 4px rgba(16, 24, 40, 0.1);
+
+  cursor: pointer;
+}
+
+.btn-back:active {
+  transform: scale(0.96);
 }
 
 .btn-back ion-icon {
   font-size: 20px;
 }
 
-.page-title-row h2 {
+.title-copy {
+  min-width: 0;
+}
+
+.title-copy h2 {
   margin: 0;
-  font-size: 15px;
+
+  color: var(--dev-text);
+
+  font-size: 20px;
   font-weight: 900;
-  color: var(--color-text);
+  line-height: 1.15;
+
+  overflow-wrap: anywhere;
 }
 
-.page-title-row p {
-  margin: 2px 0 0;
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
+.title-copy p {
+  margin: 3px 0 0;
 
-.tabs-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
-}
+  color: var(--dev-muted);
 
-.tab-btn {
-  height: 42px;
-  border-radius: 10px;
-  border: 1px solid var(--color-border);
-  background: #ffffff;
-  color: var(--color-text);
   font-size: 11px;
-  font-weight: 900;
-  font-family: var(--font-main);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* ==========================================================
+   BUSCADOR
+========================================================== */
+
+.search-tools {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.devoluciones-search {
+  min-height: 44px;
+  padding: 0;
+
+  --background: #ffffff;
+  --color: #101828;
+  --placeholder-color: #98a2b3;
+  --icon-color: var(--dev-primary);
+  --clear-button-color: #667085;
+
+  --border-radius: 12px;
+  --box-shadow:
+    0 1px 5px rgba(16, 24, 40, 0.1);
+
+  font-size: 13px;
+}
+
+/* ==========================================================
+   FILTROS
+========================================================== */
+
+.filters-scroll {
+  width: 100%;
+
+  margin-bottom: 8px;
+  padding: 1px 1px 4px;
+
   display: flex;
+  gap: 7px;
+
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filters-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-chip {
+  min-height: 34px;
+  flex: 0 0 auto;
+
+  padding: 6px 10px;
+
+  border: 1px solid var(--dev-border);
+  border-radius: 999px;
+
+  background: #ffffff;
+  color: var(--dev-muted);
+
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
+
+  font-size: 10px;
+  font-weight: 850;
+
+  cursor: pointer;
 }
 
-.tab-btn span {
-  min-width: 18px;
-  height: 18px;
+.filter-chip span {
+  min-width: 20px;
+  height: 20px;
+
+  padding: 0 5px;
   border-radius: 999px;
-  background: #eef2f7;
-  color: var(--color-text-muted);
-  display: grid;
+
+  background: #edf1f6;
+  color: #475467;
+
+  display: inline-grid;
   place-items: center;
+
   font-size: 9px;
   font-weight: 900;
 }
 
-.tab-btn.active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+.filter-chip.active {
+  border-color: var(--dev-primary);
+
+  background: var(--dev-primary);
   color: #ffffff;
+
+  box-shadow:
+    0 3px 8px rgba(10, 95, 215, 0.22);
 }
 
-.tab-btn.active span {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+.filter-chip.active span {
+  background: #ffffff;
+  color: var(--dev-primary);
 }
+
+.filter-chip:active {
+  transform: scale(0.97);
+}
+
+/* ==========================================================
+   META DE RESULTADOS
+========================================================== */
+
+.results-meta {
+  min-height: 22px;
+  margin: 0 2px 7px;
+
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  color: var(--dev-muted);
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* ==========================================================
+   LISTA
+========================================================== */
 
 .devoluciones-list {
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 1fr;
+
   gap: 10px;
 }
+
+/* ==========================================================
+   TARJETA
+========================================================== */
 
 .devolucion-card {
-  background: #ffffff;
-  border: 1px solid var(--color-border);
+  width: 100%;
+  min-width: 0;
+
+  overflow: hidden;
+
+  border: 1px solid var(--dev-border);
+  border-left: 4px solid var(--dev-warning);
   border-radius: 14px;
-  box-shadow: var(--shadow-card);
-  padding: 12px;
+
+  background: var(--dev-card);
+
+  box-shadow: var(--dev-shadow);
 }
+
+.devolucion-card--validada {
+  border-left-color: var(--dev-success);
+}
+
+/* ==========================================================
+   CABECERA DE TARJETA
+========================================================== */
 
 .card-top {
+  width: 100%;
+
+  padding: 10px 11px;
+
+  border-bottom: 1px solid #e9edf2;
+
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  gap: 10px;
-}
-
-.card-top h3 {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 900;
-  color: var(--color-primary);
-}
-
-.card-top p {
-  margin: 3px 0 0;
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--color-text);
-}
-
-.estado-badge {
-  min-height: 23px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
-  font-size: 10px;
-  font-weight: 900;
-  display: inline-flex;
-  align-items: center;
-}
-
-.estado-badge.validada {
-  background: var(--color-success-bg);
-  color: var(--color-success);
-}
-
-.card-info {
-  margin-top: 9px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.card-info p {
-  margin: 0;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.card-info strong {
-  color: var(--color-text);
-}
-
-.card-bottom {
-  margin-top: 10px;
-  padding-top: 9px;
-  border-top: 1px solid #edf2f7;
-  display: flex;
-  align-items: center;
   justify-content: space-between;
+  gap: 8px;
 }
 
-.card-bottom > span {
-  font-size: 11px;
-  font-weight: 900;
-  color: var(--color-primary);
-}
+.card-code {
+  min-width: 0;
 
-.card-actions {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 }
 
-.btn-detail,
-.btn-validate {
-  border: none;
-  font-family: var(--font-main);
-}
+.card-icon {
+  width: 33px;
+  height: 33px;
+  flex: 0 0 33px;
 
-.btn-detail {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
+  border-radius: 10px;
+
+  background: var(--dev-primary-soft);
+  color: var(--dev-primary);
+
   display: grid;
   place-items: center;
 }
 
-.btn-detail ion-icon {
+.card-icon ion-icon {
   font-size: 18px;
 }
 
-.btn-validate {
-  min-height: 34px;
-  padding: 0 12px;
-  border-radius: 12px;
-  background: var(--color-primary);
-  color: #ffffff;
-  font-size: 11px;
+.card-code-copy {
+  min-width: 0;
+}
+
+.card-code-copy span {
+  display: block;
+
+  color: var(--dev-muted);
+
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 1.15;
+}
+
+.card-code-copy h3 {
+  margin: 2px 0 0;
+
+  color: var(--dev-text);
+
+  font-size: 14px;
   font-weight: 900;
+  line-height: 1.15;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.info-box,
+.status-badge {
+  min-height: 25px;
+  flex: 0 0 auto;
+
+  padding: 5px 8px;
+  border-radius: 999px;
+
+  background: var(--dev-warning-soft);
+  color: var(--dev-warning);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.status-badge.validada {
+  background: var(--dev-success-soft);
+  color: var(--dev-success);
+}
+
+.status-badge ion-icon {
+  font-size: 13px;
+}
+
+/* ==========================================================
+   CUERPO
+========================================================== */
+
+.card-body {
+  padding: 10px 11px;
+}
+
+.card-main-info h4 {
+  margin: 0;
+
+  color: var(--dev-text);
+
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.25;
+
+  overflow-wrap: anywhere;
+}
+
+.card-main-info p {
+  margin: 3px 0 0;
+
+  color: var(--dev-muted);
+
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+/* ==========================================================
+   DATOS
+========================================================== */
+
+.card-data-grid {
+  margin-top: 9px;
+
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 7px;
+}
+
+.card-data-item {
+  min-width: 0;
+  min-height: 52px;
+
+  padding: 8px;
+
+  border: 1px solid #e1e7ef;
+  border-radius: 9px;
+
+  background: #f8fafc;
+}
+
+.card-data-item span {
+  display: block;
+
+  color: var(--dev-muted);
+
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.card-data-item strong {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--dev-text);
+
+  font-size: 10.5px;
+  font-weight: 850;
+  line-height: 1.3;
+
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================
+   MATERIALES
+========================================================== */
+
+.materials-preview {
+  margin-top: 9px;
+
+  overflow: hidden;
+
+  border: 1px solid #e1e7ef;
+  border-radius: 10px;
+
+  background: #f8fafc;
+}
+
+.material-preview-item {
+  padding: 8px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.material-preview-item +
+.material-preview-item {
+  border-top: 1px solid #e1e7ef;
+}
+
+.material-preview-info {
+  min-width: 0;
+}
+
+.material-preview-info span {
+  display: block;
+
+  color: var(--dev-text);
+
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.25;
+
+  overflow-wrap: anywhere;
+}
+
+.material-preview-info small {
+  display: block;
+
+  margin-top: 2px;
+
+  color: var(--dev-muted);
+
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.material-preview-item > strong {
+  flex: 0 0 auto;
+
+  color: var(--dev-warning);
+
+  font-size: 9px;
+  font-weight: 850;
+  line-height: 1.3;
+
+  text-align: right;
+}
+
+.devolucion-card--validada
+.material-preview-item > strong {
+  color: var(--dev-success);
+}
+
+/* ==========================================================
+   VALIDACIÓN Y OBSERVACIÓN
+========================================================== */
+
+.validation-info {
+  margin-top: 9px;
+
+  padding: 8px 9px;
+  border-radius: 10px;
+
+  background: var(--dev-success-soft);
+  color: var(--dev-success);
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.3;
+}
+
+.validation-info ion-icon {
+  flex: 0 0 auto;
+  font-size: 15px;
+}
+
+.observation-box {
+  margin-top: 9px;
+
+  padding: 9px;
+
+  border: 1px solid #e1e7ef;
+  border-radius: 10px;
+
+  background: #f8fafc;
+}
+
+.observation-box strong {
+  color: var(--dev-text);
+
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.observation-box p {
+  margin: 4px 0 0;
+
+  color: var(--dev-muted);
+
+  font-size: 10px;
+  line-height: 1.4;
+
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================
+   PIE
+========================================================== */
+
+.card-bottom {
+  width: 100%;
+
+  padding: 9px 11px;
+
+  border-top: 1px solid #e9edf2;
+
+  background: #fbfcfe;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-result {
+  min-width: 0;
+
+  color: var(--dev-muted);
+
+  font-size: 9.5px;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.btn-validate {
+  flex: 0 0 auto;
+
+  min-height: 34px;
+
+  padding: 7px 10px;
+
+  border: 1px solid var(--dev-success);
+  border-radius: 9px;
+
+  background: var(--dev-success);
+  color: #ffffff;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  font-size: 10px;
+  font-weight: 850;
+
+  cursor: pointer;
+}
+
+.btn-validate ion-icon {
+  font-size: 15px;
+}
+
+.btn-validate ion-spinner {
+  width: 15px;
+  height: 15px;
+}
+
+.btn-validate:active {
+  transform: scale(0.97);
+}
+
+.btn-validate:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ==========================================================
+   VACÍO Y CARGA
+========================================================== */
+
 .empty-card {
+  width: 100%;
+  min-height: 160px;
+
+  padding: 24px 16px;
+
+  border: 1px solid var(--dev-border);
+  border-radius: 14px;
+
   background: #ffffff;
-  border: 1px solid var(--color-border);
-  border-radius: 15px;
-  box-shadow: var(--shadow-card);
-}
 
-.empty-card {
-  padding: 22px 14px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+
   text-align: center;
+
+  box-shadow: var(--dev-shadow);
 }
 
-.empty-card ion-icon {
-  font-size: 30px;
-  color: var(--color-primary);
+.empty-card > ion-icon {
+  color: var(--dev-primary);
+  font-size: 33px;
 }
 
 .empty-card h3 {
-  margin: 8px 0 4px;
+  margin: 8px 0 0;
+
+  color: var(--dev-text);
+
   font-size: 14px;
   font-weight: 900;
-  color: var(--color-text);
 }
 
 .empty-card p {
-  margin: 0;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-text-muted);
+  max-width: 290px;
+
+  margin: 5px 0 0;
+
+  color: var(--dev-muted);
+
+  font-size: 10px;
+  line-height: 1.4;
 }
+
+.loading-card ion-spinner {
+  width: 25px;
+  height: 25px;
+
+  color: var(--dev-primary);
+}
+
+/* ==========================================================
+   INFORMACIÓN
+========================================================== */
 
 .info-box {
-  margin-top: 14px;
-  padding: 14px;
+  width: 100%;
+
+  margin-top: 10px;
+  padding: 9px 10px;
+
+  border: 1px solid #c9d9ef;
+  border-radius: 12px;
+
+  background: #edf4ff;
+  color: var(--dev-primary-dark);
+
   display: flex;
-  gap: 10px;
   align-items: flex-start;
-  background: var(--color-primary-soft);
+  gap: 7px;
+
+  box-shadow:
+    0 2px 6px rgba(16, 24, 40, 0.05);
 }
 
-.info-box ion-icon {
-  font-size: 22px;
-  color: var(--color-primary);
-  flex-shrink: 0;
+.info-box > ion-icon {
+  flex: 0 0 auto;
+
+  margin-top: 1px;
+
+  font-size: 17px;
+}
+
+.info-box strong {
+  display: block;
+
+  font-size: 10px;
+  font-weight: 850;
 }
 
 .info-box p {
-  margin: 0;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--color-text);
-  line-height: 1.45;
+  margin: 3px 0 0;
+
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+/* ==========================================================
+   TELÉFONOS MUY PEQUEÑOS
+========================================================== */
+
+@media (max-width: 350px) {
+  .devoluciones-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .title-copy h2 {
+    font-size: 18px;
+  }
+
+  .card-data-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .material-preview-item {
+    flex-direction: column;
+  }
+
+  .material-preview-item > strong {
+    width: 100%;
+    text-align: left;
+  }
+
+  .card-bottom {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .btn-validate {
+    width: 100%;
+  }
+}
+
+/* ==========================================================
+   PANTALLAS MAYORES
+========================================================== */
+
+@media (min-width: 431px) {
+  ion-content.devoluciones-root {
+    --background: #e8edf3;
+  }
+
+  .devoluciones-container {
+    min-height: 100vh;
+
+    border-left: 1px solid #e0e5ec;
+    border-right: 1px solid #e0e5ec;
+  }
 }

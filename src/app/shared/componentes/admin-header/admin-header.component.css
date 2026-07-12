@@ -1,6 +1,10 @@
 /* src/app/shared/componentes/admin-header/admin-header.component.css */
 
 :host {
+  display: block;
+  width: 100%;
+}
+:host {
   position: sticky;
   top: 0;
   z-index: 1000;

@@ -1,0 +1,511 @@
+<!--
+  src/app/paginas/empleado/modulos/inicio-empleado/
+  inicio-empleado.component.html
+-->
+
+<section
+  class="inicio-empleado"
+  *ngIf="vm as panel"
+>
+  <!-- =====================================================
+       RESUMEN DE JORNADA
+
+       El nombre del empleado ya aparece en el header.
+       Aquí no se repite el saludo.
+  ====================================================== -->
+
+  <section class="jornada-card">
+
+    <div class="jornada-card__top">
+
+      <div class="jornada-card__copy">
+
+        <span class="jornada-card__date">
+
+          <ion-icon
+            name="calendar-outline"
+            aria-hidden="true"
+          ></ion-icon>
+
+          {{ obtenerFechaHoy() }}
+
+        </span>
+
+        <h1>Resumen de jornada</h1>
+
+        <p>
+          Consulta tus actividades asignadas y continúa
+          con el flujo operativo.
+        </p>
+
+      </div>
+
+      <div
+        class="jornada-card__icon"
+        aria-hidden="true"
+      >
+        <ion-icon
+          name="briefcase-outline"
+        ></ion-icon>
+      </div>
+
+    </div>
+
+    <!-- =================================================
+         INDICADORES
+    ================================================== -->
+
+    <div
+      class="jornada-stats"
+      aria-label="Resumen de trabajos"
+    >
+
+      <!-- PENDIENTES -->
+
+      <article class="stat-card stat-card--warning">
+
+        <div class="stat-card__icon">
+
+          <ion-icon
+            name="time-outline"
+            aria-hidden="true"
+          ></ion-icon>
+
+        </div>
+
+        <div class="stat-card__copy">
+
+          <span>Pendientes</span>
+
+          <strong>
+            {{ obtenerTotalPendientes() }}
+          </strong>
+
+        </div>
+
+      </article>
+
+      <!-- EN CURSO -->
+
+      <article class="stat-card stat-card--primary">
+
+        <div class="stat-card__icon">
+
+          <ion-icon
+            name="refresh-outline"
+            aria-hidden="true"
+          ></ion-icon>
+
+        </div>
+
+        <div class="stat-card__copy">
+
+          <span>En curso</span>
+
+          <strong>
+            {{ obtenerTotalEnCurso() }}
+          </strong>
+
+        </div>
+
+      </article>
+
+      <!-- FINALIZADOS -->
+
+      <article class="stat-card stat-card--success">
+
+        <div class="stat-card__icon">
+
+          <ion-icon
+            name="briefcase-outline"
+            aria-hidden="true"
+          ></ion-icon>
+
+        </div>
+
+        <div class="stat-card__copy">
+
+          <span>Finalizados</span>
+
+          <strong>
+            {{ obtenerTotalFinalizados() }}
+          </strong>
+
+        </div>
+
+      </article>
+
+      <!-- DEVOLUCIONES -->
+
+      <button
+        type="button"
+        class="stat-card stat-card--purple"
+        aria-label="Abrir devoluciones"
+        (click)="abrirDevoluciones()"
+      >
+
+        <div class="stat-card__icon">
+
+          <ion-icon
+            name="cube-outline"
+            aria-hidden="true"
+          ></ion-icon>
+
+        </div>
+
+        <div class="stat-card__copy">
+
+          <span>Devoluciones</span>
+
+          <strong>
+            {{ obtenerTotalDevolucionesPendientes() }}
+          </strong>
+
+        </div>
+
+        <ion-icon
+          class="stat-card__arrow"
+          name="chevron-forward-outline"
+          aria-hidden="true"
+        ></ion-icon>
+
+      </button>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       ACTIVIDAD ACTUAL
+  ====================================================== -->
+
+  <section class="inicio-section">
+
+    <div class="section-header">
+
+      <div>
+
+        <span class="section-header__eyebrow">
+          Flujo operativo
+        </span>
+
+        <h2>Actividad actual</h2>
+
+      </div>
+
+      <span
+        class="section-header__status"
+        *ngIf="obtenerProximoTrabajo() as trabajoActual"
+      >
+        {{ obtenerEstadoTexto(trabajoActual) }}
+      </span>
+
+    </div>
+
+    <ng-container
+      *ngIf="
+        obtenerProximoTrabajo() as proximo;
+        else jornadaSinPendientes
+      "
+    >
+
+      <button
+        type="button"
+        class="trabajo-actual"
+        [attr.aria-label]="
+          'Abrir trabajo ' +
+          obtenerCodigoTrabajo(proximo)
+        "
+        (click)="seleccionarTrabajo(proximo)"
+      >
+
+        <!-- CABECERA -->
+
+        <div class="trabajo-actual__header">
+
+          <div class="trabajo-actual__identity">
+
+            <div class="trabajo-actual__main-icon">
+
+              <ion-icon
+                name="briefcase-outline"
+                aria-hidden="true"
+              ></ion-icon>
+
+            </div>
+
+            <div>
+
+              <span>Código de seguimiento</span>
+
+              <strong>
+                {{ obtenerCodigoTrabajo(proximo) }}
+              </strong>
+
+            </div>
+
+          </div>
+
+          <span
+            class="estado-chip"
+            [ngClass]="obtenerClaseEstado(proximo)"
+          >
+            {{ obtenerEstadoTexto(proximo) }}
+          </span>
+
+        </div>
+
+        <!-- INFORMACIÓN PRINCIPAL -->
+
+        <div class="trabajo-actual__body">
+
+          <h3>
+            {{
+              proximo.tipoTrabajo ||
+              'Trabajo operativo'
+            }}
+          </h3>
+
+          <p class="trabajo-actual__client">
+
+            <span>Cliente</span>
+
+            <strong>
+              {{
+                proximo.clienteNombre ||
+                'Cliente sin nombre'
+              }}
+            </strong>
+
+          </p>
+
+          <!-- FECHA Y UBICACIÓN -->
+
+          <div class="trabajo-actual__grid">
+
+            <div class="trabajo-data">
+
+              <div class="trabajo-data__icon">
+
+                <ion-icon
+                  name="time-outline"
+                  aria-hidden="true"
+                ></ion-icon>
+
+              </div>
+
+              <div>
+
+                <span>Fecha y hora</span>
+
+                <strong>
+                  {{ obtenerFechaHora(proximo) }}
+                </strong>
+
+              </div>
+
+            </div>
+
+            <div class="trabajo-data">
+
+              <div class="trabajo-data__icon">
+
+                <ion-icon
+                  name="location-outline"
+                  aria-hidden="true"
+                ></ion-icon>
+
+              </div>
+
+              <div>
+
+                <span>Dirección</span>
+
+                <strong>
+                  {{ obtenerDireccion(proximo) }}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ACCIÓN -->
+
+        <div class="trabajo-actual__footer">
+
+          <span>Continuar actividad</span>
+
+          <ion-icon
+            name="chevron-forward-outline"
+            aria-hidden="true"
+          ></ion-icon>
+
+        </div>
+
+      </button>
+
+    </ng-container>
+
+    <!-- ===================================================
+         SIN ACTIVIDAD PENDIENTE
+    ==================================================== -->
+
+    <ng-template #jornadaSinPendientes>
+
+      <section class="jornada-completa">
+
+        <div class="jornada-completa__icon">
+
+          <ion-icon
+            name="briefcase-outline"
+            aria-hidden="true"
+          ></ion-icon>
+
+        </div>
+
+        <div class="jornada-completa__copy">
+
+          <span>Estado de la jornada</span>
+
+          <h3>Todo está al día</h3>
+
+          <p>
+            No tienes trabajos pendientes, en camino
+            ni en proceso.
+          </p>
+
+        </div>
+
+      </section>
+
+    </ng-template>
+
+  </section>
+
+  <!-- =====================================================
+       SIGUIENTES ACTIVIDADES
+
+       Se omite el primer trabajo porque ya fue mostrado
+       en Actividad actual.
+  ====================================================== -->
+
+  <ng-container
+    *ngIf="
+      obtenerTrabajosDestacados() as destacados
+    "
+  >
+
+    <section
+      class="inicio-section"
+      *ngIf="destacados.length > 1"
+    >
+
+      <div class="section-header">
+
+        <div>
+
+          <span class="section-header__eyebrow">
+            Próximas actividades
+          </span>
+
+          <h2>Más trabajos asignados</h2>
+
+        </div>
+
+        <span class="section-header__count">
+          {{ destacados.length - 1 }}
+        </span>
+
+      </div>
+
+      <div class="siguientes-list">
+
+        <button
+          type="button"
+          class="siguiente-card"
+          *ngFor="
+            let trabajo of (
+              destacados |
+              slice : 1 : 3
+            );
+            trackBy: trackByTrabajo
+          "
+          [attr.aria-label]="
+            'Abrir trabajo ' +
+            obtenerCodigoTrabajo(trabajo)
+          "
+          (click)="seleccionarTrabajo(trabajo)"
+        >
+
+          <div class="siguiente-card__icon">
+
+            <ion-icon
+              name="briefcase-outline"
+              aria-hidden="true"
+            ></ion-icon>
+
+          </div>
+
+          <div class="siguiente-card__copy">
+
+            <div class="siguiente-card__header">
+
+              <strong>
+                {{ obtenerCodigoTrabajo(trabajo) }}
+              </strong>
+
+              <span
+                class="estado-chip estado-chip--small"
+                [ngClass]="obtenerClaseEstado(trabajo)"
+              >
+                {{ obtenerEstadoTexto(trabajo) }}
+              </span>
+
+            </div>
+
+            <h3>
+              {{
+                trabajo.tipoTrabajo ||
+                'Trabajo operativo'
+              }}
+            </h3>
+
+            <p>
+              {{
+                trabajo.clienteNombre ||
+                'Cliente sin nombre'
+              }}
+            </p>
+
+            <span class="siguiente-card__date">
+
+              <ion-icon
+                name="time-outline"
+                aria-hidden="true"
+              ></ion-icon>
+
+              {{ obtenerFechaHora(trabajo) }}
+
+            </span>
+
+          </div>
+
+          <ion-icon
+            class="siguiente-card__arrow"
+            name="chevron-forward-outline"
+            aria-hidden="true"
+          ></ion-icon>
+
+        </button>
+
+      </div>
+
+    </section>
+
+  </ng-container>
+
+</section>

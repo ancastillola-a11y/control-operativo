@@ -1,4 +1,4 @@
-//src/app/paginas/empleado/dashboard-empleado/dashboard-empleado.page.ts
+﻿//src/app/paginas/empleado/dashboard-empleado/dashboard-empleado.page.ts
 import { CommonModule } from '@angular/common';
 
 import {
@@ -97,7 +97,8 @@ export type ModuloEmpleado =
   | 'cambioEstado'
   | 'finalizar'
   | 'materialesPosesion'
-  | 'devoluciones';
+  | 'devoluciones'
+  | 'historial';
 
 export type FiltroTrabajosEmpleado =
   | 'pendientes'
@@ -285,27 +286,27 @@ export class DashboardEmpleadoPage {
     this.subirPantalla();
   }
 
-  irTrabajos(): void {
-    this.moduloActual = 'trabajos';
-    this.subirPantalla();
-  }
-
+ irTrabajos(): void {
+  this.filtroTrabajos = 'pendientes';
+  this.moduloActual = 'trabajos';
+  this.subirPantalla();
+}
   irDevoluciones(): void {
     this.moduloActual = 'devoluciones';
     this.subirPantalla();
   }
 
   irHistorial(): void {
-    this.filtroTrabajos = 'finalizadas';
-    this.moduloActual = 'trabajos';
+  this.filtroTrabajos = 'finalizadas';
+  this.moduloActual = 'historial';
 
-    this.subirPantalla();
+  this.subirPantalla();
 
-    void this.mostrarToast(
-      'Mostrando trabajos finalizados y devoluciones.',
-      'primary'
-    );
-  }
+  void this.mostrarToast(
+    'Mostrando el historial de trabajos finalizados.',
+    'primary'
+  );
+}
 
   abrirDetalleTrabajo(
     trabajo: DashboardTrabajoEmpleado
@@ -1256,15 +1257,15 @@ export class DashboardEmpleadoPage {
     );
   }
 
-  trackByTrabajo(
+  trackByTrabajo = (
     index: number,
     trabajo: DashboardTrabajoEmpleado
-  ): string {
+  ): string => {
     return (
       this.obtenerTrabajoUid(trabajo) ||
       String(index)
     );
-  }
+  };
 
   /*
    * ============================================================

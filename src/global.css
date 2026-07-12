@@ -385,3 +385,133 @@ img {
   max-width: 100%;
   height: auto;
 }
+/* ==========================================================
+   ALERTAS DE DEVOLUCIONES
+
+   Deben estar en global.scss porque Ionic coloca los
+   overlays fuera de la página actual.
+========================================================== */
+
+ion-alert.devolucion-detalle-alert,
+ion-alert.devolucion-validar-alert,
+ion-alert.devolucion-validacion-alert {
+  --width: calc(100vw - 28px);
+  --max-width: 390px;
+
+  --min-width: 280px;
+  --max-height: 82vh;
+
+  --background: #ffffff;
+  --backdrop-opacity: 0.58;
+}
+
+ion-alert.devolucion-detalle-alert .alert-wrapper,
+ion-alert.devolucion-validar-alert .alert-wrapper,
+ion-alert.devolucion-validacion-alert .alert-wrapper {
+  width: 100%;
+  max-width: 390px;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 18px 50px rgba(16, 24, 40, 0.24);
+}
+
+ion-alert.devolucion-detalle-alert .alert-head,
+ion-alert.devolucion-validar-alert .alert-head,
+ion-alert.devolucion-validacion-alert .alert-head {
+  padding:
+    18px
+    18px
+    8px;
+}
+
+ion-alert.devolucion-detalle-alert .alert-title,
+ion-alert.devolucion-validar-alert .alert-title,
+ion-alert.devolucion-validacion-alert .alert-title {
+  color: #101828;
+
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+ion-alert.devolucion-detalle-alert .alert-sub-title,
+ion-alert.devolucion-validar-alert .alert-sub-title,
+ion-alert.devolucion-validacion-alert .alert-sub-title {
+  margin-top: 4px;
+
+  color: #475467;
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+ion-alert.devolucion-detalle-alert .alert-message,
+ion-alert.devolucion-validar-alert .alert-message,
+ion-alert.devolucion-validacion-alert .alert-message {
+  max-height: 52vh;
+
+  padding:
+    10px
+    18px
+    14px;
+
+  overflow-y: auto;
+
+  color: #344054;
+
+  font-size: 12px;
+  line-height: 1.5;
+
+  white-space: normal;
+}
+
+ion-alert.devolucion-detalle-alert .alert-input-group,
+ion-alert.devolucion-validar-alert .alert-input-group,
+ion-alert.devolucion-validacion-alert .alert-input-group {
+  padding:
+    8px
+    18px
+    12px;
+}
+
+ion-alert.devolucion-detalle-alert .alert-input,
+ion-alert.devolucion-validar-alert .alert-input,
+ion-alert.devolucion-validacion-alert .alert-input {
+  height: 44px;
+
+  margin: 0;
+
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+
+  padding: 0 12px;
+
+  color: #101828;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+ion-alert.devolucion-detalle-alert .alert-button-group,
+ion-alert.devolucion-validar-alert .alert-button-group,
+ion-alert.devolucion-validacion-alert .alert-button-group {
+  padding:
+    8px
+    12px
+    12px;
+}
+
+ion-alert.devolucion-detalle-alert .alert-button,
+ion-alert.devolucion-validar-alert .alert-button,
+ion-alert.devolucion-validacion-alert .alert-button {
+  min-height: 40px;
+
+  border-radius: 9px;
+
+  color: #0757bd;
+
+  font-size: 12px;
+  font-weight: 850;
+}

@@ -1,157 +1,604 @@
-<!-- src/app/paginas/administrador/devoluciones/devoluciones.page.html -->
+<!--
+  src/app/paginas/administrador/devoluciones/
+  devoluciones.page.html
+-->
 
-<ion-content [fullscreen]="true" class="devoluciones-root">
+<ion-content
+  [fullscreen]="true"
+  class="devoluciones-root"
+>
+  <!-- =====================================================
+       CABECERA DEL ADMINISTRADOR
+  ====================================================== -->
 
   <ng-container *ngIf="adminVm$ | async as adminVm">
     <app-admin-header
-      [nombre]="adminVm.administrador.nombres || adminVm.administrador.usuario || adminVm.administrador.correo || 'Administrador'"
+      [nombre]="
+        adminVm.administrador.nombres ||
+        adminVm.administrador.usuario ||
+        adminVm.administrador.correo ||
+        'Administrador'
+      "
       [rol]="'Administrador'"
       [fotoUrl]="adminVm.administrador.fotoUrl || ''"
-      [notificaciones]="adminVm.resumen.notificacionesNoLeidas || 0"
+      [notificaciones]="
+        adminVm.resumen.notificacionesNoLeidas || 0
+      "
       (menuClick)="abrirMenu()"
       (notificacionesClick)="abrirNotificaciones()"
       (perfilClick)="abrirPerfil()"
     ></app-admin-header>
   </ng-container>
 
-  <ng-container *ngIf="vm$ | async as vm">
+  <!-- =====================================================
+       CONTENIDO
+  ====================================================== -->
 
-    <div class="devoluciones-container">
+  <ng-container
+    *ngIf="vm$ | async as vm; else cargandoDevoluciones"
+  >
+    <main class="devoluciones-container">
+
+      <!-- =================================================
+           TÍTULO
+      ================================================== -->
 
       <section class="page-title-row">
+
         <button
           type="button"
           class="btn-back"
+          aria-label="Volver al menú administrativo"
           (click)="volver()"
         >
-          <ion-icon name="arrow-back-outline"></ion-icon>
+          <ion-icon
+            name="arrow-back-outline"
+            aria-hidden="true"
+          ></ion-icon>
         </button>
 
-        <div>
+        <div class="title-copy">
+
           <h2>Devoluciones de materiales</h2>
-          <p>Valida retornos y actualiza el stock del almacén.</p>
+
+          <p>
+            Valida el retorno de sobrantes al almacén.
+          </p>
+
         </div>
+
       </section>
 
-      <section class="tabs-row">
+      <!-- =================================================
+           BUSCADOR
+      ================================================== -->
+
+      <section class="search-tools">
+
+        <ion-searchbar
+          class="devoluciones-search"
+          placeholder="Buscar código, cliente o empleado"
+          inputmode="search"
+          enterkeyhint="search"
+          showClearButton="focus"
+          [debounce]="250"
+          [value]="busqueda"
+          (ionInput)="cambiarBusqueda($event)"
+        ></ion-searchbar>
+
+      </section>
+
+      <!-- =================================================
+           FILTROS
+      ================================================== -->
+
+      <section
+        class="filters-scroll"
+        aria-label="Filtros de devoluciones"
+      >
 
         <button
           type="button"
-          class="tab-btn"
+          class="filter-chip"
           [class.active]="vm.filtro === 'pendientes'"
+          [attr.aria-pressed]="vm.filtro === 'pendientes'"
           (click)="cambiarFiltro('pendientes')"
         >
           Pendientes
-          <span>{{ vm.totalPendientes }}</span>
+
+          <span>
+            {{ vm.totalPendientes }}
+          </span>
         </button>
 
         <button
           type="button"
-          class="tab-btn"
+          class="filter-chip"
           [class.active]="vm.filtro === 'validadas'"
+          [attr.aria-pressed]="vm.filtro === 'validadas'"
           (click)="cambiarFiltro('validadas')"
         >
           Validadas
-          <span>{{ vm.totalValidadas }}</span>
+
+          <span>
+            {{ vm.totalValidadas }}
+          </span>
         </button>
 
         <button
           type="button"
-          class="tab-btn"
+          class="filter-chip"
           [class.active]="vm.filtro === 'historial'"
+          [attr.aria-pressed]="vm.filtro === 'historial'"
           (click)="cambiarFiltro('historial')"
         >
           Historial
-          <span>{{ vm.totalHistorial }}</span>
+
+          <span>
+            {{ vm.totalHistorial }}
+          </span>
         </button>
 
       </section>
 
-      <section
-        class="devoluciones-list"
-        *ngIf="vm.devolucionesFiltradas.length > 0; else sinDevoluciones"
+      <!-- =================================================
+           RESULTADOS
+      ================================================== -->
+
+      <ng-container
+        *ngIf="
+          obtenerResultados(
+            vm.devolucionesFiltradas
+          ) as resultados
+        "
       >
 
-        <article
-          class="devolucion-card"
-          *ngFor="let item of vm.devolucionesFiltradas; trackBy: trackByDevolucion"
+        <div class="results-meta">
+
+          <span>
+            {{
+              resultados.length === 1
+                ? '1 resultado'
+                : resultados.length + ' resultados'
+            }}
+          </span>
+
+          <span *ngIf="busqueda">
+            para “{{ busqueda }}”
+          </span>
+
+        </div>
+
+        <!-- ===============================================
+             LISTADO
+        ================================================ -->
+
+        <section
+          class="devoluciones-list"
+          *ngIf="
+            resultados.length > 0;
+            else sinDevoluciones
+          "
         >
 
-          <div class="card-top">
-            <div>
-              <h3>{{ item.codigoTrabajo }}</h3>
-              <p>{{ item.tipoTrabajo }}</p>
+          <article
+            class="devolucion-card"
+            *ngFor="
+              let item of resultados;
+              trackBy: trackByDevolucion
+            "
+            [class.devolucion-card--pendiente]="
+              item.estadoDevolucion === 'pendiente'
+            "
+            [class.devolucion-card--validada]="
+              item.estadoDevolucion === 'validada'
+            "
+          >
+
+            <!-- ===========================================
+                 CABECERA DE LA TARJETA
+            ============================================ -->
+
+            <div class="card-top">
+
+              <div class="card-code">
+
+                <div class="card-icon">
+                  <ion-icon
+                    name="cube-outline"
+                    aria-hidden="true"
+                  ></ion-icon>
+                </div>
+
+                <div class="card-code-copy">
+
+                  <span>Código de seguimiento</span>
+
+                  <h3>
+                    {{
+                      item.codigoTrabajo ||
+                      'Sin código'
+                    }}
+                  </h3>
+
+                </div>
+
+              </div>
+
+              <span
+                class="status-badge"
+                [class.pendiente]="
+                  item.estadoDevolucion === 'pendiente'
+                "
+                [class.validada]="
+                  item.estadoDevolucion === 'validada'
+                "
+              >
+                <ion-icon
+                  [name]="
+                    item.estadoDevolucion === 'validada'
+                      ? 'checkmark-circle-outline'
+                      : 'warning-outline'
+                  "
+                  aria-hidden="true"
+                ></ion-icon>
+
+                {{
+                  item.estadoTexto ||
+                  (
+                    item.estadoDevolucion === 'validada'
+                      ? 'Validada'
+                      : 'Pendiente'
+                  )
+                }}
+              </span>
+
             </div>
 
-            <span
-              class="estado-badge"
-              [class.validada]="item.estadoDevolucion === 'validada'"
-            >
-              {{ item.estadoTexto }}
-            </span>
-          </div>
+            <!-- ===========================================
+                 CUERPO
+            ============================================ -->
 
-          <div class="card-info">
-            <p>
-              <strong>Empleado:</strong>
-              {{ item.empleadoTexto }}
-            </p>
+            <div class="card-body">
 
-            <p>
-              <strong>Fecha:</strong>
-              {{ item.fechaTexto }}
-            </p>
-          </div>
+              <div class="card-main-info">
 
-          <div class="card-bottom">
-            <span>
-              {{ item.totalMateriales }}
-              {{ item.totalMateriales === 1 ? 'material' : 'materiales' }}
-            </span>
+                <h4>
+                  {{
+                    item.clienteNombre ||
+                    'Cliente sin nombre'
+                  }}
+                </h4>
 
-            <div class="card-actions">
-              <button
-                type="button"
-                class="btn-detail"
-                (click)="verDetalle(item)"
+                <p>
+                  {{
+                    item.tipoTrabajo ||
+                    'Trabajo operativo'
+                  }}
+                </p>
+
+              </div>
+
+              <!-- =========================================
+                   DATOS PRINCIPALES
+              ========================================== -->
+
+              <div class="card-data-grid">
+
+                <div class="card-data-item">
+
+                  <span>Empleado</span>
+
+                  <strong>
+                    {{
+                      item.empleadoTexto ||
+                      'Sin empleado registrado'
+                    }}
+                  </strong>
+
+                </div>
+
+                <div class="card-data-item">
+
+                  <span>Fecha</span>
+
+                  <strong>
+                    {{
+                      item.fechaRegistroTexto ||
+                      item.fechaTexto ||
+                      'Sin fecha registrada'
+                    }}
+                  </strong>
+
+                </div>
+
+                <div class="card-data-item">
+
+                  <span>Materiales</span>
+
+                  <strong>
+                    {{ item.totalMateriales || 0 }}
+
+                    {{
+                      item.totalMateriales === 1
+                        ? 'material'
+                        : 'materiales'
+                    }}
+                  </strong>
+
+                </div>
+
+                <div class="card-data-item">
+
+                  <span>Cantidad devuelta</span>
+
+                  <strong>
+                    {{ item.totalDevuelto || 0 }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+              <!-- =========================================
+                   MATERIALES
+              ========================================== -->
+
+              <div
+                class="materials-preview"
+                *ngIf="
+                  (item.materiales || []).length > 0
+                "
               >
-                <ion-icon name="eye-outline"></ion-icon>
-              </button>
+
+                <div
+                  class="material-preview-item"
+                  *ngFor="
+                    let material of (item.materiales || [])
+                  "
+                >
+
+                  <div class="material-preview-info">
+
+                    <span>
+                      {{
+                        material.nombre ||
+                        'Material'
+                      }}
+                    </span>
+
+                    <small>
+                      Asignado:
+                      {{ material.cantidadAsignada || 0 }}
+                      {{ material.unidad || 'und' }}
+
+                      · Usado:
+                      {{ material.cantidadUsada || 0 }}
+                    </small>
+
+                  </div>
+
+                  <strong>
+                    Devuelto:
+                    {{ material.cantidadDevuelta || 0 }}
+                    {{ material.unidad || 'und' }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+              <!-- =========================================
+                   FECHA DE VALIDACIÓN
+              ========================================== -->
+
+              <div
+                class="validation-info"
+                *ngIf="
+                  item.estadoDevolucion === 'validada' &&
+                  item.fechaValidacionTexto
+                "
+              >
+                <ion-icon
+                  name="checkmark-circle-outline"
+                  aria-hidden="true"
+                ></ion-icon>
+
+                <span>
+                  Validada el
+                  {{ item.fechaValidacionTexto }}
+                </span>
+              </div>
+
+              <!-- =========================================
+                   OBSERVACIÓN
+              ========================================== -->
+
+              <div
+                class="observation-box"
+                *ngIf="item.observacionDevolucion"
+              >
+
+                <strong>Observación</strong>
+
+                <p>
+                  {{ item.observacionDevolucion }}
+                </p>
+
+              </div>
+
+            </div>
+
+            <!-- ===========================================
+                 PIE
+            ============================================ -->
+
+            <div class="card-bottom">
+
+              <span class="card-result">
+
+                <ng-container
+                  *ngIf="
+                    item.estadoDevolucion === 'pendiente';
+                    else devolucionValidada
+                  "
+                >
+                  Pendiente de validación
+                </ng-container>
+
+                <ng-template #devolucionValidada>
+                  Stock actualizado correctamente
+                </ng-template>
+
+              </span>
 
               <button
                 type="button"
                 class="btn-validate"
-                *ngIf="item.estadoDevolucion === 'pendiente'"
+                *ngIf="
+                  item.estadoDevolucion === 'pendiente'
+                "
+                [disabled]="estaValidando(item)"
                 (click)="validar(item)"
               >
-                Validar
+
+                <ion-spinner
+                  name="crescent"
+                  *ngIf="estaValidando(item)"
+                ></ion-spinner>
+
+                <ion-icon
+                  name="checkmark-circle-outline"
+                  *ngIf="!estaValidando(item)"
+                  aria-hidden="true"
+                ></ion-icon>
+
+                <span>
+                  {{
+                    estaValidando(item)
+                      ? 'Validando...'
+                      : 'Validar devolución'
+                  }}
+                </span>
+
               </button>
+
             </div>
-          </div>
 
-        </article>
+          </article>
 
-      </section>
-
-      <ng-template #sinDevoluciones>
-        <section class="empty-card">
-          <ion-icon name="cube-outline"></ion-icon>
-          <h3>Sin devoluciones</h3>
-          <p>No se encontraron registros para este filtro.</p>
         </section>
-      </ng-template>
+
+        <!-- ===============================================
+             SIN RESULTADOS
+        ================================================ -->
+
+        <ng-template #sinDevoluciones>
+
+          <section class="empty-card">
+
+            <ion-icon
+              name="cube-outline"
+              aria-hidden="true"
+            ></ion-icon>
+
+            <h3>Sin resultados</h3>
+
+            <p *ngIf="busqueda">
+              No se encontraron devoluciones relacionadas
+              con “{{ busqueda }}”.
+            </p>
+
+            <p
+              *ngIf="
+                !busqueda &&
+                vm.filtro === 'pendientes'
+              "
+            >
+              No existen devoluciones pendientes.
+            </p>
+
+            <p
+              *ngIf="
+                !busqueda &&
+                vm.filtro === 'validadas'
+              "
+            >
+              Todavía no existen devoluciones validadas.
+            </p>
+
+            <p
+              *ngIf="
+                !busqueda &&
+                vm.filtro === 'historial'
+              "
+            >
+              No existen registros en el historial.
+            </p>
+
+          </section>
+
+        </ng-template>
+
+      </ng-container>
+
+      <!-- =================================================
+           INFORMACIÓN
+      ================================================== -->
 
       <section class="info-box">
-        <ion-icon name="information-circle-outline"></ion-icon>
-        <p>
-          Las devoluciones validadas se suman automáticamente al stock del almacén.
-        </p>
+
+        <ion-icon
+          name="information-circle-outline"
+          aria-hidden="true"
+        ></ion-icon>
+
+        <div>
+
+          <strong>Actualización segura del stock</strong>
+
+          <p>
+            El stock solo aumenta cuando el código de
+            devolución es correcto.
+          </p>
+
+        </div>
+
       </section>
 
-    </div>
-
+    </main>
   </ng-container>
 
-  <app-admin-bottom-nav activo="mas"></app-admin-bottom-nav>
+  <!-- =====================================================
+       CARGA
+  ====================================================== -->
+
+  <ng-template #cargandoDevoluciones>
+
+    <main class="devoluciones-container">
+
+      <section class="empty-card loading-card">
+
+        <ion-spinner name="crescent"></ion-spinner>
+
+        <h3>Cargando devoluciones</h3>
+
+        <p>
+          Consultando trabajos con materiales sobrantes.
+        </p>
+
+      </section>
+
+    </main>
+
+  </ng-template>
+
+  <!-- =====================================================
+       BARRA INFERIOR
+  ====================================================== -->
+
+  <app-admin-bottom-nav
+    activo="mas"
+  ></app-admin-bottom-nav>
 
 </ion-content>

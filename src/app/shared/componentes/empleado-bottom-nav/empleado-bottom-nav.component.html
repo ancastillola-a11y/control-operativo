@@ -1,49 +1,115 @@
-<!--src/app/shared/componentes/empleado-bottom-nav/empleado-bottom-nav.component.html-->
-<nav class="empleado-bottom-nav">
+<!--
+  src/app/shared/componentes/empleado-bottom-nav/
+  empleado-bottom-nav.component.html
+-->
+
+<nav
+  class="empleado-bottom-nav"
+  aria-label="Navegación principal del empleado"
+>
+  <!-- =====================================================
+       INICIO
+  ====================================================== -->
 
   <button
     type="button"
+    class="empleado-bottom-nav__item"
     [class.active]="activo === 'inicio'"
+    [attr.aria-current]="activo === 'inicio' ? 'page' : null"
+    aria-label="Ir al inicio"
     (click)="inicioClick.emit()"
   >
-    <ion-icon name="home-outline"></ion-icon>
+    <ion-icon
+      name="home-outline"
+      aria-hidden="true"
+    ></ion-icon>
+
     <span>Inicio</span>
   </button>
 
+  <!-- =====================================================
+       TRABAJOS
+  ====================================================== -->
+
   <button
     type="button"
+    class="empleado-bottom-nav__item"
     [class.active]="activo === 'trabajos'"
+    [attr.aria-current]="activo === 'trabajos' ? 'page' : null"
+    aria-label="Ir a trabajos"
     (click)="trabajosClick.emit()"
   >
-    <ion-icon name="briefcase-outline"></ion-icon>
+    <ion-icon
+      name="briefcase-outline"
+      aria-hidden="true"
+    ></ion-icon>
+
     <span>Trabajos</span>
   </button>
 
+  <!-- =====================================================
+       DEVOLUCIONES
+
+       Es un módulo principal independiente.
+
+       Materiales en posesión es una vista interna del
+       proceso de devolución y no aparece como botón
+       independiente en esta barra.
+  ====================================================== -->
+
   <button
     type="button"
-    [class.active]="activo === 'materiales'"
-    (click)="materialesClick.emit()"
+    class="empleado-bottom-nav__item"
+    [class.active]="activo === 'devoluciones'"
+    [attr.aria-current]="activo === 'devoluciones' ? 'page' : null"
+    aria-label="Ir a devoluciones"
+    (click)="devolucionesClick.emit()"
   >
-    <ion-icon name="cube-outline"></ion-icon>
+    <ion-icon
+      name="return-up-back-outline"
+      aria-hidden="true"
+    ></ion-icon>
+
     <span>Devoluciones</span>
   </button>
 
+  <!-- =====================================================
+       HISTORIAL
+  ====================================================== -->
+
   <button
     type="button"
+    class="empleado-bottom-nav__item"
     [class.active]="activo === 'historial'"
+    [attr.aria-current]="activo === 'historial' ? 'page' : null"
+    aria-label="Ir al historial"
     (click)="historialClick.emit()"
   >
-    <ion-icon name="time-outline"></ion-icon>
+    <ion-icon
+      name="time-outline"
+      aria-hidden="true"
+    ></ion-icon>
+
     <span>Historial</span>
   </button>
 
+  <!-- =====================================================
+       PERFIL
+  ====================================================== -->
+
   <button
     type="button"
+    class="empleado-bottom-nav__item"
     [class.active]="activo === 'perfil'"
+    [attr.aria-current]="activo === 'perfil' ? 'page' : null"
+    aria-label="Abrir perfil"
     (click)="perfilClick.emit()"
   >
-    <ion-icon name="person-circle-outline"></ion-icon>
+    <ion-icon
+      name="person-circle-outline"
+      aria-hidden="true"
+    ></ion-icon>
+
     <span>Perfil</span>
   </button>
-
 </nav>

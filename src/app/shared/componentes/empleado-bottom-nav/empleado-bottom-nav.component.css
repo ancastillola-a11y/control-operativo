@@ -1,6 +1,7 @@
 /*src/app/shared/componentes/empleado-bottom-nav/empleado-bottom-nav.component.css*/
 :host {
   display: block;
+  width: 100%;
 }
 
 .empleado-bottom-nav {

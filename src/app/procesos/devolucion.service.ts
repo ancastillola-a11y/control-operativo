@@ -1,5 +1,9 @@
 ﻿// src/app/procesos/devolucion.service.ts
-import { Injectable, inject } from '@angular/core';
+
+import {
+  Injectable,
+  inject
+} from '@angular/core';
 
 import {
   BehaviorSubject,
@@ -12,7 +16,9 @@ import {
   shareReplay
 } from 'rxjs/operators';
 
-import { DevolucionDAO } from '../dao/devolucion.dao';
+import {
+  DevolucionDAO
+} from '../dao/devolucion.dao';
 
 import {
   DevolucionTrabajoVista,
@@ -37,26 +43,48 @@ export class DevolucionService {
     this.filtroSubject.asObservable()
   ]).pipe(
     map(([trabajos, filtro]) => {
-      const devoluciones = (trabajos || [])
-        .filter((trabajo: any) => trabajo?.eliminado !== true)
-        .filter((trabajo: any) => this.esTrabajoConDevolucionReal(trabajo))
-        .map((trabajo: any) => this.mapearDevolucion(trabajo))
-        .sort((a, b) => {
-          const ordenEstado =
-            this.ordenEstadoDevolucion(a.estadoDevolucion) -
-            this.ordenEstadoDevolucion(b.estadoDevolucion);
+      const devoluciones: DevolucionTrabajoVista[] =
+        (trabajos || [])
+          .filter(
+            (trabajo: any) =>
+              trabajo?.eliminado !== true
+          )
+          .filter(
+            (trabajo: any) =>
+              this.esTrabajoConDevolucionReal(trabajo)
+          )
+          .map(
+            (
+              trabajo: any
+            ): DevolucionTrabajoVista =>
+              this.mapearDevolucion(trabajo)
+          )
+          .sort(
+            (
+              a: DevolucionTrabajoVista,
+              b: DevolucionTrabajoVista
+            ) => {
+              const ordenEstado =
+                this.ordenEstadoDevolucion(
+                  a.estadoDevolucion
+                ) -
+                this.ordenEstadoDevolucion(
+                  b.estadoDevolucion
+                );
 
-          if (ordenEstado !== 0) {
-            return ordenEstado;
-          }
+              if (ordenEstado !== 0) {
+                return ordenEstado;
+              }
 
-          return b.uid.localeCompare(a.uid);
-        });
+              return b.uid.localeCompare(a.uid);
+            }
+          );
 
-      const devolucionesFiltradas = this.aplicarFiltro(
-        devoluciones,
-        filtro
-      );
+      const devolucionesFiltradas =
+        this.aplicarFiltro(
+          devoluciones,
+          filtro
+        );
 
       return {
         filtro,
@@ -64,15 +92,26 @@ export class DevolucionService {
         devoluciones,
         devolucionesFiltradas,
 
-        totalPendientes: devoluciones.filter(
-          (item) => item.estadoDevolucion === 'pendiente'
-        ).length,
+        totalPendientes:
+          devoluciones.filter(
+            (
+              item: DevolucionTrabajoVista
+            ) =>
+              item.estadoDevolucion ===
+              'pendiente'
+          ).length,
 
-        totalValidadas: devoluciones.filter(
-          (item) => item.estadoDevolucion === 'validada'
-        ).length,
+        totalValidadas:
+          devoluciones.filter(
+            (
+              item: DevolucionTrabajoVista
+            ) =>
+              item.estadoDevolucion ===
+              'validada'
+          ).length,
 
-        totalHistorial: devoluciones.length
+        totalHistorial:
+          devoluciones.length
       };
     }),
 
@@ -82,7 +121,9 @@ export class DevolucionService {
     })
   );
 
-  cambiarFiltro(filtro: FiltroDevolucion) {
+  cambiarFiltro(
+    filtro: FiltroDevolucion
+  ): void {
     this.filtroSubject.next(filtro);
   }
 
@@ -92,9 +133,14 @@ export class DevolucionService {
   ): Promise<void> {
     if (typeof data === 'string') {
       await this.dao.validarDevolucion({
-        trabajoUid: String(data || '').trim(),
-        codigoIngresado: String(codigo || '').trim(),
-        origenValidacion: 'administrador'
+        trabajoUid:
+          String(data || '').trim(),
+
+        codigoIngresado:
+          String(codigo || '').trim(),
+
+        origenValidacion:
+          'administrador'
       });
 
       return;
@@ -103,27 +149,51 @@ export class DevolucionService {
     await this.dao.validarDevolucion(data);
   }
 
+  /*
+   * ============================================================
+   * FILTRO DE LA VISTA
+   * ============================================================
+   */
+
   private aplicarFiltro(
     devoluciones: DevolucionTrabajoVista[],
     filtro: FiltroDevolucion
   ): DevolucionTrabajoVista[] {
     if (filtro === 'pendientes') {
       return devoluciones.filter(
-        (item) => item.estadoDevolucion === 'pendiente'
+        (
+          item: DevolucionTrabajoVista
+        ) =>
+          item.estadoDevolucion ===
+          'pendiente'
       );
     }
 
     if (filtro === 'validadas') {
       return devoluciones.filter(
-        (item) => item.estadoDevolucion === 'validada'
+        (
+          item: DevolucionTrabajoVista
+        ) =>
+          item.estadoDevolucion ===
+          'validada'
       );
     }
 
     return devoluciones;
   }
 
-  private esTrabajoConDevolucionReal(trabajo: any): boolean {
-    const estado = String(trabajo?.estado || '').trim();
+  /*
+   * ============================================================
+   * IDENTIFICAR TRABAJOS CON DEVOLUCIÓN
+   * ============================================================
+   */
+
+  private esTrabajoConDevolucionReal(
+    trabajo: any
+  ): boolean {
+    const estado = String(
+      trabajo?.estado || ''
+    ).trim();
 
     if (
       estado === 'devolucion_pendiente' ||
@@ -139,159 +209,325 @@ export class DevolucionService {
       return true;
     }
 
-    const materiales = Array.isArray(trabajo?.materialesAsignados)
-      ? trabajo.materialesAsignados
-      : [];
+    const materiales: any[] =
+      Array.isArray(
+        trabajo?.materialesAsignados
+      )
+        ? trabajo.materialesAsignados
+        : [];
 
-    return materiales.some((material: any) =>
-      Number(material?.cantidadDevuelta || 0) > 0
-    );
-  }
-
-  private mapearDevolucion(
-    trabajo: any
-  ): DevolucionTrabajoVista {
-    const materialesOriginales = Array.isArray(trabajo.materialesAsignados)
-      ? trabajo.materialesAsignados
-      : [];
-
-    const materiales: MaterialDevolucionVista[] = materialesOriginales
-      .map((item: any) => {
+    return materiales.some(
+      (material: any) => {
         const cantidadAsignada = Number(
-          item.cantidadAsignada ??
-          item.cantidad ??
+          material?.cantidadAsignada ??
+          material?.cantidad ??
           0
         );
 
         const cantidadUsada = Number(
-          item.cantidadUsada ??
-          item.usado ??
+          material?.cantidadUsada ??
+          material?.usado ??
+          0
+        );
+
+        const sobranteCalculado = Math.max(
+          cantidadAsignada - cantidadUsada,
           0
         );
 
         const cantidadDevuelta = Number(
-          item.cantidadDevuelta ??
-          0
+          material?.cantidadDevuelta ??
+          material?.cantidadRetornada ??
+          material?.cantidadSobrante ??
+          sobranteCalculado
         );
 
-        return {
-          materialUid: String(
-            item.materialUid ||
-            item.uid ||
-            item.id ||
-            ''
-          ),
+        return (
+          Number.isFinite(cantidadDevuelta) &&
+          cantidadDevuelta > 0
+        );
+      }
+    );
+  }
 
-          nombre: String(
-            item.nombre ||
-            item.materialNombre ||
-            'Material'
-          ),
+  /*
+   * ============================================================
+   * MAPEAR TRABAJO A DEVOLUCIÓN
+   * ============================================================
+   */
 
-          unidad: String(item.unidad || 'und'),
+  private mapearDevolucion(
+    trabajo: any
+  ): DevolucionTrabajoVista {
+    const materialesOriginales: any[] =
+      Array.isArray(
+        trabajo?.materialesAsignados
+      )
+        ? trabajo.materialesAsignados
+        : [];
 
-          cantidadAsignada,
-          cantidadUsada,
-          cantidadDevuelta,
+    const materiales: MaterialDevolucionVista[] =
+      materialesOriginales
+        .map(
+          (
+            item: any,
+            index: number
+          ): MaterialDevolucionVista => {
+            const cantidadAsignada = Number(
+              item?.cantidadAsignada ??
+              item?.cantidad ??
+              0
+            );
 
-          cantidadTexto:
-            `${cantidadDevuelta} ${String(item.unidad || 'und')}`
-        };
-      })
-      .filter((item: MaterialDevolucionVista) =>
-        item.materialUid &&
-        Number(item.cantidadDevuelta || 0) > 0
-      );
+            const cantidadUsada = Number(
+              item?.cantidadUsada ??
+              item?.usado ??
+              0
+            );
 
-    const estadoDevolucion: EstadoDevolucion =
-      trabajo.estado === 'devolucion_realizada' ||
-      trabajo.devolucionValidada === true
-        ? 'validada'
-        : 'pendiente';
+            const sobranteCalculado = Math.max(
+              cantidadAsignada -
+              cantidadUsada,
+              0
+            );
 
-    const empleados = Array.isArray(trabajo.empleadosAsignados)
-      ? trabajo.empleadosAsignados
-      : [];
+            const cantidadDevuelta = Number(
+              item?.cantidadDevuelta ??
+              item?.cantidadRetornada ??
+              item?.cantidadSobrante ??
+              sobranteCalculado
+            );
 
-    const empleadoTexto =
-      trabajo.empleadoDevolucionNombre ||
+            const materialUid = String(
+              item?.materialUid ||
+              item?.uid ||
+              item?.id ||
+              item?.materialId ||
+              ''
+            ).trim();
+
+            const unidad = String(
+              item?.unidad ||
+              'und'
+            ).trim();
+
+            const cantidadAsignadaNormalizada =
+              Number.isFinite(
+                cantidadAsignada
+              )
+                ? Math.max(
+                    cantidadAsignada,
+                    0
+                  )
+                : 0;
+
+            const cantidadUsadaNormalizada =
+              Number.isFinite(
+                cantidadUsada
+              )
+                ? Math.max(
+                    cantidadUsada,
+                    0
+                  )
+                : 0;
+
+            const cantidadDevueltaNormalizada =
+              Number.isFinite(
+                cantidadDevuelta
+              )
+                ? Math.max(
+                    cantidadDevuelta,
+                    0
+                  )
+                : 0;
+
+            return {
+              /*
+               * Los registros históricos pueden no tener
+               * materialUid. La clave temporal solo se usa
+               * para mostrar la información en pantalla.
+               */
+              materialUid:
+                materialUid ||
+                `historico-${index}`,
+
+              nombre: String(
+                item?.nombre ||
+                item?.materialNombre ||
+                'Material'
+              ).trim(),
+
+              unidad,
+
+              cantidadAsignada:
+                cantidadAsignadaNormalizada,
+
+              cantidadUsada:
+                cantidadUsadaNormalizada,
+
+              cantidadDevuelta:
+                cantidadDevueltaNormalizada,
+
+              cantidadTexto:
+                `${cantidadDevueltaNormalizada} ${unidad}`
+            };
+          }
+        )
+        .filter(
+          (
+            item: MaterialDevolucionVista
+          ): boolean =>
+            Number(
+              item.cantidadDevuelta || 0
+            ) > 0
+        );
+
+    const estadoDevolucion:
+      EstadoDevolucion =
+        trabajo?.estado ===
+          'devolucion_realizada' ||
+        trabajo?.devolucionValidada ===
+          true
+          ? 'validada'
+          : 'pendiente';
+
+    const empleados: any[] =
+      Array.isArray(
+        trabajo?.empleadosAsignados
+      )
+        ? trabajo.empleadosAsignados
+        : [];
+
+    const empleadoTexto = String(
+      trabajo?.empleadoDevolucionNombre ||
       (
         empleados.length > 0
           ? empleados
-              .map((empleado: any) =>
-                empleado.nombreCompleto ||
-                empleado.nombres ||
-                empleado.usuario ||
-                'Empleado'
+              .map(
+                (empleado: any) =>
+                  empleado?.nombreCompleto ||
+                  empleado?.nombres ||
+                  empleado?.usuario ||
+                  'Empleado'
               )
               .join(', ')
           : 'Sin empleado'
+      )
+    ).trim();
+
+    const totalDevuelto =
+      materiales.reduce(
+        (
+          total: number,
+          material:
+            MaterialDevolucionVista
+        ) =>
+          total +
+          Number(
+            material.cantidadDevuelta ||
+            0
+          ),
+        0
       );
 
-    const totalDevuelto = materiales.reduce(
-      (total, material) =>
-        total + Number(material.cantidadDevuelta || 0),
-      0
-    );
-
     return {
-      uid: String(trabajo.uid || trabajo.id || ''),
+      uid: String(
+        trabajo?.uid ||
+        trabajo?.id ||
+        ''
+      ).trim(),
 
-      codigoTrabajo: this.obtenerCodigoTrabajo(trabajo),
+      codigoTrabajo:
+        this.obtenerCodigoTrabajo(
+          trabajo
+        ),
 
       clienteNombre: String(
-        trabajo.clienteNombre ||
+        trabajo?.clienteNombre ||
         'Sin cliente'
-      ),
+      ).trim(),
 
       tipoTrabajo: String(
-        trabajo.tipoTrabajo ||
+        trabajo?.tipoTrabajo ||
         'Trabajo operativo'
-      ),
+      ).trim(),
 
       empleadoTexto,
 
-      fechaTexto: this.obtenerFechaTexto(trabajo),
+      fechaTexto:
+        this.obtenerFechaTexto(
+          trabajo
+        ),
 
-      codigoDevolucion: String(trabajo.codigoDevolucion || ''),
+      codigoDevolucion: String(
+        trabajo?.codigoDevolucion ||
+        ''
+      ).trim(),
 
-      estadoTrabajo: String(trabajo.estado || ''),
+      estadoTrabajo: String(
+        trabajo?.estado ||
+        ''
+      ).trim(),
 
       estadoDevolucion,
 
       estadoTexto:
-        estadoDevolucion === 'validada'
+        estadoDevolucion ===
+        'validada'
           ? 'Validada'
           : 'Pendiente',
 
-      totalMateriales: materiales.length,
+      totalMateriales:
+        materiales.length,
+
       totalDevuelto,
 
       materiales,
 
-      devolucionRegistrada: trabajo.devolucionRegistrada === true,
-      devolucionValidada: trabajo.devolucionValidada === true,
+      devolucionRegistrada:
+        trabajo?.devolucionRegistrada ===
+        true,
 
-      empleadoDevolucionUid: String(
-        trabajo.empleadoDevolucionUid ||
-        ''
-      ),
+      devolucionValidada:
+        trabajo?.devolucionValidada ===
+        true,
 
-      empleadoDevolucionNombre: String(
-        trabajo.empleadoDevolucionNombre ||
-        empleadoTexto ||
-        ''
-      ),
+      empleadoDevolucionUid:
+        String(
+          trabajo?.empleadoDevolucionUid ||
+          ''
+        ).trim(),
 
-      fechaRegistroTexto: this.obtenerFechaRegistroTexto(trabajo),
-      fechaValidacionTexto: this.obtenerFechaValidacionTexto(trabajo),
+      empleadoDevolucionNombre:
+        String(
+          trabajo?.empleadoDevolucionNombre ||
+          empleadoTexto ||
+          ''
+        ).trim(),
 
-      observacionDevolucion: String(
-        trabajo.observacionDevolucion ||
-        ''
-      )
+      fechaRegistroTexto:
+        this.obtenerFechaRegistroTexto(
+          trabajo
+        ),
+
+      fechaValidacionTexto:
+        this.obtenerFechaValidacionTexto(
+          trabajo
+        ),
+
+      observacionDevolucion:
+        String(
+          trabajo?.observacionDevolucion ||
+          ''
+        ).trim()
     };
   }
+
+  /*
+   * ============================================================
+   * ORDEN
+   * ============================================================
+   */
 
   private ordenEstadoDevolucion(
     estado: EstadoDevolucion
@@ -307,9 +543,24 @@ export class DevolucionService {
     return 99;
   }
 
-  private obtenerFechaTexto(trabajo: any): string {
-    const fecha = String(trabajo.fechaProgramada || '').trim();
-    const hora = String(trabajo.horaProgramada || '').trim();
+  /*
+   * ============================================================
+   * FECHAS
+   * ============================================================
+   */
+
+  private obtenerFechaTexto(
+    trabajo: any
+  ): string {
+    const fecha = String(
+      trabajo?.fechaProgramada ||
+      ''
+    ).trim();
+
+    const hora = String(
+      trabajo?.horaProgramada ||
+      ''
+    ).trim();
 
     if (fecha && hora) {
       return `${fecha} · ${hora}`;
@@ -322,55 +573,148 @@ export class DevolucionService {
     return 'Sin fecha';
   }
 
-  private obtenerFechaRegistroTexto(trabajo: any): string {
+  private obtenerFechaRegistroTexto(
+    trabajo: any
+  ): string {
     const fecha =
-      trabajo.fechaDevolucionRegistrada ||
-      trabajo.finalizadoAt ||
-      trabajo.updatedAt;
+      trabajo?.fechaDevolucionRegistrada ||
+      trabajo?.finalizadoAt ||
+      trabajo?.updatedAt;
 
-    return this.formatearFechaFirestore(fecha);
-  }
-
-  private obtenerFechaValidacionTexto(trabajo: any): string {
     return this.formatearFechaFirestore(
-      trabajo.fechaDevolucionValidada
+      fecha
     );
   }
 
-  private formatearFechaFirestore(fecha: any): string {
+  private obtenerFechaValidacionTexto(
+    trabajo: any
+  ): string {
+    return this.formatearFechaFirestore(
+      trabajo?.fechaDevolucionValidada
+    );
+  }
+
+  private formatearFechaFirestore(
+    fecha: any
+  ): string {
     if (!fecha) {
       return '';
     }
 
-    if (typeof fecha?.toDate === 'function') {
-      return fecha.toDate().toLocaleString('es-PE');
+    if (
+      typeof fecha?.toDate ===
+      'function'
+    ) {
+      return fecha
+        .toDate()
+        .toLocaleString('es-PE');
     }
 
     if (fecha instanceof Date) {
-      return fecha.toLocaleString('es-PE');
+      return fecha.toLocaleString(
+        'es-PE'
+      );
+    }
+
+    if (typeof fecha === 'string') {
+      const fechaConvertida =
+        new Date(fecha);
+
+      if (
+        !Number.isNaN(
+          fechaConvertida.getTime()
+        )
+      ) {
+        return fechaConvertida
+          .toLocaleString('es-PE');
+      }
     }
 
     return '';
   }
 
-  private obtenerCodigoTrabajo(trabajo: any): string {
-    const codigoDirecto = String(
-      trabajo.codigoTrabajo ||
-      trabajo.codigoSeguimiento ||
-      trabajo.codigo ||
-      ''
+  /*
+   * ============================================================
+   * CÓDIGO DE SEGUIMIENTO
+   * ============================================================
+   */
+
+  private obtenerCodigoTrabajo(
+    trabajo: any
+  ): string {
+    /*
+     * Este código identifica el trabajo.
+     * No es el código de devolución.
+     */
+
+    const candidatos = [
+      trabajo?.codigoSeguimiento,
+      trabajo?.codigoTrabajo,
+      trabajo?.codigo,
+      trabajo?.numero,
+      trabajo?.id
+    ]
+      .map(
+        (valor: unknown) =>
+          String(valor || '').trim()
+      )
+      .filter(
+        (valor: string) =>
+          valor.length > 0
+      );
+
+    const codigoValido =
+      candidatos.find(
+        (codigo: string) =>
+          /^T-\d{5}$/i.test(
+            codigo
+          )
+      );
+
+    if (codigoValido) {
+      return codigoValido
+        .toUpperCase();
+    }
+
+    /*
+     * Compatibilidad con trabajos antiguos
+     * que todavía no guardaron T-#####.
+     */
+    const base = String(
+      trabajo?.uid ||
+      trabajo?.id ||
+      trabajo?.clienteNombre ||
+      'TRABAJO'
     ).trim();
 
-    if (codigoDirecto) {
-      return codigoDirecto;
+    const numero =
+      this.generarNumeroDesdeTexto(
+        base
+      );
+
+    return `T-${String(numero).padStart(
+      5,
+      '0'
+    )}`;
+  }
+
+  private generarNumeroDesdeTexto(
+    texto: string
+  ): number {
+    let hash = 0;
+
+    for (
+      let indice = 0;
+      indice < texto.length;
+      indice++
+    ) {
+      hash =
+        ((hash << 5) - hash) +
+        texto.charCodeAt(indice);
+
+      hash |= 0;
     }
 
-    const uid = String(trabajo.uid || trabajo.id || '').trim();
-
-    if (!uid) {
-      return 'T-00000';
-    }
-
-    return `T-${uid.slice(0, 5).toUpperCase()}`;
+    return Math.abs(hash) % 100000;
   }
 }
